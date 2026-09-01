@@ -1,13 +1,6 @@
 export default function WhoWeArePage() {
   return (
-    <section style={{
-      width: 'min(1200px, calc(100% - 2rem))',
-      margin: 'clamp(2rem, 5vw, 4rem) auto',
-      display: 'grid',
-      gridTemplateColumns: '1.1fr 0.9fr',
-      gap: 'clamp(1.5rem, 3vw, 3rem)',
-      alignItems: 'center',
-    }}>
+    <section className="who-we-are-page">
       <div style={{
         display: 'flex',
         flexDirection: 'column',

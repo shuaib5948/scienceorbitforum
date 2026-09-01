@@ -13,7 +13,7 @@ export default function PeoplePage() {
         align="center"
       />
 
-      <section className="container section" style={{ paddingTop: 'var(--space-7)' }}>
+      <section className="container section people-page" style={{ paddingTop: 'var(--space-7)' }}>
         <h2 style={{
           margin: 0,
           fontFamily: 'var(--font-subhead)',
@@ -26,26 +26,12 @@ export default function PeoplePage() {
           Leadership
         </h2>
 
-        <div style={{ marginTop: 'var(--space-5)', display: 'grid', gap: 'var(--space-6)' }}>
-          <article style={{
-            display: 'grid',
-            gridTemplateColumns: 'minmax(210px, 0.8fr) minmax(0, 1.2fr)',
-            gap: 'clamp(1rem, 2vw, 2rem)',
-            alignItems: 'center',
-          }}>
-            <div style={{
-              width: '100%',
-              maxWidth: '300px',
-              aspectRatio: '4 / 5',
-              borderRadius: '18px',
-              overflow: 'hidden',
-              background: '#dfeaf8',
-              boxShadow: '0 14px 28px rgba(8,29,58,0.08)',
-            }}>
+        <div className="people-page__leadership-grid" style={{ marginTop: 'var(--space-5)' }}>
+          <article className="people-page__profile">
+            <div className="people-page__photo">
               <img
                 src={presidentImage}
                 alt="Portrait of M. Rasheed T. P."
-                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
               />
             </div>
 
@@ -83,12 +69,7 @@ export default function PeoplePage() {
             </div>
           </article>
 
-          <article style={{
-            display: 'grid',
-            gridTemplateColumns: 'minmax(0, 1.2fr) minmax(210px, 0.8fr)',
-            gap: 'clamp(1rem, 2vw, 2rem)',
-            alignItems: 'center',
-          }}>
+          <article className="people-page__profile people-page__profile--reverse">
             <div>
               <p style={{
                 margin: 0,
@@ -112,19 +93,10 @@ export default function PeoplePage() {
               </h3>
             </div>
 
-            <div style={{
-              width: '100%',
-              maxWidth: '300px',
-              aspectRatio: '4 / 5',
-              borderRadius: '18px',
-              overflow: 'hidden',
-              background: '#dfeaf8',
-              boxShadow: '0 14px 28px rgba(8,29,58,0.08)',
-            }}>
+            <div className="people-page__photo">
               <img
                 src={secretaryImage}
                 alt="Portrait of M. Shabeer U."
-                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
               />
             </div>
           </article>

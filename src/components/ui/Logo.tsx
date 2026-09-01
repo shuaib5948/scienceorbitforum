@@ -11,14 +11,14 @@ export interface LogoMarkProps {
 }
 
 /**
- * Science Orbit Forum mark — geometric orbital symbol.
+ * Science Orbit mark — geometric orbital symbol.
  * Uses the logo.png asset for consistent branding.
  */
 export function LogoMark({ size = 40, tone = 'light', className = '' }: LogoMarkProps) {
   return (
     <img
       src={logoImage}
-      alt="Science Orbit Forum mark"
+      alt="Science Orbit mark"
       width={size}
       height={size}
       className={`brand__mark ${className}`.trim()}
@@ -37,9 +37,9 @@ export interface LogoProps {
 }
 
 /**
- * Science Orbit Forum wordmark lockup.
+ * Science Orbit wordmark lockup.
  *
- * - `horizontal` : mark beside "SCIENCE ORBIT FORUM" in single color
+ * - `horizontal` : mark beside "SCIENCE ORBIT" in single color
  * - `icon`       : the mark alone (favicon / avatar / compact contexts)
  * - `stacked`    : mark above the wordmark
  */

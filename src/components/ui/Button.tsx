@@ -1,4 +1,5 @@
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from 'react';
+import { Link } from '@tanstack/react-router';
 
 export type ButtonVariant = 'primary' | 'navy' | 'secondary' | 'ghost' | 'inverse';
 export type ButtonSize = 'sm' | 'md' | 'lg';
@@ -55,6 +56,21 @@ export function ButtonLink({
   href,
   ...rest
 }: ButtonLinkProps) {
+  const isInternalRoute =
+    typeof href === 'string' &&
+    href.startsWith('/') &&
+    !href.startsWith('//') &&
+    !href.startsWith('/api');
+
+  if (isInternalRoute) {
+    return (
+      <Link to={href} className={classes(variant, size, className)} {...rest}>
+        {children}
+        {withArrow && <Arrow />}
+      </Link>
+    );
+  }
+
   return (
     <a href={href} className={classes(variant, size, className)} {...rest}>
       {children}

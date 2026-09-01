@@ -36,6 +36,65 @@
   display: grid;
   gap: var(--space-5);
 }
+
+.who-we-are-page,
+.mission-page,
+.vision-page {
+  width: min(1200px, calc(100% - 2rem));
+  margin: clamp(2rem, 5vw, 4rem) auto;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: clamp(1.5rem, 3vw, 3rem);
+  align-items: center;
+}
+
+.people-page__leadership-grid {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.people-page__profile {
+  display: grid;
+  grid-template-columns: minmax(210px, 0.8fr) minmax(0, 1.2fr);
+  gap: clamp(1rem, 2vw, 2rem);
+  align-items: center;
+}
+
+.people-page__profile--reverse {
+  grid-template-columns: minmax(0, 1.2fr) minmax(210px, 0.8fr);
+}
+
+.people-page__photo {
+  width: 100%;
+  max-width: 300px;
+  aspect-ratio: 4 / 5;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #dfeaf8;
+  box-shadow: 0 14px 28px rgba(8, 29, 58, 0.08);
+}
+
+.people-page__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .who-we-are-page,
+  .mission-page,
+  .vision-page,
+  .people-page__profile,
+  .people-page__profile--reverse {
+    grid-template-columns: 1fr;
+  }
+
+  .people-page__photo {
+    max-width: 100%;
+  }
+}
+
 @media (min-width: 768px) {
   .page__grid--people {
     grid-template-columns: repeat(2, 1fr);

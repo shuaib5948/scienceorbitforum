@@ -1,5 +1,5 @@
 /* =========================================================================
-   SCIENCE ORBIT FORUM — LAYOUT
+   SCIENCE ORBIT — LAYOUT
    Header, navigation, hero scaffold and footer.
    These establish the page chrome that later phases will reuse verbatim.
    ========================================================================= */
@@ -381,13 +381,9 @@
 /* Interior page hero — mirrors the home hero language */
 .page-hero {
   position: relative;
-  display: flex;
-  align-items: center;
-  min-height: 12vh;
   background: var(--color-bg-navy);
   color: var(--color-text-inverse);
   overflow: hidden;
-  border-bottom: 1px solid rgb(63 209 224 / 0.15);
 }
 
 .page-hero__orb {
@@ -399,31 +395,25 @@
 
 .page-hero__content {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 12vh;
-  padding-block: clamp(14px, 2vw, 26px);
 }
 
 .page-hero__title {
   font-family: var(--font-display);
-  font-size: clamp(1.45rem, 2.2vw, 2.2rem);
+  font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 700;
   text-wrap: balance;
-  line-height: 1.15;
+  line-height: var(--leading-h1);
   letter-spacing: var(--tracking-h1);
   color: #fff;
   max-width: 720px;
-  margin-top: var(--space-2);
+  margin-top: var(--space-4);
 }
 
 .page-hero__lede {
-  max-width: 640px;
-  margin-top: var(--space-2);
+  max-width: 560px;
+  margin-top: var(--space-4);
   color: var(--color-text-inverse-muted);
-  font-size: 0.96rem;
-  line-height: 1.5;
+  font-size: var(--text-body-large);
 }
 
 /* Centered masthead variant + seam rule */
@@ -440,7 +430,7 @@
 
 /* Dark opening bands get extra air — the color already carries weight */
 .page-hero--roomy .page-hero__content {
-  padding-block: clamp(24px, 4vw, 42px);
+  padding-block: clamp(110px, 12vw, 130px);
 }
 
 /* --------------------------------------------------------------------------

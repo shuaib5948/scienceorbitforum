@@ -19,14 +19,6 @@ import UpdatesPage from './pages/UpdatesPage';
 import UpdateDetailPage from './pages/UpdateDetailPage';
 import PeoplePage from './pages/PeoplePage';
 import JoinPage from './pages/JoinPage';
-import MembershipCategoriesPage from './pages/MembershipCategoriesPage';
-import InstitutionSubscriptionPage from './pages/InstitutionSubscriptionPage';
-import MembershipBenefitsPage from './pages/MembershipBenefitsPage';
-import MembershipRegulationsPage from './pages/MembershipRegulationsPage';
-import FundingSupportPage from './pages/FundingSupportPage';
-import PartnershipsPage from './pages/PartnershipsPage';
-import SponsorshipPage from './pages/SponsorshipPage';
-import SupportOurProgrammesPage from './pages/SupportOurProgrammesPage';
 import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
 import { DesignSystem } from './showcase/DesignSystem';
@@ -121,64 +113,10 @@ const peopleRoute = createRoute({
   component: PeoplePage,
 });
 
-const peopleAboutRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/about/people',
-  component: PeoplePage,
-});
-
 const joinRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/join',
   component: JoinPage,
-});
-
-const membershipCategoriesRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/membership-categories',
-  component: MembershipCategoriesPage,
-});
-
-const institutionSubscriptionRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/institution-subscription',
-  component: InstitutionSubscriptionPage,
-});
-
-const membershipBenefitsRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/membership-benefits',
-  component: MembershipBenefitsPage,
-});
-
-const membershipRegulationsRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/membership-regulations',
-  component: MembershipRegulationsPage,
-});
-
-const fundingSupportRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/funding-support',
-  component: FundingSupportPage,
-});
-
-const partnershipsRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/partnerships',
-  component: PartnershipsPage,
-});
-
-const sponsorshipRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/sponsorship',
-  component: SponsorshipPage,
-});
-
-const supportOurProgrammesRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/support-our-programmes',
-  component: SupportOurProgrammesPage,
 });
 
 const privacyRoute = createRoute({
@@ -209,16 +147,7 @@ const routeTree = rootRoute.addChildren([
   updatesRoute,
   updateDetailRoute,
   peopleRoute,
-  peopleAboutRoute,
   joinRoute,
-  membershipCategoriesRoute,
-  institutionSubscriptionRoute,
-  membershipBenefitsRoute,
-  membershipRegulationsRoute,
-  fundingSupportRoute,
-  partnershipsRoute,
-  sponsorshipRoute,
-  supportOurProgrammesRoute,
   privacyRoute,
   termsRoute,
   designSystemRoute,

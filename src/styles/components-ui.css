@@ -1509,6 +1509,7 @@
     display: none;
   }
 
+  .home-news__track,
   .home-news__grid {
     grid-template-columns: 1fr;
   }

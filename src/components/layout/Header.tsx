@@ -31,12 +31,12 @@ export interface HeaderNavSection {
 export const HEADER_NAV: HeaderNavSection[] = [
   {
     label:'About',
-    match: ['/who-we-are', '/mission', '/vision', '/people', '/about/people'],
+    match: ['/who-we-are', '/mission', '/vision', '/people'],
     items: [
       { label:'Who We Are',to:'/who-we-are' },
       { label:'Mission',to:'/mission' },
       { label:'Vision',to:'/vision' },
-      { label:'People',to:'/about/people' },
+      { label:'People',to:'/people' },
     ],
   },
   {
@@ -49,23 +49,22 @@ export const HEADER_NAV: HeaderNavSection[] = [
   },
   {
     label:'Membership',
-    match: ['/join', '/membership-categories', '/institution-subscription', '/membership-benefits', '/membership-regulations'],
+    match: ['/join'],
     items: [
-      { label:'Join Science Orbit Forum',to:'/join' },
-      { label:'Membership Categories', to:'/membership-categories' },
-      { label:'Institution Subscription', to:'/institution-subscription' },
-      { label:'Benefits', to:'/membership-benefits' },
-      { label:'Membership Regulations', to:'/membership-regulations' },
+      { label:'Join Science Orbit',to:'/join' },
+      { label:'Membership Categories', href:'#membership-categories' },
+      { label:'Benefits', href:'#membership-benefits' },
+      { label:'Membership Regulations',href:'#membership-regulations' },
     ],
   },
   {
     label:'Support',
-    match: ['/funding-support', '/partnerships', '/sponsorship', '/support-our-programmes'],
+    match: [],
     items: [
-      { label:'Funding & Support', to:'/funding-support' },
-      { label:'Partnerships', to:'/partnerships' },
-      { label:'Sponsorship', to:'/sponsorship' },
-      { label:'Support Our Programmes', to:'/support-our-programmes' },
+      { label:'Funding & Support',href:'#funding-and-support' },
+      { label:'Partnerships', href:'#partnerships' },
+      { label:'Sponsorship', href:'#sponsorship' },
+      { label:'Support Our Programmes',href:'#support-our-programmes' },
     ],
   },
 ];
@@ -159,7 +158,7 @@ export function Header() {
           .join(' ')}
       >
         <div className="container header__inner">
-          <Link to="/" aria-label="Science Orbit Forum — home">
+          <Link to="/" aria-label="Science Orbit — home">
             <Logo size={40} tone="light" />
           </Link>
 
@@ -243,7 +242,7 @@ export function Header() {
           <button className="drawer__backdrop" aria-label="Close navigation" onClick={close} />
           <nav id="mobile-nav" className="drawer__panel" aria-label="Mobile navigation">
             <div className="drawer__head">
-              <span className="drawer__title">SCIENCE ORBIT FORUM</span>
+              <span className="drawer__title">SCIENCE ORBIT</span>
               <button
                 ref={closeBtnRef}
                 type="button"
