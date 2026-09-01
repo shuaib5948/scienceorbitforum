@@ -1,0 +1,12 @@
+{
+  "server": {
+    "port": 4000,
+    "host": "0.0.0.0"
+  },
+  "site": {
+    "name": "Science Orbit Forum",
+    "shortName": "Science Orbit Forum",
+    "department": "Department of Science and Technology",
+    "institution": "Jamia Madeenathunnoor, Kerala, India"
+  }
+}

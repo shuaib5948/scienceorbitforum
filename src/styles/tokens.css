@@ -1,0 +1,188 @@
+/* =========================================================================
+   SCIENCE ORBIT FORUM — DESIGN TOKENS
+   Phase 1 · Visual identity & design foundation
+   -------------------------------------------------------------------------
+   These tokens are the single source of truth for colour, typography,
+   spacing, radius, shadow, grid, motion and component dimensions. Every
+   future page and component in the website should reference only these
+   custom properties (or their utility aliases) so the whole site stays
+   consistent and easy to re-skin.
+   ========================================================================= */
+
+/* --------------------------------------------------------------------------
+   BRAND FONT — Diavlo
+   Diavlo BOLD II 37 (OTF) is reserved for the brand name lockups
+   ("SCIENCE ORBIT FORUM" wordmark, mobile drawer title and the "Science Orbit Forum
+   Forum" hero eyebrow). Everything else keeps the Sora / Manrope / Inter
+   stacks below.
+   -------------------------------------------------------------------------- */
+@font-face {
+  font-family: 'Diavlo';
+  src: url('/fonts/Diavlo_BOLD_II_37.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* ------------------------------------------------------------------ */
+  /* 01 · COLOR — Brand palette                                          */
+  /* ------------------------------------------------------------------ */
+  --color-primary: #0b1b33;        /* Deep Navy — primary brand (spec)   */
+  --color-secondary: #1e4fd8;      /* Scientific Blue (spec)             */
+  --color-accent: #3fd1e0;         /* Cyan — energy / highlight (spec)   */
+
+  /* Background */
+  --color-bg: #f7f8fa;             /* Off-white page background (spec)    */
+  --color-bg-navy: #0b1b33;        /* Deep navy section background       */
+  --color-bg-ink: #06101f;         /* Almost-black navy for dark heroes  */
+
+  /* Surfaces */
+  --color-surface: #ffffff;
+  --color-surface-muted: #eef3f8;  /* Soft blue-tinted surface           */
+  --color-surface-blue: #e3eef8;   /* Ambient scientific-blue wash       */
+  --color-surface-cyan: #eaf6fb;   /* Subtle cyan wash                    */
+
+  /* Text */
+  --color-text: #111827;           /* Ink — body text on light (spec)     */
+  --color-text-muted: #6b7280;     /* Muted gray — secondary text (spec)  */
+  --color-text-faint: #7b8a9c;     /* Cool gray · secondary meta          */
+  --color-text-inverse: #f4f8fc;   /* On dark surfaces                     */
+  --color-text-inverse-muted: #b9c8d8;
+
+  /* Border */
+  --color-border: #d9e1ea;
+  --color-border-strong: #c3cdd9;
+
+  /* Link */
+  --color-link: var(--color-secondary);
+  --color-link-hover: var(--color-secondary-deep);
+
+  /* Interactive states */
+  --color-primary-hover: #0e2440;
+  --color-primary-active: #08192e;
+  --color-secondary-hover: #1a45c0;
+  --color-secondary-active: #16389c;
+  --color-secondary-deep: #2a5ce0;
+  --color-accent-hover: #38c9db;
+  --color-accent-active: #2eb9cc;
+  --color-disabled-bg: #d6dde6;
+  --color-disabled-text: #9aa6b4;
+
+  /* Orbital mark (logo accents) */
+  --color-orbit-core: var(--color-primary);
+  --color-orbit-path: var(--color-accent);
+
+  /* ------------------------------------------------------------------ */
+  /* 02 · TYPOGRAPHY                                                     */
+  /* Two families only: Manrope (display / headings), Inter (body).      */
+  /* ------------------------------------------------------------------ */
+  --font-display: 'Sora', 'Manrope', 'Segoe UI', sans-serif;
+  --font-subhead: 'Manrope', 'Segoe UI', sans-serif;
+  --font-body: 'Inter', 'Segoe UI', sans-serif;
+  --font-brand: 'Diavlo', 'Sora', 'Manrope', 'Segoe UI', sans-serif;
+
+  --text-overline: 11px;
+  --text-caption: 13px;
+  --text-body-small: 14px;
+  --text-body: 16px;
+  --text-body-large: 18px;
+  --text-h4: 22px;
+  --text-h3: 28px;
+  --text-h2: 38px;
+  --text-h1: 48px;
+  --text-display: 64px;
+
+  --tracking-display: -0.02em;
+  --tracking-h1: -0.018em;
+  --tracking-h2: -0.015em;
+  --tracking-h3: -0.01em;
+  --tracking-body: -0.01em;
+  --tracking-eyebrow: 0.12em;
+
+  --leading-display: 1.02;
+  --leading-h1: 1.06;
+  --leading-h2: 1.12;
+  --leading-h3: 1.2;
+  --leading-body: 1.6;
+  --leading-body-large: 1.55;
+
+  /* ------------------------------------------------------------------ */
+  /* 03 · SPACING — 4px base scale                                       */
+  /* ------------------------------------------------------------------ */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 80px;
+  --space-10: 96px;
+  --space-11: 128px;
+  --space-12: 160px;
+
+  /* ------------------------------------------------------------------ */
+  /* 04 · BORDER RADIUS                                                  */
+  /* ------------------------------------------------------------------ */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-pill: 999px;
+
+  /* ------------------------------------------------------------------ */
+  /* 05 · SHADOW                                                         */
+  /* ------------------------------------------------------------------ */
+  --shadow-xs: 0 1px 1px rgb(7 26 47 / 0.05);
+  --shadow-sm: 0 2px 6px rgb(7 26 47 / 0.07);
+  --shadow-md: 0 6px 18px rgb(7 26 47 / 0.1);
+  --shadow-lg: 0 16px 40px rgb(7 26 47 / 0.14);
+  --shadow-accent: 0 6px 18px rgb(30 79 216 / 0.16);
+
+  /* ------------------------------------------------------------------ */
+  /* 06 · GRID & CONTAINER                                               */
+  /* ------------------------------------------------------------------ */
+  --container-max: 1240px;
+  --gutter-desktop: 24px;
+  --gutter-tablet: 20px;
+  --gutter-mobile: 16px;
+  --grid-gap: 24px;
+  --columns-desktop: 12;
+  --columns-tablet: 8;
+  --columns-mobile: 4;
+  --card-gap: var(--space-5);
+  --section-pad-desktop: var(--space-10);
+  --section-pad-mobile: var(--space-8);
+
+  /* ------------------------------------------------------------------ */
+  /* 07 · COMPONENT DIMENSIONS                                          */
+  /* ------------------------------------------------------------------ */
+  /* Buttons */
+  --button-height-sm: 36px;
+  --button-height: 44px;
+  --button-height-lg: 52px;
+  --button-pad-x-sm: 14px;
+  --button-pad-x: 20px;
+  --button-pad-x-lg: 26px;
+  --button-stroke: 1.5px;
+  /* Icons */
+  --icon-xs: 14px;
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 24px;
+  --icon-xl: 32px;
+  /* Header / nav */
+  --header-height: 72px;
+  --header-height-scrolled: 60px;
+
+  /* ------------------------------------------------------------------ */
+  /* 08 · MOTION                                                         */
+  /* ------------------------------------------------------------------ */
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 500ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-standard: cubic-bezier(0.33, 0, 0.3, 1);
+}

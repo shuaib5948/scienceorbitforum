@@ -1,0 +1,11 @@
+# robots.txt for Science Orbit Forum
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://scienceorbitforum.org/sitemap.xml
+
+# Disallow specific paths if needed in the future
+# Disallow: /admin/
+# Disallow: /private/

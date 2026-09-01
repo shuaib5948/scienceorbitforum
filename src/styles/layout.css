@@ -1,0 +1,652 @@
+/* =========================================================================
+   SCIENCE ORBIT FORUM — LAYOUT
+   Header, navigation, hero scaffold and footer.
+   These establish the page chrome that later phases will reuse verbatim.
+   ========================================================================= */
+
+/* --------------------------------------------------------------------------
+   HEADER / NAVIGATION
+   -------------------------------------------------------------------------- */
+
+/* Sticky header — light bar (no overlay mode) */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 64px;
+  background-color: rgba(247, 249, 252, 0.98);
+  border-bottom: 1px solid var(--color-border);
+  transition:
+    background-color 200ms var(--ease-standard),
+    border-color 200ms var(--ease-standard),
+    box-shadow 200ms var(--ease-standard),
+    height 200ms var(--ease-standard);
+}
+
+/* When scrolled, add accent underline and subtle shadow */
+.header--scrolled {
+  border-bottom-color: var(--color-secondary);
+  box-shadow: 0 1px 12px rgb(0 0 0 / 0.06);
+}
+
+/* Header inner layout */
+.header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  height: 100%;
+  padding-inline: var(--space-5);
+}
+
+/* Desktop navigation */
+.nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.nav__list {
+  display: flex;
+  gap: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav__item {
+  position: relative;
+}
+
+/* Dropdown trigger button */
+.nav__trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  background: transparent;
+  border: none;
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-subhead);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-text);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: color var(--duration-base) var(--ease-standard);
+}
+
+.nav__trigger:hover {
+  color: var(--color-secondary);
+}
+
+.nav__trigger:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.nav__item[data-active] .nav__trigger {
+  color: var(--color-primary);
+}
+
+/* Caret rotation on open */
+.nav__caret {
+  transition: transform 200ms var(--ease-standard);
+}
+
+.nav__item--open .nav__caret {
+  transform: rotate(180deg);
+}
+
+/* Dropdown menu panel */
+.nav__dropdown {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  left: 0;
+  min-width: 200px;
+  background-color: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+  list-style: none;
+  margin: 0;
+  padding: var(--space-2) 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition:
+    opacity 200ms var(--ease-standard),
+    visibility 200ms var(--ease-standard),
+    transform 200ms var(--ease-standard);
+  pointer-events: none;
+}
+
+.nav__item--open .nav__dropdown,
+.nav__item:focus-within .nav__dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+@media (hover: hover) {
+  .nav__item:hover .nav__dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+}
+
+/* Dropdown link items */
+.nav__dropdown-link {
+  display: block;
+  padding: var(--space-2) var(--space-4);
+  color: var(--color-text);
+  text-decoration: none;
+  font-size: 14px;
+  transition: background-color 150ms var(--ease-standard);
+}
+
+.nav__dropdown-link:hover {
+  background-color: var(--color-surface-muted);
+}
+
+.nav__dropdown-link[data-active='true'] {
+  background-color: var(--color-surface-blue);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.nav__dropdown-link:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+/* Standalone Donate button in nav */
+.nav__donate {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* --------------------------------------------------------------------------
+   MOBILE HAMBURGER TOGGLE
+   -------------------------------------------------------------------------- */
+
+.header__toggle {
+  display: none;
+  width: 44px;
+  height: 44px;
+  padding: 8px;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-primary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 150ms var(--ease-standard);
+}
+
+.header__toggle:hover {
+  border-color: var(--color-secondary);
+}
+
+.header__toggle:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   MOBILE DRAWER NAVIGATION
+   -------------------------------------------------------------------------- */
+
+.drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: none;
+  flex-direction: column;
+}
+
+.drawer__backdrop {
+  flex: 1;
+  background-color: rgb(7 26 47 / 0.4);
+  backdrop-filter: blur(2px);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.drawer__panel {
+  position: relative;
+  width: 100%;
+  max-width: 85vw;
+  max-height: 100vh;
+  background-color: var(--color-bg-navy);
+  color: var(--color-text-inverse);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  box-shadow: -1px 0 8px rgb(0 0 0 / 0.2);
+}
+
+.drawer__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-5);
+  border-bottom: 1px solid rgb(244 248 252 / 0.1);
+}
+
+.drawer__title {
+  font-family: var(--font-brand);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #fff;
+}
+
+.drawer__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgb(255 255 255 / 0.2);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  transition:
+    border-color 150ms var(--ease-standard),
+    background-color 150ms var(--ease-standard);
+}
+
+.drawer__close:hover {
+  border-color: var(--color-accent);
+  background-color: rgb(255 255 255 / 0.05);
+}
+
+.drawer__close:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Navigation groups/sections in drawer */
+.drawer__groups {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: var(--space-4) 0;
+  overflow-y: auto;
+}
+
+.drawer__group {
+  border-bottom: 1px solid rgb(244 248 252 / 0.08);
+}
+
+/* Drawer section header (accordion trigger) */
+.drawer__section {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  background: transparent;
+  border: none;
+  color: var(--color-text-inverse);
+  font-family: var(--font-subhead);
+  font-size: 16px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 150ms var(--ease-standard);
+}
+
+.drawer__section:hover {
+  background-color: rgb(244 248 252 / 0.06);
+}
+
+.drawer__section:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+}
+
+/* Caret rotation on section open */
+.drawer__caret {
+  transition: transform 200ms var(--ease-standard);
+}
+
+.drawer__caret--open {
+  transform: rotate(180deg);
+}
+
+/* Submenu items (accordion content) */
+.drawer__sub {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background-color: rgb(244 248 252 / 0.03);
+}
+
+.drawer__link {
+  display: flex;
+  align-items: center;
+  padding: var(--space-3) var(--space-5) var(--space-3) calc(var(--space-5) + var(--space-2));
+  color: var(--color-text-inverse);
+  text-decoration: none;
+  font-family: var(--font-subhead);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.5;
+  border-left: 2px solid transparent;
+  border-left-color: rgb(63 209 224 / 0);
+  transition:
+    background-color 150ms var(--ease-standard),
+    border-left-color 150ms var(--ease-standard),
+    color 150ms var(--ease-standard);
+}
+
+.drawer__link:hover {
+  background-color: rgb(244 248 252 / 0.08);
+  color: var(--color-accent);
+  border-left-color: var(--color-accent);
+}
+
+.drawer__link[data-active='true'] {
+  color: var(--color-accent);
+  font-weight: 600;
+  background-color: rgb(244 248 252 / 0.1);
+  border-left-color: var(--color-accent);
+}
+
+.drawer__link:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+}
+
+/* Action buttons area at bottom of drawer */
+.drawer__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-5);
+  border-top: 1px solid rgb(244 248 252 / 0.1);
+  margin-top: auto;
+}
+
+/* Interior page hero — mirrors the home hero language */
+.page-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 12vh;
+  background: var(--color-bg-navy);
+  color: var(--color-text-inverse);
+  overflow: hidden;
+  border-bottom: 1px solid rgb(63 209 224 / 0.15);
+}
+
+.page-hero__orb {
+  position: absolute;
+  inset: 0;
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+.page-hero__content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 12vh;
+  padding-block: clamp(14px, 2vw, 26px);
+}
+
+.page-hero__title {
+  font-family: var(--font-display);
+  font-size: clamp(1.45rem, 2.2vw, 2.2rem);
+  font-weight: 700;
+  text-wrap: balance;
+  line-height: 1.15;
+  letter-spacing: var(--tracking-h1);
+  color: #fff;
+  max-width: 720px;
+  margin-top: var(--space-2);
+}
+
+.page-hero__lede {
+  max-width: 640px;
+  margin-top: var(--space-2);
+  color: var(--color-text-inverse-muted);
+  font-size: 0.96rem;
+  line-height: 1.5;
+}
+
+/* Centered masthead variant + seam rule */
+.page-hero__content--center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.page-hero--seam {
+  border-bottom: 1px solid rgb(63 209 224 / 0.15);
+}
+
+/* Dark opening bands get extra air — the color already carries weight */
+.page-hero--roomy .page-hero__content {
+  padding-block: clamp(24px, 4vw, 42px);
+}
+
+/* --------------------------------------------------------------------------
+   FOOTER
+   -------------------------------------------------------------------------- */
+.footer {
+  background-color: var(--color-bg-navy);
+  color: var(--color-text-inverse);
+  border-top: 1px solid rgb(63 209 224 / 0.3);
+}
+
+.footer__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--grid-gap);
+}
+
+.footer__brand {
+  grid-column: span 1;
+}
+
+.footer__col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.footer__heading {
+  font-family: var(--font-subhead);
+  font-size: var(--text-caption);
+  font-weight: 700;
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--color-text-inverse-muted);
+}
+
+.footer__link {
+  color: var(--color-text-inverse-muted);
+  font-size: var(--text-body-small);
+  text-decoration: none;
+}
+
+.footer__link:hover {
+  color: var(--color-accent);
+}
+
+.footer__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-top: var(--space-7);
+  padding-block-start: var(--space-5);
+}
+
+.footer__note {
+  font-size: var(--text-body-small);
+  color: var(--color-text-inverse-muted);
+}
+
+.footer__social {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.footer__social .social-icon {
+  background-color: rgb(244 248 252 / 0.08);
+  color: var(--color-text-inverse-muted);
+}
+
+.footer__social .social-icon:hover {
+  background-color: var(--color-accent);
+  color: var(--color-primary);
+}
+
+.footer__tagline {
+  margin-top: var(--space-4);
+  font-size: var(--text-body-small);
+  color: var(--color-text-inverse-muted);
+  max-width: 260px;
+  line-height: var(--leading-body);
+}
+
+.footer__contact {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.footer__contact svg {
+  color: var(--color-accent);
+  flex-shrink: 0;
+}
+/* --------------------------------------------------------------------------
+   BUTTON BLOCK (full-width utility)
+   -------------------------------------------------------------------------- */
+.btn--block {
+  width: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   DRAWER BACKDROP
+   -------------------------------------------------------------------------- */
+.drawer__backdrop {
+  position: absolute;
+  inset: 0;
+  background-color: rgb(7 26 47 / 0.55);
+  backdrop-filter: blur(3px);
+  border: 0;
+  padding: 0;
+}
+
+.drawer__panel {
+  position: relative;
+}
+
+/* --------------------------------------------------------------------------
+   RESPONSIVE RULES — grid, container, header, footer
+   Desktop  > 1024 : 12 columns · Tablet 640–1024 : 8 · Mobile < 640 : 4
+   -------------------------------------------------------------------------- */
+
+/* Tablet and below: show hamburger, hide desktop nav, show drawer */
+@media (max-width: 1023px) {
+  :root {
+    --section-pad-desktop: var(--space-8);
+  }
+
+  .container {
+    padding-inline: var(--gutter-tablet);
+  }
+
+  .footer__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .nav {
+    display: none;
+  }
+
+  .header__toggle {
+    display: inline-flex;
+  }
+
+  .drawer {
+    display: flex;
+  }
+
+  .drawer__panel {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --section-pad-desktop: var(--space-8);
+  }
+
+  .container {
+    padding-inline: var(--gutter-mobile);
+  }
+
+  .footer__grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+
+  .footer__bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header {
+    height: 56px;
+  }
+
+  .header__inner {
+    padding-inline: var(--space-3);
+  }
+
+  .drawer__title {
+    font-size: 16px;
+  }
+
+  .drawer__section {
+    font-size: 15px;
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .drawer__link {
+    font-size: 14px;
+    padding: var(--space-2) var(--space-4) var(--space-2) calc(var(--space-4) + var(--space-1));
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .header,
+  .nav__caret,
+  .nav__dropdown,
+  .nav__trigger,
+  .nav__dropdown-link,
+  .drawer__section,
+  .drawer__link,
+  .drawer__caret,
+  .header__toggle {
+    transition: none !important;
+  }
+}

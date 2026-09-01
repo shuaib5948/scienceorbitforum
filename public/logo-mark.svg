@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56" role="img" aria-label="Science Orbit mark">
+  <!-- orbital ring -->
+  <circle cx="28" cy="28" r="19" fill="none" stroke="#1261A0" stroke-width="2.6" />
+  <!-- tilted orbital path -->
+  <ellipse
+    cx="28"
+    cy="28"
+    rx="24"
+    ry="10"
+    fill="none"
+    stroke="#18B6D9"
+    stroke-width="1.8"
+    transform="rotate(-24 28 28)"
+  />
+  <!-- central node -->
+  <circle cx="28" cy="28" r="4" fill="#071A2F" />
+  <!-- orbiting node -->
+  <circle cx="50.5" cy="18" r="2.8" fill="#18B6D9" />
+  <!-- constellation counter-node -->
+  <circle cx="6" cy="38" r="1.9" fill="#071A2F" opacity="0.65" />
+</svg>
