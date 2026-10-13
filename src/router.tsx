@@ -75,17 +75,21 @@ const rootRoute = createRootRoute({
 function RootComponent() {
   const { pathname } = useLocation();
   const subdomain = getActiveSubdomain();
-  const isStandaloneIcrast =
-    pathname.startsWith('/icrast') || subdomain === 'icrast';
+  const isStandalone =
+    pathname.startsWith('/icrast') ||
+    subdomain === 'icrast' ||
+    pathname.startsWith('/festival') ||
+    subdomain === 'festival' ||
+    pathname === '/events/science-festival-2026';
 
   return (
     <>
       <SkipLink />
-      {!isStandaloneIcrast && <Header />}
+      {!isStandalone && <Header />}
       <main id="main" tabIndex={-1}>
         <Outlet />
       </main>
-      {!isStandaloneIcrast && <Footer />}
+      {!isStandalone && <Footer />}
     </>
   );
 }
@@ -123,6 +127,12 @@ const icrastSubmitRoute = createRoute({
 const festivalRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/festival',
+  component: FestivalPortalPage,
+});
+
+const scienceFestivalAliasRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/events/science-festival-2026',
   component: FestivalPortalPage,
 });
 
@@ -211,6 +221,7 @@ const routeTree = rootRoute.addChildren([
   icrastVenueRoute,
   icrastSubmitRoute,
   festivalRoute,
+  scienceFestivalAliasRoute,
   whoWeAreRoute,
   missionRoute,
   visionRoute,

@@ -1,6 +1,5 @@
-import { Reveal } from '../components/ui/Reveal';
-import { OrbOrnament } from '../components/ui/OrbOrnament';
-import { Calendar, MapPin, Sparkles, Atom, Cpu, Compass, CheckCircle2, ArrowLeft, Rocket, Users, Award } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ArrowLeft, Calendar, MapPin, Sparkles, ExternalLink, Compass } from 'lucide-react';
 
 function getMainSiteUrl(): string {
   if (typeof window === 'undefined') return '/';
@@ -10,258 +9,297 @@ function getMainSiteUrl(): string {
   if (baseHost !== hostname) {
     return `${protocol}//${baseHost}${portSuffix}`;
   }
-  return '/events';
+  return '/';
 }
+
+function getIcrastUrl(): string {
+  if (typeof window === 'undefined') return '/icrast';
+  const { protocol, hostname, port } = window.location;
+  const baseHost = hostname.replace(/^(icrast|festival)\./i, '');
+  const portSuffix = port ? `:${port}` : '';
+  if (hostname.startsWith('festival.')) {
+    return `${protocol}//icrast.${baseHost}${portSuffix}`;
+  }
+  return '/icrast';
+}
+
+interface Pillar {
+  colorName: string;
+  hex: string;
+  title: string;
+  subtitle: string;
+  description: string;
+}
+
+const festivalPillars: Pillar[] = [
+  {
+    colorName: 'Peach Yellow',
+    hex: '#ffbd59',
+    title: 'PERSPECTIVE & UNITY',
+    subtitle: 'Interdisciplinary Collaboration',
+    description:
+      'Uniting diverse viewpoints, scientific disciplines, students, researchers, and public communities into a cohesive culture of curiosity and shared discovery.',
+  },
+  {
+    colorName: 'Vivid Blue',
+    hex: '#5170ff',
+    title: 'CONTINUUM & DISCOVERY',
+    subtitle: 'The Continuum of Life',
+    description:
+      'Tracing the magnificent scientific bridge from the smallest subatomic building blocks of matter to the boundless complexity of living organisms and ecosystems.',
+  },
+  {
+    colorName: 'Bright Red',
+    hex: '#ff3131',
+    title: 'RESEARCH FOUNDATIONAL INTEGRATION',
+    subtitle: 'Rigorous Academic Inquiry',
+    description:
+      'Rooting exploration in fundamental sciences, evidence-based research, and the synthesis of foundational knowledge to tackle pressing global challenges.',
+  },
+  {
+    colorName: 'Cobalt Blue',
+    hex: '#002aad',
+    title: 'TECHNOLOGY & INNOVATION',
+    subtitle: 'Frontier Solutions',
+    description:
+      'Accelerating modern technologies, computational intelligence, biotechnology, functional materials, and engineering paradigms that advance human well-being.',
+  },
+  {
+    colorName: 'Coral Red',
+    hex: '#ff5757',
+    title: 'EXPLORATION & EXPERIMENTATION',
+    subtitle: 'Hands-on Science',
+    description:
+      'Encouraging direct laboratory experimentation, open maker workshops, scientific exhibitions, and fearless inquiry beyond the classroom.',
+  },
+];
 
 export default function FestivalPortalPage() {
   const mainSiteUrl = getMainSiteUrl();
+  const icrastUrl = getIcrastUrl();
 
-  const zones = [
-    {
-      icon: Atom,
-      title: 'Live Science & Physics Pavilions',
-      desc: 'Hands-on experimental zones demonstrating optics, electromagnetism, fluid dynamics, and chemical reactions in real time.',
-    },
-    {
-      icon: Cpu,
-      title: 'Robotics, AI & Maker Arena',
-      desc: 'Student-built autonomous robots, IoT prototypes, coding challenges, and hardware hackathons solving real-world problems.',
-    },
-    {
-      icon: Compass,
-      title: 'Astronomy & Space Exploration Dome',
-      desc: 'Solar observation sessions, evening telescope sky-watching, astrophotography exhibitions, and space science talks.',
-    },
-    {
-      icon: Sparkles,
-      title: 'Inter-Institutional Project Expo',
-      desc: 'Flagship competition showcasing working models and research posters by high school, undergraduate, and postgraduate teams.',
-    },
-  ];
+  // Simple animated progress simulation for the loading feel
+  const [progress, setProgress] = useState(68);
 
-  const scheduleDays = [
-    {
-      day: 'Day 01 · 15 March 2026',
-      title: 'Grand Inauguration & Exhibition Opening',
-      events: 'Inaugural ceremony, keynote address, opening of Science Pavilions, and School Innovation Showcase.',
-    },
-    {
-      day: 'Day 02 · 16 March 2026',
-      title: 'Workshops, Hackathons & Evening Sky Watch',
-      events: 'Live STEM workshops, Robotics & Coding Sprint, Public Science Talks, and night-sky telescope session.',
-    },
-    {
-      day: 'Day 03 · 17 March 2026',
-      title: 'Final Evaluations & Science Orbit Awards',
-      events: 'Project judging by academic panel, Science Quiz Grand Finale, Valedictory ceremony & Innovation Awards.',
-    },
-  ];
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setProgress((prev) => (prev >= 94 ? 68 : prev + 2));
+    }, 1800);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
-    <div className="subdomain-portal subdomain-portal--festival">
-      {/* Hero Banner */}
-      <section className="subdomain-hero subdomain-hero--festival">
-        <div className="subdomain-hero__orb" aria-hidden="true">
-          <OrbOrnament />
-        </div>
+    <div className="festival-coming-soon">
+      {/* Dynamic atmospheric color glows */}
+      <div className="festival-aura" aria-hidden="true">
+        <div className="festival-aura__orb festival-aura__orb--yellow" />
+        <div className="festival-aura__orb festival-aura__orb--vivid-blue" />
+        <div className="festival-aura__orb festival-aura__orb--bright-red" />
+        <div className="festival-aura__orb festival-aura__orb--cobalt-blue" />
+        <div className="festival-aura__orb festival-aura__orb--coral-red" />
+        <div className="festival-aura__grid-mesh" />
+      </div>
 
-        <div className="container subdomain-hero__inner">
-          <Reveal>
-            <div className="subdomain-hero__top-bar">
-              <a href={mainSiteUrl} className="subdomain-hero__back-link">
-                <ArrowLeft size={16} />
-                <span>Science Orbit Forum</span>
-              </a>
-              <span className="subdomain-hero__domain-pill">festival.scienceorbitforum.org</span>
-            </div>
+      {/* Top Navigation Bar */}
+      <header className="festival-nav">
+        <div className="festival-nav__container">
+          <a href={mainSiteUrl} className="festival-nav__back">
+            <ArrowLeft size={16} />
+            <span>Science Orbit Forum</span>
+          </a>
 
-            <div className="subdomain-hero__badges">
-              <span className="subdomain-badge subdomain-badge--cyan">Flagship Annual Festival</span>
-              <span className="subdomain-badge subdomain-badge--outline">3 Days · Open to All</span>
-            </div>
+          <div className="festival-nav__badge-wrap">
+            <span className="festival-domain-pill">festival.scienceorbitforum.org</span>
+          </div>
 
-            <h1 className="subdomain-hero__title">
-              Science Orbit Festival 2026
-            </h1>
-            <p className="subdomain-hero__subtitle">
-              A Three-Day Celebration of Scientific Curiosity, Live Experiments, Exhibitions &amp; Collaborative Discovery
-            </p>
-
-            <div className="subdomain-hero__meta-grid">
-              <div className="subdomain-hero__meta-card">
-                <Calendar size={20} className="subdomain-hero__meta-icon" />
-                <div>
-                  <span className="subdomain-hero__meta-label">Dates</span>
-                  <strong className="subdomain-hero__meta-value">15 – 17 March 2026</strong>
-                </div>
-              </div>
-
-              <div className="subdomain-hero__meta-card">
-                <MapPin size={20} className="subdomain-hero__meta-icon" />
-                <div>
-                  <span className="subdomain-hero__meta-label">Venue</span>
-                  <strong className="subdomain-hero__meta-value">Main Campus Grounds &amp; Science Pavilions</strong>
-                </div>
-              </div>
-
-              <div className="subdomain-hero__meta-card">
-                <Users size={20} className="subdomain-hero__meta-icon" />
-                <div>
-                  <span className="subdomain-hero__meta-label">Participation</span>
-                  <strong className="subdomain-hero__meta-value">Students, Researchers, Educators &amp; Public</strong>
-                </div>
-              </div>
-            </div>
-
-            <div className="subdomain-hero__actions">
-              <a href="#register-festival" className="subdomain-btn subdomain-btn--primary">
-                <Rocket size={17} />
-                <span>Register Exhibit / Attend</span>
-              </a>
-              <a href="#festival-zones" className="subdomain-btn subdomain-btn--ghost">
-                <Sparkles size={17} />
-                <span>Explore Festival Zones</span>
-              </a>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* About & Schedule */}
-      <section className="subdomain-section">
-        <div className="container">
-          <div className="subdomain-split">
-            <Reveal>
-              <span className="subdomain-eyebrow">About the Festival</span>
-              <h2 className="subdomain-heading">Where Science Comes Alive Beyond the Classroom</h2>
-              <div className="subdomain-feature-image-wrap">
-                <img
-                  src="/images/science-orbit-festival.jpg"
-                  alt="Science Orbit Festival 2026 Exhibition Hall"
-                  className="subdomain-feature-image"
-                />
-              </div>
-              <p className="subdomain-text">
-                <strong>Science Orbit Festival 2026</strong> is our flagship three-day public science gathering designed to spark wonder, hands-on experimentation, and interdisciplinary dialogue among students, researchers, and the wider community.
-              </p>
-              <p className="subdomain-text">
-                Featuring interactive pavilions, live laboratory demonstrations, student project competitions, and evening astronomy sessions, the festival transforms complex scientific concepts into engaging, memorable experiences for all ages.
-              </p>
-
-              <div className="subdomain-highlights-list">
-                <div className="subdomain-highlight-item">
-                  <CheckCircle2 size={18} />
-                  <span>50+ interactive student exhibitions &amp; live science booths</span>
-                </div>
-                <div className="subdomain-highlight-item">
-                  <CheckCircle2 size={18} />
-                  <span>Hands-on workshops in physics, chemistry, robotics &amp; astronomy</span>
-                </div>
-                <div className="subdomain-highlight-item">
-                  <CheckCircle2 size={18} />
-                  <span>Open entry for school groups, families &amp; science enthusiasts</span>
-                </div>
-              </div>
-            </Reveal>
-
-            {/* 3-Day Schedule Overview */}
-            <Reveal delay={100}>
-              <div className="subdomain-timeline-card">
-                <div className="subdomain-timeline-card__header">
-                  <Calendar size={20} />
-                  <h3>3-Day Programme Overview</h3>
-                </div>
-                <div className="subdomain-timeline-list">
-                  {scheduleDays.map((item) => (
-                    <div key={item.day} className="subdomain-timeline-item">
-                      <div className="subdomain-timeline-item__dot" />
-                      <div className="subdomain-timeline-item__body">
-                        <span className="subdomain-timeline-item__status">{item.day}</span>
-                        <h4>{item.title}</h4>
-                        <p>{item.events}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Reveal>
+          <div className="festival-nav__links">
+            <a href={icrastUrl} className="festival-nav__link">
+              <span>ICRAST-26</span>
+              <ExternalLink size={13} />
+            </a>
+            <a href="/join" className="festival-nav__link festival-nav__link--cta">
+              Join Forum
+            </a>
           </div>
         </div>
-      </section>
+      </header>
 
-      {/* Festival Zones */}
-      <section id="festival-zones" className="subdomain-section subdomain-section--muted">
-        <div className="container">
-          <Reveal>
-            <div className="subdomain-section-header">
-              <span className="subdomain-eyebrow">Experiences &amp; Pavilions</span>
-              <h2 className="subdomain-heading">Featured Festival Zones</h2>
-              <p className="subdomain-lede">
-                Discover four dedicated experiential zones across the campus grounds:
+      {/* Hero & Loading Stage */}
+      <main className="festival-hero">
+        <div className="festival-hero__container">
+          {/* Official Festival Logo Emblem */}
+          <div className="festival-logo-frame">
+            <div className="festival-logo-frame__ring" aria-hidden="true" />
+            <div className="festival-logo-frame__inner">
+              <img
+                src="/images/science-festival-logo.png"
+                alt="Science Orbit Festival 2K26 Logo"
+                className="festival-logo-img"
+              />
+            </div>
+          </div>
+
+          {/* Status Badge */}
+          <div className="festival-status-badge">
+            <span className="festival-status-dot" />
+            <span className="festival-status-text">COMING SOON · DECEMBER 2026</span>
+          </div>
+
+          {/* Title and Theme */}
+          <h1 className="festival-title">
+            <span className="festival-title__main">Science Orbit Festival 2K26</span>
+            <span className="festival-title__code">SOF-26</span>
+          </h1>
+
+          <p className="festival-theme-quote">
+            <span className="festival-theme-quote__mark">“</span>
+            From Atoms to Ecosystems: The Continuum of Life
+            <span className="festival-theme-quote__mark">”</span>
+          </p>
+
+          <p className="festival-lede">
+            Science Orbit Forum has launched <strong>Science Orbit Festival 2K26 (SOF-26)</strong>,
+            a premier multi-month celebration of scientific curiosity, interdisciplinary research, and discovery.
+            Culminating in <strong>December 2026 in Kozhikode (Calicut), Kerala</strong>.
+          </p>
+
+          {/* Simulated Loading & Initialization Bar */}
+          <div className="festival-loader-box">
+            <div className="festival-loader-header">
+              <span className="festival-loader-label">
+                <Sparkles size={14} className="festival-loader-sparkle" />
+                <span>Portal &amp; Programme Modules Loading</span>
+              </span>
+              <span className="festival-loader-percent">{progress}%</span>
+            </div>
+
+            <div className="festival-loader-track" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100}>
+              <div
+                className="festival-loader-bar"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+
+            <div className="festival-loader-footer">
+              <span className="festival-loader-subtext">
+                Assembling Pavilions · Student Expos · Workshops · Scientific Dialogues
+              </span>
+            </div>
+          </div>
+
+          {/* Quick Info Grid */}
+          <div className="festival-meta-strip">
+            <div className="festival-meta-cell">
+              <Calendar size={17} className="festival-meta-cell__icon" />
+              <div>
+                <span className="festival-meta-cell__label">Festival Timeline</span>
+                <strong className="festival-meta-cell__val">Oct 2026 – Dec 2026</strong>
+              </div>
+            </div>
+
+            <div className="festival-meta-cell">
+              <MapPin size={17} className="festival-meta-cell__icon" />
+              <div>
+                <span className="festival-meta-cell__label">Culmination Venue</span>
+                <strong className="festival-meta-cell__val">Kozhikode (Calicut), Kerala</strong>
+              </div>
+            </div>
+
+            <div className="festival-meta-cell">
+              <Compass size={17} className="festival-meta-cell__icon" />
+              <div>
+                <span className="festival-meta-cell__label">Featured Flagship</span>
+                <strong className="festival-meta-cell__val">ICRAST-26 (21 Nov 2026)</strong>
+              </div>
+            </div>
+          </div>
+
+          {/* Section: The 5 Thematic Pillars */}
+          <section className="festival-pillars-section" aria-labelledby="pillars-title">
+            <div className="festival-pillars-header">
+              <span className="festival-eyebrow">Festival Color System &amp; Thematic Pillars</span>
+              <h2 id="pillars-title" className="festival-pillars-title">
+                The Spectrum of SOF-26
+              </h2>
+              <p className="festival-pillars-subtitle">
+                Each color in our festival emblem embodies a foundational pillar of scientific progress and community engagement:
               </p>
             </div>
-          </Reveal>
 
-          <div className="subdomain-cards-grid">
-            {zones.map((zone, idx) => {
-              const IconComponent = zone.icon;
-              return (
-                <Reveal key={zone.title} delay={idx * 70}>
-                  <article className="subdomain-track-card">
-                    <div className="subdomain-track-card__icon">
-                      <IconComponent size={22} />
+            <div className="festival-pillars-grid">
+              {festivalPillars.map((pillar) => (
+                <article
+                  key={pillar.hex}
+                  className="festival-pillar-card"
+                  style={{
+                    borderColor: `${pillar.hex}33`,
+                    '--pillar-color': pillar.hex,
+                  } as React.CSSProperties}
+                >
+                  <div
+                    className="festival-pillar-card__accent"
+                    style={{ background: pillar.hex }}
+                  />
+
+                  <div className="festival-pillar-card__top">
+                    <span
+                      className="festival-pillar-swatch"
+                      style={{ background: pillar.hex }}
+                      aria-hidden="true"
+                    />
+                    <div className="festival-pillar-color-info">
+                      <span className="festival-pillar-color-name">{pillar.colorName}</span>
+                      <code className="festival-pillar-hex">{pillar.hex}</code>
                     </div>
-                    <h3 className="subdomain-track-card__title">{zone.title}</h3>
-                    <p className="subdomain-track-card__desc">{zone.desc}</p>
-                  </article>
-                </Reveal>
-              );
-            })}
+                  </div>
+
+                  <h3 className="festival-pillar-title" style={{ color: pillar.hex }}>
+                    {pillar.title}
+                  </h3>
+                  <span className="festival-pillar-subtitle">{pillar.subtitle}</span>
+
+                  <p className="festival-pillar-desc">{pillar.description}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          {/* Actions & Next Steps */}
+          <div className="festival-actions-row">
+            <a href={mainSiteUrl} className="festival-btn festival-btn--secondary">
+              <ArrowLeft size={16} />
+              <span>Return to Science Orbit Forum</span>
+            </a>
+
+            <a href={icrastUrl} className="festival-btn festival-btn--primary">
+              <span>Explore ICRAST-26 Conference</span>
+              <ExternalLink size={16} />
+            </a>
+
+            <a href="/join" className="festival-btn festival-btn--outline">
+              <span>Join the Community</span>
+            </a>
           </div>
         </div>
-      </section>
+      </main>
 
-      {/* Registration Banner */}
-      <section id="register-festival" className="subdomain-section">
-        <div className="container">
-          <Reveal>
-            <div className="subdomain-cta-banner">
-              <div className="subdomain-cta-banner__content">
-                <span className="subdomain-badge subdomain-badge--cyan">Exhibitor &amp; Visitor Registration</span>
-                <h2>Showcase Your Project at Science Orbit Festival 2026</h2>
-                <p>
-                  Whether you are presenting a working science model, competing in the inter-institutional quiz, or visiting with your school or institution, register early to secure your slot.
-                </p>
-
-                <div className="subdomain-cta-stats">
-                  <div className="subdomain-cta-stat">
-                    <Calendar size={18} />
-                    <span>15 – 17 March 2026</span>
-                  </div>
-                  <div className="subdomain-cta-stat">
-                    <Award size={18} />
-                    <span>Innovation &amp; Expo Awards</span>
-                  </div>
-                  <div className="subdomain-cta-stat">
-                    <Users size={18} />
-                    <span>Open to Schools &amp; Colleges</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="subdomain-cta-banner__action">
-                <a href="/join" className="subdomain-btn subdomain-btn--primary">
-                  <span>Register Now</span>
-                  <Rocket size={16} />
-                </a>
-                <a href={mainSiteUrl} className="subdomain-btn subdomain-btn--ghost">
-                  <span>Back to Main Forum</span>
-                </a>
-              </div>
-            </div>
-          </Reveal>
+      {/* Simple Footer */}
+      <footer className="festival-footer">
+        <div className="festival-footer__container">
+          <p className="festival-footer__copy">
+            © 2026 Science Orbit Forum. Science Orbit Festival 2K26 (SOF-26). All rights reserved.
+          </p>
+          <div className="festival-footer__links">
+            <a href={mainSiteUrl}>Home</a>
+            <span aria-hidden="true">·</span>
+            <a href={icrastUrl}>ICRAST-26</a>
+            <span aria-hidden="true">·</span>
+            <a href="/join">Membership</a>
+            <span aria-hidden="true">·</span>
+            <a href="/updates">Updates</a>
+          </div>
         </div>
-      </section>
+      </footer>
     </div>
   );
 }
