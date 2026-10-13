@@ -426,15 +426,6 @@ export default function IcrastPortalPage() {
                     <span>Participate Now</span>
                     <ArrowUpRight size={16} />
                   </Link>
-
-                  <a
-                    href={ICRAST_GUIDELINES_DOWNLOAD_URL}
-                    download="ICRAST-26-Presentation-Guidelines.pdf"
-                    className="icrast-submission-banner__link"
-                  >
-                    <Download size={15} />
-                    <span>Download Presentation Guidelines</span>
-                  </a>
                 </div>
               </div>
             </div>

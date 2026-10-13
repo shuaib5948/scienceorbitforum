@@ -29,10 +29,10 @@ import {
   RESEARCH_AREAS,
   PRESENTATION_CATEGORIES,
   PRESENTATION_MODES,
+  ICRAST_SCRIPT_URL,
   type CoAuthor,
   type IcrastAbstractSubmissionPayload,
 } from '../types/icrast';
-import { MEMBERSHIP_SCRIPT_URL } from '../types/membership';
 
 interface FileUploadState {
   file: File | null;
@@ -293,7 +293,7 @@ export default function IcrastSubmitPage() {
     };
 
     try {
-      if (!MEMBERSHIP_SCRIPT_URL) {
+      if (!ICRAST_SCRIPT_URL) {
         // Fallback simulation
         await new Promise((res) => setTimeout(res, 1400));
         setSubmittedData({
@@ -307,7 +307,7 @@ export default function IcrastSubmitPage() {
         return;
       }
 
-      const response = await fetch(MEMBERSHIP_SCRIPT_URL, {
+      const response = await fetch(ICRAST_SCRIPT_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'text/plain;charset=utf-8',

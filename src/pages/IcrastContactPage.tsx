@@ -4,7 +4,6 @@ import { Reveal } from '../components/ui/Reveal';
 import {
   IcrastLayout,
   ICRAST_PARTICIPATE_URL,
-  ICRAST_GUIDELINES_DOWNLOAD_URL,
 } from '../components/icrast/IcrastLayout';
 import {
   Mail,
@@ -18,7 +17,6 @@ import {
   Globe,
   ArrowUpRight,
   Compass,
-  Download,
 } from 'lucide-react';
 
 export default function IcrastContactPage() {
@@ -188,14 +186,6 @@ export default function IcrastContactPage() {
                     <span>Participate Now</span>
                     <ArrowUpRight size={15} />
                   </Link>
-                  <a
-                    href={ICRAST_GUIDELINES_DOWNLOAD_URL}
-                    download="ICRAST-26-Presentation-Guidelines.pdf"
-                    className="icrast-btn icrast-btn--outline-navy icrast-btn--lg"
-                  >
-                    <Download size={15} />
-                    <span>Download Guidelines</span>
-                  </a>
                 </div>
               </div>
             </div>

@@ -134,3 +134,10 @@ export const PRESENTATION_MODES = [
   'On-site presentation',
   'Live online presentation',
 ] as const;
+
+// Script endpoint for ICRAST abstract submission (falls back to unified MEMBERSHIP_SCRIPT_URL if not distinct)
+export const ICRAST_SCRIPT_URL =
+  import.meta.env.VITE_ICRAST_SCRIPT_URL ||
+  import.meta.env.VITE_MEMBERSHIP_SCRIPT_URL ||
+  '';
+
