@@ -32,7 +32,7 @@ import { DesignSystem } from './showcase/DesignSystem';
 
 function getActiveSubdomain(): 'icrast' | 'festival' | null {
   if (typeof window === 'undefined') return null;
-  const host = window.location.hostname.toLowerCase();
+  const host = window.location.hostname.toLowerCase().replace(/^www\./, '');
   if (host.startsWith('icrast.')) return 'icrast';
   if (host.startsWith('festival.')) return 'festival';
   return null;
@@ -77,6 +77,9 @@ function RootComponent() {
   const subdomain = getActiveSubdomain();
   const isStandalone =
     pathname.startsWith('/icrast') ||
+    pathname === '/venue' ||
+    pathname === '/submit' ||
+    (pathname === '/contact' && subdomain === 'icrast') ||
     subdomain === 'icrast' ||
     pathname.startsWith('/festival') ||
     subdomain === 'festival' ||
@@ -112,15 +115,37 @@ const icrastContactRoute = createRoute({
   component: IcrastContactPage,
 });
 
+const icrastContactSubdomainRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/contact',
+  component: () => {
+    const subdomain = getActiveSubdomain();
+    if (subdomain === 'icrast') return <IcrastContactPage />;
+    return <WhoWeArePage />;
+  },
+});
+
 const icrastVenueRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/icrast/venue',
   component: IcrastVenuePage,
 });
 
+const icrastVenueSubdomainRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/venue',
+  component: IcrastVenuePage,
+});
+
 const icrastSubmitRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/icrast/submit',
+  component: IcrastSubmitPage,
+});
+
+const icrastSubmitSubdomainRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/submit',
   component: IcrastSubmitPage,
 });
 
@@ -218,8 +243,11 @@ const routeTree = rootRoute.addChildren([
   indexRoute,
   icrastRoute,
   icrastContactRoute,
+  icrastContactSubdomainRoute,
   icrastVenueRoute,
+  icrastVenueSubdomainRoute,
   icrastSubmitRoute,
+  icrastSubmitSubdomainRoute,
   festivalRoute,
   scienceFestivalAliasRoute,
   whoWeAreRoute,

@@ -13,10 +13,16 @@ export const ICRAST_GUIDELINES_DOWNLOAD_URL =
   '/docs/ICRAST-26-Presentation-Guidelines.pdf';
 
 function getMainSiteUrl(): string {
-  if (typeof window === 'undefined') return '/';
+  if (typeof window === 'undefined') return 'https://scienceorbitforum.org';
   const { protocol, hostname, port } = window.location;
-  const baseHost = hostname.replace(/^(icrast|festival)\./i, '');
+  const baseHost = hostname.replace(/^(icrast|festival|www)\./i, '');
   const portSuffix = port ? `:${port}` : '';
+  if (baseHost === 'scienceorbitforum.org') {
+    return 'https://scienceorbitforum.org';
+  }
+  if (baseHost === 'localhost' || baseHost === '127.0.0.1') {
+    return `${protocol}//${baseHost}${portSuffix}`;
+  }
   if (baseHost !== hostname) {
     return `${protocol}//${baseHost}${portSuffix}`;
   }
@@ -34,6 +40,18 @@ export function IcrastLayout({ children }: IcrastLayoutProps) {
   const isVenuePage = pathname.endsWith('/venue');
   const isHomePage = !isContactPage && !isVenuePage;
 
+  const isSubdomain =
+    typeof window !== 'undefined' &&
+    window.location.hostname.toLowerCase().startsWith('icrast.');
+
+  const homePath = isSubdomain ? '/' : '/icrast';
+  const aboutHref = isSubdomain ? '/#about' : '/icrast#about';
+  const themesHref = isSubdomain ? '/#themes' : '/icrast#themes';
+  const datesHref = isSubdomain ? '/#dates' : '/icrast#dates';
+  const venuePath = isSubdomain ? '/venue' : '/icrast/venue';
+  const contactPath = isSubdomain ? '/contact' : '/icrast/contact';
+  const submitPath = isSubdomain ? '/submit' : '/icrast/submit';
+
   return (
     <div className="icrast-portal">
       {/* Top 5-Color ICRAST Logo Spectrum Line */}
@@ -43,7 +61,7 @@ export function IcrastLayout({ children }: IcrastLayoutProps) {
       <header className="icrast-topbar">
         <div className="container icrast-topbar__inner">
           {/* Brand: ICRAST-26 | Science Orbit Forum */}
-          <Link to="/icrast" className="icrast-topbar__brand">
+          <Link to={homePath} className="icrast-topbar__brand">
             <img
               src="/images/icrast-logo-mark.png"
               alt="ICRAST-26 Logo"
@@ -60,28 +78,28 @@ export function IcrastLayout({ children }: IcrastLayoutProps) {
           {/* 6 Main Navigation Items: Home · About · Themes · Important Dates · Venue · Contact */}
           <nav className="icrast-topbar__nav" aria-label="ICRAST-26 Navigation">
             <Link
-              to="/icrast"
+              to={homePath}
               className={`icrast-topbar__link ${isHomePage ? 'is-active' : ''}`}
             >
               Home
             </Link>
-            <a href="/icrast#about" className="icrast-topbar__link">
+            <a href={aboutHref} className="icrast-topbar__link">
               About
             </a>
-            <a href="/icrast#themes" className="icrast-topbar__link">
+            <a href={themesHref} className="icrast-topbar__link">
               Themes
             </a>
-            <a href="/icrast#dates" className="icrast-topbar__link">
+            <a href={datesHref} className="icrast-topbar__link">
               Important Dates
             </a>
             <Link
-              to="/icrast/venue"
+              to={venuePath}
               className={`icrast-topbar__link ${isVenuePage ? 'is-active' : ''}`}
             >
               Venue
             </Link>
             <Link
-              to="/icrast/contact"
+              to={contactPath}
               className={`icrast-topbar__link ${
                 isContactPage ? 'is-active' : ''
               }`}
@@ -93,7 +111,7 @@ export function IcrastLayout({ children }: IcrastLayoutProps) {
           {/* Primary Action Button: Link to dedicated Abstract Submission Form */}
           <div className="icrast-topbar__actions">
             <Link
-              to="/icrast/submit"
+              to={submitPath}
               className="icrast-btn icrast-btn--primary"
             >
               <span>Participate Now</span>
@@ -129,18 +147,18 @@ export function IcrastLayout({ children }: IcrastLayoutProps) {
             </div>
 
             <nav className="icrast-site-footer__nav" aria-label="Footer Navigation">
-              <Link to="/icrast">Home</Link>
-              <a href="/icrast#about">About</a>
-              <a href="/icrast#themes">Themes</a>
-              <a href="/icrast#dates">Dates</a>
-              <Link to="/icrast/venue">Venue</Link>
+              <Link to={homePath}>Home</Link>
+              <a href={aboutHref}>About</a>
+              <a href={themesHref}>Themes</a>
+              <a href={datesHref}>Dates</a>
+              <Link to={venuePath}>Venue</Link>
               <a
                 href={ICRAST_GUIDELINES_DOWNLOAD_URL}
                 download="ICRAST-26-Presentation-Guidelines.pdf"
               >
                 Guidelines
               </a>
-              <Link to="/icrast/contact">Contact</Link>
+              <Link to={contactPath}>Contact</Link>
             </nav>
 
             <div className="icrast-site-footer__contacts">

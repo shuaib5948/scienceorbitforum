@@ -19,10 +19,21 @@ function getEventHref(eventItem: EventItem): string {
   }
 
   const { protocol, hostname, port } = window.location;
-  const cleanHost = hostname.replace(/^www\./i, '');
+  const baseHost = hostname.replace(/^(www|icrast|festival)\./i, '');
   const portSuffix = port ? `:${port}` : '';
 
-  return `${protocol}//${eventItem.subdomain}.${cleanHost}${portSuffix}`;
+  // Production domain: https://icrast.scienceorbitforum.org or https://festival.scienceorbitforum.org
+  if (baseHost === 'scienceorbitforum.org' || baseHost.endsWith('.scienceorbitforum.org')) {
+    return `https://${eventItem.subdomain}.scienceorbitforum.org`;
+  }
+
+  // Local development with subdomains
+  if (baseHost === 'localhost' || baseHost === '127.0.0.1') {
+    return `${protocol}//${eventItem.subdomain}.${baseHost}${portSuffix}`;
+  }
+
+  // Fallback for Vercel preview deployments where wildcard subdomains may not be configured
+  return `/${eventItem.subdomain}`;
 }
 
 export default function EventsPage() {
