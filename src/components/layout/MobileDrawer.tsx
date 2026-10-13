@@ -150,14 +150,14 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) =
 
         {/* Bottom CTA & Contact */}
         <div className="mobile-drawer-footer">
-          <a
-            href="/support#donate"
+          <Link
+            to="/donate"
             onClick={onClose}
             className="mobile-drawer-btn"
           >
             <span>Donate</span>
             <ArrowRight size={16} />
-          </a>
+          </Link>
 
           <div className="mobile-drawer-contact">
             <div className="mobile-drawer-contact-item">
