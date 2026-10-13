@@ -3,6 +3,7 @@ import {
   createRoute,
   createRouter,
   Outlet,
+  useLocation,
 } from '@tanstack/react-router';
 import { Header } from './components/layout/Header';
 import { Footer } from './components/layout/Footer';
@@ -16,18 +17,41 @@ import VisionPage from './pages/VisionPage';
 import EventsPage from './pages/EventsPage';
 import EventDetailPage from './pages/EventDetailPage';
 import UpdatesPage from './pages/UpdatesPage';
-import UpdateDetailPage from './pages/UpdateDetailPage';
 import PeoplePage from './pages/PeoplePage';
 import JoinPage from './pages/JoinPage';
+import MembershipApplyPage from './pages/MembershipApplyPage';
+import SupportPage from './pages/SupportPage';
 import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
+import IcrastPortalPage from './pages/IcrastPortalPage';
+import IcrastContactPage from './pages/IcrastContactPage';
+import IcrastVenuePage from './pages/IcrastVenuePage';
+import IcrastSubmitPage from './pages/IcrastSubmitPage';
+import FestivalPortalPage from './pages/FestivalPortalPage';
 import { DesignSystem } from './showcase/DesignSystem';
+
+function getActiveSubdomain(): 'icrast' | 'festival' | null {
+  if (typeof window === 'undefined') return null;
+  const host = window.location.hostname.toLowerCase();
+  if (host.startsWith('icrast.')) return 'icrast';
+  if (host.startsWith('festival.')) return 'festival';
+  return null;
+}
+
+function RootIndexComponent() {
+  const subdomain = getActiveSubdomain();
+  if (subdomain === 'icrast') return <IcrastPortalPage />;
+  if (subdomain === 'festival') return <FestivalPortalPage />;
+  return <HomePage />;
+}
 
 /**
  * Science Orbit Forum — Phase 2 route graph (code-first TanStack Router).
  *
  * URL structure (clean, no unnecessary nesting):
- *   /                Home             (gateway to all sections)
+ *   /                Home (or ICRAST / Festival portal when accessed via subdomain)
+ *   /icrast          ICRAST-26 Conference Portal
+ *   /festival        Science Orbit Festival 2026 Portal
  *   /who-we-are      Who We Are
  *   /mission         Mission
  *   /vision          Vision
@@ -36,6 +60,8 @@ import { DesignSystem } from './showcase/DesignSystem';
  *   /updates         Updates
  *   /updates/[slug]  Update detail
  *   /people          People
+ *   /join            Membership Hub (Categories, Benefits, Regulations)
+ *   /join/apply      Membership Application Form
  *   /privacy         Privacy
  *   /terms           Terms
  *   /design-system   Phase 1 showcase (preserved for reference)
@@ -47,14 +73,19 @@ const rootRoute = createRootRoute({
 });
 
 function RootComponent() {
+  const { pathname } = useLocation();
+  const subdomain = getActiveSubdomain();
+  const isStandaloneIcrast =
+    pathname.startsWith('/icrast') || subdomain === 'icrast';
+
   return (
     <>
       <SkipLink />
-      <Header />
+      {!isStandaloneIcrast && <Header />}
       <main id="main" tabIndex={-1}>
         <Outlet />
       </main>
-      <Footer />
+      {!isStandaloneIcrast && <Footer />}
     </>
   );
 }
@@ -62,7 +93,37 @@ function RootComponent() {
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
-  component: HomePage,
+  component: RootIndexComponent,
+});
+
+const icrastRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/icrast',
+  component: IcrastPortalPage,
+});
+
+const icrastContactRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/icrast/contact',
+  component: IcrastContactPage,
+});
+
+const icrastVenueRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/icrast/venue',
+  component: IcrastVenuePage,
+});
+
+const icrastSubmitRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/icrast/submit',
+  component: IcrastSubmitPage,
+});
+
+const festivalRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/festival',
+  component: FestivalPortalPage,
 });
 
 const whoWeAreRoute = createRoute({
@@ -101,12 +162,6 @@ const updatesRoute = createRoute({
   component: UpdatesPage,
 });
 
-const updateDetailRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/updates/$updateSlug',
-  component: UpdateDetailPage,
-});
-
 const peopleRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/people',
@@ -117,6 +172,18 @@ const joinRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/join',
   component: JoinPage,
+});
+
+const joinApplyRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/join/apply',
+  component: MembershipApplyPage,
+});
+
+const supportRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/support',
+  component: SupportPage,
 });
 
 const privacyRoute = createRoute({
@@ -139,15 +206,21 @@ const designSystemRoute = createRoute({
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
+  icrastRoute,
+  icrastContactRoute,
+  icrastVenueRoute,
+  icrastSubmitRoute,
+  festivalRoute,
   whoWeAreRoute,
   missionRoute,
   visionRoute,
   eventsRoute,
   eventDetailRoute,
   updatesRoute,
-  updateDetailRoute,
   peopleRoute,
   joinRoute,
+  joinApplyRoute,
+  supportRoute,
   privacyRoute,
   termsRoute,
   designSystemRoute,
