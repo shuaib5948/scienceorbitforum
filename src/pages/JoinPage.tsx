@@ -1,360 +1,289 @@
-import { useState } from 'react';
-import { SectionHeading } from '../components/ui/SectionHeading';
-import { ButtonLink } from '../components/ui/Button';
-import { Reveal } from '../components/ui/Reveal';
+import { useEffect, useState } from 'react';
 import { PageHero } from '../components/site/PageHero';
+import { Reveal } from '../components/ui/Reveal';
+import {
+  MEMBERSHIP_CATEGORIES,
+  MEMBERSHIP_BENEFITS,
+  MEMBERSHIP_REGULATIONS,
+} from '../data/membership';
+import {
+  ArrowRight,
+  Award,
+  Crown,
+  Medal,
+  GraduationCap,
+  Building2,
+  Users,
+  Briefcase,
+  Coins,
+  ChevronDown,
+} from 'lucide-react';
 
-interface FormData {
-  fullName: string;
-  email: string;
-  phone: string;
-  location: string;
-  background: string;
-  interest: string;
-  introduction: string;
-  profileLink: string;
-  consent: boolean;
-}
+const CATEGORY_ICONS: Record<string, typeof Crown> = {
+  platinum: Crown,
+  gold: Medal,
+  silver: GraduationCap,
+  institutional: Building2,
+};
+
+const BENEFIT_ICONS: Record<string, typeof Users> = {
+  community: Users,
+  development: Briefcase,
+  funding: Coins,
+};
 
 export default function JoinPage() {
-  const [submitted, setSubmitted] = useState(false);
-  const [formData, setFormData] = useState<FormData>({
-    fullName: '',
-    email: '',
-    phone: '',
-    location: '',
-    background: '',
-    interest: '',
-    introduction: '',
-    profileLink: '',
-    consent: false,
-  });
+  const [openRegSection, setOpenRegSection] = useState<string | null>('01');
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: Connect to backend when available
-    console.log('Form submitted:', formData);
-    setSubmitted(true);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const scrollToHash = () => {
+      const hash = window.location.hash.replace('#', '');
+      if (!hash) return;
+      const el = document.getElementById(hash);
+      if (el) {
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 80);
+      }
+    };
+    scrollToHash();
+    window.addEventListener('hashchange', scrollToHash);
+    return () => window.removeEventListener('hashchange', scrollToHash);
+  }, []);
+
+  const toggleRegulation = (number: string) => {
+    setOpenRegSection((prev) => (prev === number ? null : number));
   };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
-    }));
-  };
-
-  if (submitted) {
-    return (
-      <div className="container section" style={{ textAlign: 'center', maxWidth: 680 }}>
-        <Reveal>
-          <div style={{
-            width: 80,
-            height: 80,
-            borderRadius: '50%',
-            background: 'var(--color-surface-cyan)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto var(--space-6)',
-            fontSize: 40,
-          }}>
-            ✓
-          </div>
-          <SectionHeading
-            eyebrow="Thank You"
-            title="Your application has been submitted."
-            align="center"
-          />
-          <p style={{ color: 'var(--color-text-muted)', marginTop: 'var(--space-4)' }}>
-            We have received your membership application. The Science Orbit Forum team will review your information and get in touch with you soon.
-          </p>
-          <div style={{ marginTop: 'var(--space-6)' }}>
-            <ButtonLink href="/" withArrow>Return to Homepage</ButtonLink>
-          </div>
-        </Reveal>
-      </div>
-    );
-  }
 
   return (
     <>
       <PageHero
+        className="page-hero--people-gradient"
         eyebrow="Join Science Orbit Forum"
         title="Become Part of the Orbit"
-        lede="Become part of a growing community of curious minds exploring science, research and innovation."
-        roomy
+        lede="Select your membership tier below to apply, explore member privileges, and review our institutional membership regulations."
       />
 
-      <section className="container section">
-        <div style={{ maxWidth: 720, margin: '0 auto' }}>
-          <SectionHeading
-            eyebrow="Who Can Participate"
-            title="Science Orbit Forum welcomes curious minds from all backgrounds."
-          />
-          <ul style={{ color: 'var(--color-text-muted)', marginTop: 'var(--space-4)', paddingLeft: 'var(--space-5)' }}>
-            <li>Students</li>
-            <li>Researchers</li>
-            <li>Educators</li>
-            <li>Science enthusiasts</li>
-            <li>Innovators</li>
-            <li>Anyone genuinely interested in science and learning</li>
-          </ul>
+      {/* Section 1: 4 Membership Categories */}
+      <section
+        id="membership-categories"
+        className="container section membership-hub-section"
+      >
+        <Reveal>
+          <div className="membership-section-head">
+            <span className="subdomain-eyebrow">Membership Categories</span>
+            <h2 className="subdomain-heading">
+              Membership Categories
+            </h2>
+            <p className="subdomain-lede">
+              Select a membership category below to proceed to the application form.
+            </p>
+          </div>
+        </Reveal>
+
+        <div className="membership-categories-grid">
+          {MEMBERSHIP_CATEGORIES.map((category, idx) => {
+            const IconComponent = CATEGORY_ICONS[category.id] ?? Award;
+
+            if (category.comingSoon) {
+              return (
+                <Reveal key={category.id} delay={idx * 60}>
+                  <div
+                    className="membership-category-card membership-category-card--disabled"
+                    aria-label="Institutions: Coming soon"
+                  >
+                    <div className="membership-category-card__header">
+                      <div className="membership-category-card__icon membership-category-card__icon--muted">
+                        <IconComponent size={20} />
+                      </div>
+                      <h3 className="membership-category-card__title">
+                        {category.title}
+                      </h3>
+                    </div>
+
+                    <div className="membership-category-card__body membership-category-card__body--centered">
+                      <span className="membership-category-card__soon-text">
+                        {category.cost}
+                      </span>
+                    </div>
+
+                    <div className="membership-category-card__footer">
+                      <span className="membership-category-card__btn membership-category-card__btn--disabled">
+                        <span>Coming soon</span>
+                      </span>
+                    </div>
+                  </div>
+                </Reveal>
+              );
+            }
+
+            return (
+              <Reveal key={category.id} delay={idx * 60}>
+                <a
+                  href={`/join/apply?category=${category.id}`}
+                  className="membership-category-card"
+                  aria-label={`Apply for ${category.title} Membership`}
+                >
+                  <div className="membership-category-card__header">
+                    <div className="membership-category-card__icon">
+                      <IconComponent size={20} />
+                    </div>
+                    <h3 className="membership-category-card__title">
+                      {category.title}
+                    </h3>
+                    <div className="membership-category-card__cost-row">
+                      <span className="membership-category-card__price">
+                        {category.cost}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="membership-category-card__body">
+                    <span className="membership-category-card__eligibility-label">
+                      Eligibility
+                    </span>
+                    <ul className="membership-category-card__eligibility-list">
+                      {category.eligibility?.map((person) => (
+                        <li key={person}>{person}</li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="membership-category-card__footer">
+                    <span className="membership-category-card__btn">
+                      <span>Apply Now</span>
+                      <ArrowRight size={15} />
+                    </span>
+                  </div>
+                </a>
+              </Reveal>
+            );
+          })}
         </div>
       </section>
 
-      <section className="section" style={{ background: 'var(--color-surface-muted)' }}>
+      {/* Section 2: Membership Benefits */}
+      <section
+        id="membership-benefits"
+        className="membership-band membership-band--muted"
+      >
         <div className="container">
-          <div style={{ maxWidth: 680, margin: '0 auto' }}>
-            <SectionHeading
-              eyebrow="Membership Application"
-              title="Tell us about yourself"
-              align="center"
-            />
-            
-            <form onSubmit={handleSubmit} style={{ marginTop: 'var(--space-6)' }}>
-              <Reveal>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
-                  <div>
-                    <label htmlFor="fullName" style={{ display: 'block', fontWeight: 600, marginBottom: 'var(--space-2)', fontSize: 'var(--text-body-small)' }}>
-                      Full Name *
-                    </label>
-                    <input
-                      type="text"
-                      id="fullName"
-                      name="fullName"
-                      value={formData.fullName}
-                      onChange={handleChange}
-                      required
-                      style={{
-                        width: '100%',
-                        padding: 'var(--space-3)',
-                        border: '1px solid var(--color-border)',
-                        borderRadius: 'var(--radius-md)',
-                        fontSize: 'var(--text-body)',
-                        fontFamily: 'inherit',
-                      }}
-                      placeholder="Your full name"
-                    />
-                  </div>
+          <Reveal>
+            <div className="membership-section-head">
+              <span className="subdomain-eyebrow">Member Privileges</span>
+              <h2 className="subdomain-heading">Membership Benefits</h2>
+              <p className="subdomain-lede">
+                Every member of Science Orbit Forum gains access to academic, publishing, and collaborative opportunities:
+              </p>
+            </div>
+          </Reveal>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
-                    <div>
-                      <label htmlFor="email" style={{ display: 'block', fontWeight: 600, marginBottom: 'var(--space-2)', fontSize: 'var(--text-body-small)' }}>
-                        Email *
-                      </label>
-                      <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                        style={{
-                          width: '100%',
-                          padding: 'var(--space-3)',
-                          border: '1px solid var(--color-border)',
-                          borderRadius: 'var(--radius-md)',
-                          fontSize: 'var(--text-body)',
-                          fontFamily: 'inherit',
-                        }}
-                        placeholder="your@email.com"
-                      />
+          <div className="membership-benefits-grid">
+            {MEMBERSHIP_BENEFITS.map((benefit, idx) => {
+              const BenefitIcon = BENEFIT_ICONS[benefit.id] ?? Award;
+              return (
+                <Reveal key={benefit.id} delay={idx * 60}>
+                  <article className="membership-benefit-card">
+                    <div className="membership-benefit-card__icon">
+                      <BenefitIcon size={20} />
                     </div>
-
-                    <div>
-                      <label htmlFor="phone" style={{ display: 'block', fontWeight: 600, marginBottom: 'var(--space-2)', fontSize: 'var(--text-body-small)' }}>
-                        Phone
-                      </label>
-                      <input
-                        type="tel"
-                        id="phone"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        style={{
-                          width: '100%',
-                          padding: 'var(--space-3)',
-                          border: '1px solid var(--color-border)',
-                          borderRadius: 'var(--radius-md)',
-                          fontSize: 'var(--text-body)',
-                          fontFamily: 'inherit',
-                        }}
-                        placeholder="+91 XXXXX XXXXX"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label htmlFor="location" style={{ display: 'block', fontWeight: 600, marginBottom: 'var(--space-2)', fontSize: 'var(--text-body-small)' }}>
-                      Location *
-                    </label>
-                    <input
-                      type="text"
-                      id="location"
-                      name="location"
-                      value={formData.location}
-                      onChange={handleChange}
-                      required
-                      style={{
-                        width: '100%',
-                        padding: 'var(--space-3)',
-                        border: '1px solid var(--color-border)',
-                        borderRadius: 'var(--radius-md)',
-                        fontSize: 'var(--text-body)',
-                        fontFamily: 'inherit',
-                      }}
-                      placeholder="City, State/Country"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="background" style={{ display: 'block', fontWeight: 600, marginBottom: 'var(--space-2)', fontSize: 'var(--text-body-small)' }}>
-                      Educational / Professional Background *
-                    </label>
-                    <textarea
-                      id="background"
-                      name="background"
-                      value={formData.background}
-                      onChange={handleChange}
-                      required
-                      rows={3}
-                      style={{
-                        width: '100%',
-                        padding: 'var(--space-3)',
-                        border: '1px solid var(--color-border)',
-                        borderRadius: 'var(--radius-md)',
-                        fontSize: 'var(--text-body)',
-                        fontFamily: 'inherit',
-                        resize: 'vertical',
-                      }}
-                      placeholder="Tell us about your educational or professional background..."
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="interest" style={{ display: 'block', fontWeight: 600, marginBottom: 'var(--space-2)', fontSize: 'var(--text-body-small)' }}>
-                      Area of Interest *
-                    </label>
-                    <select
-                      id="interest"
-                      name="interest"
-                      value={formData.interest}
-                      onChange={handleChange}
-                      required
-                      style={{
-                        width: '100%',
-                        padding: 'var(--space-3)',
-                        border: '1px solid var(--color-border)',
-                        borderRadius: 'var(--radius-md)',
-                        fontSize: 'var(--text-body)',
-                        fontFamily: 'inherit',
-                        backgroundColor: 'var(--color-surface)',
-                      }}
-                    >
-                      <option value="">Select your area of interest</option>
-                      <option value="physics">Physics</option>
-                      <option value="chemistry">Chemistry</option>
-                      <option value="biology">Biology</option>
-                      <option value="mathematics">Mathematics</option>
-                      <option value="computer-science">Computer Science</option>
-                      <option value="engineering">Engineering</option>
-                      <option value="environmental-science">Environmental Science</option>
-                      <option value="astronomy">Astronomy</option>
-                      <option value="general-science">General Science</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label htmlFor="introduction" style={{ display: 'block', fontWeight: 600, marginBottom: 'var(--space-2)', fontSize: 'var(--text-body-small)' }}>
-                      Short Introduction *
-                    </label>
-                    <textarea
-                      id="introduction"
-                      name="introduction"
-                      value={formData.introduction}
-                      onChange={handleChange}
-                      required
-                      rows={4}
-                      style={{
-                        width: '100%',
-                        padding: 'var(--space-3)',
-                        border: '1px solid var(--color-border)',
-                        borderRadius: 'var(--radius-md)',
-                        fontSize: 'var(--text-body)',
-                        fontFamily: 'inherit',
-                        resize: 'vertical',
-                      }}
-                      placeholder="Tell us briefly about yourself and why you want to join Science Orbit Forum..."
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="profileLink" style={{ display: 'block', fontWeight: 600, marginBottom: 'var(--space-2)', fontSize: 'var(--text-body-small)' }}>
-                      Social / Profile Link (Optional)
-                    </label>
-                    <input
-                      type="url"
-                      id="profileLink"
-                      name="profileLink"
-                      value={formData.profileLink}
-                      onChange={handleChange}
-                      style={{
-                        width: '100%',
-                        padding: 'var(--space-3)',
-                        border: '1px solid var(--color-border)',
-                        borderRadius: 'var(--radius-md)',
-                        fontSize: 'var(--text-body)',
-                        fontFamily: 'inherit',
-                      }}
-                      placeholder="LinkedIn, personal website, or other profile"
-                    />
-                  </div>
-
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)' }}>
-                    <input
-                      type="checkbox"
-                      id="consent"
-                      name="consent"
-                      checked={formData.consent}
-                      onChange={handleChange}
-                      required
-                      style={{ marginTop: 4, width: 18, height: 18 }}
-                    />
-                    <label htmlFor="consent" style={{ fontSize: 'var(--text-body-small)', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
-                      I agree that the information provided is accurate and I consent to Science Orbit Forum contacting me regarding my membership application. I understand that my data will be processed in accordance with the Privacy Policy.
-                    </label>
-                  </div>
-
-                  <button
-                    type="submit"
-                    style={{
-                      width: '100%',
-                      height: 'var(--button-height-lg)',
-                      backgroundColor: 'var(--color-secondary)',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: 'var(--radius-md)',
-                      fontSize: '16px',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      transition: 'all var(--duration-base) var(--ease-standard)',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = 'var(--color-secondary-hover)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'var(--color-secondary)';
-                    }}
-                  >
-                    Become a Science Orbit Forum Member
-                  </button>
-                </div>
-              </Reveal>
-            </form>
+                    <h3 className="membership-benefit-card__title">
+                      {benefit.title}
+                    </h3>
+                    <p className="membership-benefit-card__desc">
+                      {benefit.description}
+                    </p>
+                  </article>
+                </Reveal>
+              );
+            })}
           </div>
+        </div>
+      </section>
+
+      {/* Section 3: Membership Regulations (9-Section Accordion) */}
+      <section id="membership-regulations" className="membership-band">
+        <div className="container">
+          <Reveal>
+            <div className="membership-section-head">
+              <span className="subdomain-eyebrow">
+                Provisional Edition – 2026
+              </span>
+              <h2 className="subdomain-heading">
+                Membership Regulations, Terms and Conditions
+              </h2>
+              <p className="subdomain-lede">
+                Official governance rules, member responsibilities, and terms of admission for Science Orbit Forum (SOF).
+              </p>
+            </div>
+          </Reveal>
+
+          <div className="membership-regulations-accordion">
+            {MEMBERSHIP_REGULATIONS.map((reg) => {
+              const isOpen = openRegSection === reg.number;
+              return (
+                <div
+                  key={reg.number}
+                  className={`membership-accordion-item ${
+                    isOpen ? 'is-open' : ''
+                  }`}
+                >
+                  <button
+                    type="button"
+                    className="membership-accordion-trigger"
+                    onClick={() => toggleRegulation(reg.number)}
+                    aria-expanded={isOpen}
+                  >
+                    <div className="membership-accordion-trigger__left">
+                      <span className="membership-accordion-num">
+                        {reg.number}
+                      </span>
+                      <h3 className="membership-accordion-title">
+                        {reg.title}
+                      </h3>
+                    </div>
+                    <ChevronDown
+                      size={18}
+                      className={`membership-accordion-caret ${
+                        isOpen ? 'is-rotated' : ''
+                      }`}
+                    />
+                  </button>
+
+                  {isOpen && (
+                    <div className="membership-accordion-panel">
+                      <div className="membership-accordion-clauses">
+                        {reg.clauses.map((clause, cIdx) => (
+                          <div key={cIdx} className="membership-clause">
+                            <p className="membership-clause__text">
+                              {clause.code && (
+                                <strong className="membership-clause__code">
+                                  {clause.code}{' '}
+                                </strong>
+                              )}
+                              {clause.text}
+                            </p>
+                            {clause.bullets && (
+                              <ul className="membership-clause__bullets">
+                                {clause.bullets.map((b) => (
+                                  <li key={b}>{b}</li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          <p className="membership-regulations-effective">
+            Effective date: To be announced
+          </p>
         </div>
       </section>
     </>
