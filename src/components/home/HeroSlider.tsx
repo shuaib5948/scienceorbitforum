@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, EffectFade, Pagination, Navigation } from 'swiper/modules';
-import type { NavigationOptions } from 'swiper/types';
+import { Autoplay, EffectFade, Pagination } from 'swiper/modules';
+import type { Swiper as SwiperClass } from 'swiper';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { heroSlidesData } from '../../content/hero-slides';
 import { ButtonLink } from '../ui/Button';
@@ -9,7 +9,6 @@ import { OrbOrnament } from '../ui/OrbOrnament';
 
 // Swiper styles
 import 'swiper/css';
-import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/effect-fade';
 
@@ -19,8 +18,7 @@ import 'swiper/css/effect-fade';
  * orbital iconography, high-contrast editorial typography, and interactive controls.
  */
 export const HeroSlider: React.FC = () => {
-  const prevRef = useRef<HTMLButtonElement | null>(null);
-  const nextRef = useRef<HTMLButtonElement | null>(null);
+  const swiperRef = useRef<SwiperClass | null>(null);
 
   return (
     <section 
@@ -29,12 +27,12 @@ export const HeroSlider: React.FC = () => {
       aria-label="Science Orbit Forum Highlights"
     >
       <Swiper
-        modules={[Autoplay, Pagination, EffectFade, Navigation]}
+        modules={[Autoplay, Pagination, EffectFade]}
         effect="fade"
         fadeEffect={{ crossFade: true }}
-        speed={1400}
+        speed={800}
         autoplay={{
-          delay: 6000,
+          delay: 4000,
           disableOnInteraction: false,
           pauseOnMouseEnter: true,
         }}
@@ -42,16 +40,8 @@ export const HeroSlider: React.FC = () => {
           clickable: true,
           dynamicBullets: false,
         }}
-        navigation={{
-          prevEl: prevRef.current,
-          nextEl: nextRef.current,
-        }}
-        onBeforeInit={(swiper) => {
-          if (swiper.params.navigation && typeof swiper.params.navigation !== 'boolean') {
-            const nav = swiper.params.navigation as NavigationOptions;
-            nav.prevEl = prevRef.current;
-            nav.nextEl = nextRef.current;
-          }
+        onSwiper={(swiper) => {
+          swiperRef.current = swiper;
         }}
         loop={true}
         className="hero-slider__swiper"
@@ -134,19 +124,19 @@ export const HeroSlider: React.FC = () => {
 
       {/* Prev / Next Navigation Arrows */}
       <button
-        ref={prevRef}
         type="button"
         className="hero-slider__arrow hero-slider__arrow--prev"
         aria-label="Previous slide"
+        onClick={() => swiperRef.current?.slidePrev()}
       >
         <ChevronLeft size={24} />
       </button>
 
       <button
-        ref={nextRef}
         type="button"
         className="hero-slider__arrow hero-slider__arrow--next"
         aria-label="Next slide"
+        onClick={() => swiperRef.current?.slideNext()}
       >
         <ChevronRight size={24} />
       </button>

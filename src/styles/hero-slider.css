@@ -53,7 +53,7 @@
   object-fit: cover;
   object-position: center;
   transform: scale(1.05);
-  transition: transform 9s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: transform 6s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .swiper-slide-active .hero-slider__image {
@@ -64,7 +64,7 @@
 .hero-slider__overlay-dark {
   position: absolute;
   inset: 0;
-  background: rgba(6, 13, 26, 0.55);
+  background: rgba(6, 13, 26, 0.38);
   pointer-events: none;
 }
 
@@ -73,9 +73,9 @@
   inset: 0;
   background: linear-gradient(
     180deg,
-    rgba(6, 13, 26, 0.75) 0%,
-    rgba(6, 13, 26, 0.35) 45%,
-    rgba(6, 13, 26, 0.9) 100%
+    rgba(6, 13, 26, 0.55) 0%,
+    rgba(6, 13, 26, 0.22) 45%,
+    rgba(6, 13, 26, 0.75) 100%
   );
   pointer-events: none;
 }

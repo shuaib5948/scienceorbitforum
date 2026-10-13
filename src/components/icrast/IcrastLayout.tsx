@@ -11,6 +11,8 @@ export const ICRAST_SUBMIT_ABSTRACT_URL = '/icrast/submit';
 export const ICRAST_REGISTER_FREE_URL = '/icrast/submit';
 export const ICRAST_GUIDELINES_DOWNLOAD_URL =
   '/docs/ICRAST-26-Presentation-Guidelines.pdf';
+export const ICRAST_TEMPLATE_DOWNLOAD_URL =
+  '/docs/ICRAST-26-Abstract-Template.pdf';
 
 function getMainSiteUrl(): string {
   if (typeof window === 'undefined') return 'https://scienceorbitforum.org';

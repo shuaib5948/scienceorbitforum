@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Reveal } from '../components/ui/Reveal';
-import { IcrastLayout, ICRAST_GUIDELINES_DOWNLOAD_URL } from '../components/icrast/IcrastLayout';
+import { IcrastLayout, ICRAST_TEMPLATE_DOWNLOAD_URL } from '../components/icrast/IcrastLayout';
 import {
   ArrowLeft,
   CheckCircle2,
@@ -817,8 +817,8 @@ export default function IcrastSubmitPage() {
                       </span>
                     </div>
                     <a
-                      href={ICRAST_GUIDELINES_DOWNLOAD_URL}
-                      download="ICRAST-26-Presentation-Guidelines.pdf"
+                      href={ICRAST_TEMPLATE_DOWNLOAD_URL}
+                      download="ICRAST-26-Abstract-Template.pdf"
                       className="icrast-btn icrast-btn--ghost"
                       style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem' }}
                     >
