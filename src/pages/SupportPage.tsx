@@ -1,6 +1,7 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect } from 'react';
 import { PageHero } from '../components/site/PageHero';
 import { Reveal } from '../components/ui/Reveal';
+import { UpiDonationWidget } from '../components/donate/UpiDonationWidget';
 import {
   SUPPORT_INTRO,
   SUPPORT_AVENUES,
@@ -32,14 +33,7 @@ const AVENUE_ICONS: Record<string, typeof HeartHandshake> = {
   'student-grants': Sparkles,
 };
 
-const PRESET_AMOUNTS = [1000, 2500, 5000, 10000];
-
 export default function SupportPage() {
-  const [frequency, setFrequency] = useState<'one-time' | 'annual'>('one-time');
-  const [selectedAmount, setSelectedAmount] = useState<number | 'custom'>(5000);
-  const [customAmount, setCustomAmount] = useState<string>('');
-  const [submitted, setSubmitted] = useState(false);
-
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const scrollToHash = () => {
@@ -56,18 +50,6 @@ export default function SupportPage() {
     window.addEventListener('hashchange', scrollToHash);
     return () => window.removeEventListener('hashchange', scrollToHash);
   }, []);
-
-  const displayAmount =
-    selectedAmount === 'custom'
-      ? customAmount
-        ? `₹${Number(customAmount).toLocaleString('en-IN')}`
-        : ''
-      : `₹${selectedAmount.toLocaleString('en-IN')}`;
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setSubmitted(true);
-  };
 
   return (
     <>
@@ -168,21 +150,41 @@ export default function SupportPage() {
         </div>
       </section>
 
-      {/* Section 3: Standard Institutional Donate Now Widget */}
+      {/* Section 3: Zero-Cost Direct UPI & Bank Contribution Widget */}
       <section id="donate" className="membership-band">
         <div className="container">
           <Reveal>
             <div className="donate-widget-layout">
-              {/* Left Column: Mission Impact & Direct Institutional Support */}
+              {/* Left Column: Mission Impact & Zero-Fee Guarantee */}
               <div className="donate-widget-info">
-                <span className="subdomain-eyebrow">Support Science</span>
-                <h2 className="subdomain-heading">Make a Contribution</h2>
+                <span className="subdomain-eyebrow">Zero-Cost Contribution</span>
+                <h2 className="subdomain-heading">Direct UPI &amp; Bank Contribution</h2>
                 <p className="donate-widget-info__lede">
                   Your contribution directly supports scientific education, research outreach, student fellowships, and public science engagement programmes across Science Orbit Forum.
                 </p>
+
+                <div className="donate-benefits-list">
+                  <div className="donate-benefit-pill">
+                    <CheckCircle2 size={16} className="donate-benefit-pill__icon" />
+                    <span><strong>100% Free:</strong> 0% gateway commission or deduction. Every rupee supports SOF.</span>
+                  </div>
+                  <div className="donate-benefit-pill">
+                    <CheckCircle2 size={16} className="donate-benefit-pill__icon" />
+                    <span><strong>Instant Mobile UPI:</strong> 1-click pay via Google Pay, PhonePe, Paytm, BHIM &amp; Cred.</span>
+                  </div>
+                  <div className="donate-benefit-pill">
+                    <CheckCircle2 size={16} className="donate-benefit-pill__icon" />
+                    <span><strong>Direct Bank Settlement:</strong> NPCI &amp; RBI compliant direct account transfers.</span>
+                  </div>
+                  <div className="donate-benefit-pill">
+                    <CheckCircle2 size={16} className="donate-benefit-pill__icon" />
+                    <span><strong>Official Receipts:</strong> Acknowledgment issued for all institutional &amp; individual contributions.</span>
+                  </div>
+                </div>
+
                 <div className="donate-widget-info__meta">
                   <span>
-                    For CSR grants, institutional sponsorships, or bank wire inquiries, contact{' '}
+                    For CSR grants, formal MOUs, or institutional wire inquiries, contact{' '}
                     <a href="mailto:info@scienceorbitforum.org">
                       info@scienceorbitforum.org
                     </a>
@@ -191,129 +193,9 @@ export default function SupportPage() {
                 </div>
               </div>
 
-              {/* Right Column: Standard Donation Selector Card */}
-              <div className="donate-widget-card">
-                {submitted ? (
-                  <div className="donate-widget-success">
-                    <div className="donate-widget-success__icon">
-                      <CheckCircle2 size={28} />
-                    </div>
-                    <h3 className="donate-widget-success__title">
-                      Contribution Initiated
-                    </h3>
-                    <p className="donate-widget-success__text">
-                      Thank you for your{' '}
-                      <strong>
-                        {frequency === 'annual' ? 'annual' : 'one-time'}
-                      </strong>{' '}
-                      contribution{displayAmount ? ` of ${displayAmount}` : ''}. Our online payment gateway integration is being finalised; please contact{' '}
-                      <a href="mailto:info@scienceorbitforum.org">
-                        info@scienceorbitforum.org
-                      </a>{' '}
-                      to complete your transfer and receive your official receipt.
-                    </p>
-                    <button
-                      type="button"
-                      className="donate-widget-reset"
-                      onClick={() => setSubmitted(false)}
-                    >
-                      Change Amount
-                    </button>
-                  </div>
-                ) : (
-                  <form onSubmit={handleSubmit} className="donate-widget-form">
-                    {/* Frequency Segmented Toggle */}
-                    <div
-                      className="donate-frequency-tabs"
-                      role="tablist"
-                      aria-label="Contribution frequency"
-                    >
-                      <button
-                        type="button"
-                        role="tab"
-                        aria-selected={frequency === 'one-time'}
-                        className={`donate-frequency-tab ${
-                          frequency === 'one-time' ? 'is-active' : ''
-                        }`}
-                        onClick={() => setFrequency('one-time')}
-                      >
-                        One-Time
-                      </button>
-                      <button
-                        type="button"
-                        role="tab"
-                        aria-selected={frequency === 'annual'}
-                        className={`donate-frequency-tab ${
-                          frequency === 'annual' ? 'is-active' : ''
-                        }`}
-                        onClick={() => setFrequency('annual')}
-                      >
-                        Annual Support
-                      </button>
-                    </div>
-
-                    {/* Preset Amounts Grid */}
-                    <div className="donate-amounts-grid">
-                      {PRESET_AMOUNTS.map((amt) => {
-                        const active = selectedAmount === amt;
-                        return (
-                          <button
-                            key={amt}
-                            type="button"
-                            onClick={() => {
-                              setSelectedAmount(amt);
-                              setCustomAmount('');
-                            }}
-                            className={`donate-amount-btn ${
-                              active ? 'is-active' : ''
-                            }`}
-                          >
-                            ₹{amt.toLocaleString('en-IN')}
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    {/* Custom Amount Input with ₹ Prefix */}
-                    <div
-                      className={`donate-custom-input-wrap ${
-                        selectedAmount === 'custom' ? 'is-focused' : ''
-                      }`}
-                    >
-                      <span className="donate-custom-prefix">₹</span>
-                      <input
-                        type="number"
-                        min={100}
-                        placeholder="Other amount"
-                        value={customAmount}
-                        onFocus={() => setSelectedAmount('custom')}
-                        onChange={(e) => {
-                          setSelectedAmount('custom');
-                          setCustomAmount(e.target.value);
-                        }}
-                        className="donate-custom-input"
-                        aria-label="Custom contribution amount in INR"
-                      />
-                      <span className="donate-custom-currency">INR</span>
-                    </div>
-
-                    {/* Primary Donate Button */}
-                    <button type="submit" className="donate-submit-btn">
-                      <span>
-                        Donate {displayAmount ? displayAmount : 'Now'}
-                        {frequency === 'annual' ? ' / year' : ''}
-                      </span>
-                      <ArrowRight size={16} />
-                    </button>
-
-                    <p className="donate-widget-footnote">
-                      <ShieldCheck size={14} />
-                      <span>
-                        Managed in accordance with SOF financial governance &amp; compliance standards.
-                      </span>
-                    </p>
-                  </form>
-                )}
+              {/* Right Column: Interactive Zero-Cost UPI Widget */}
+              <div className="donate-widget-card-wrap">
+                <UpiDonationWidget />
               </div>
             </div>
           </Reveal>

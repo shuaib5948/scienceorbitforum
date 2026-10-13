@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { useParams, Link } from '@tanstack/react-router';
+import { setDocumentTitle } from '../lib/usePageMeta';
 import { SectionHeading } from '../components/ui/SectionHeading';
 import { ButtonLink } from '../components/ui/Button';
 import { Breadcrumbs, DateLabel, CategoryLabel } from '../components/ui/Labels';
@@ -16,6 +18,12 @@ export default function EventDetailPage() {
   const item = events.find((e) => e.slug === eventSlug);
   const relatedUpdates = updates.filter((u) => u.tag === item?.tag).slice(0, 3);
   const relatedEvents = events.filter((e) => e.id !== item?.id && e.tag === item?.tag).slice(0, 3);
+
+  useEffect(() => {
+    if (item?.title) {
+      setDocumentTitle(`${item.title} · Science Orbit Forum`);
+    }
+  }, [item?.title]);
 
   if (!item) {
     return (

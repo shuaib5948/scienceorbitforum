@@ -116,6 +116,12 @@ export default function IcrastSubmitPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
+  useEffect(() => {
+    if (submittedData) {
+      document.title = 'Abstract Submitted Successfully · ICRAST-26';
+    }
+  }, [submittedData]);
+
   // Co-author handlers
   const addCoAuthor = () => {
     setCoAuthors((prev) => [

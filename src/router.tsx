@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import {
   createRootRoute,
   createRoute,
@@ -5,6 +6,7 @@ import {
   Outlet,
   useLocation,
 } from '@tanstack/react-router';
+import { setDocumentTitle, setFavicon, type FaviconType } from './lib/usePageMeta';
 import { Header } from './components/layout/Header';
 import { Footer } from './components/layout/Footer';
 import { SkipLink } from './components/site/SkipLink';
@@ -66,6 +68,106 @@ function RootIndexComponent() {
  *   /terms           Terms
  *   /design-system   Phase 1 showcase (preserved for reference)
  */
+function getRouteMetadata(
+  pathname: string,
+  subdomain: 'icrast' | 'festival' | null
+): { title: string; favicon: FaviconType } {
+  // 1. ICRAST Portal or Subdomain
+  if (subdomain === 'icrast' || pathname.startsWith('/icrast')) {
+    if (pathname === '/venue' || pathname === '/icrast/venue') {
+      return { title: 'Venue & Travel Guide · ICRAST-26', favicon: 'icrast' };
+    }
+    if (pathname === '/contact' || pathname === '/icrast/contact') {
+      return { title: 'Contact & Secretariat · ICRAST-26', favicon: 'icrast' };
+    }
+    if (pathname === '/submit' || pathname === '/icrast/submit') {
+      return { title: 'Abstract Submission · ICRAST-26', favicon: 'icrast' };
+    }
+    return {
+      title: 'ICRAST-26 · International Conference on Recent Advances in Science & Technology',
+      favicon: 'icrast',
+    };
+  }
+
+  // 2. Festival Portal or Subdomain
+  if (
+    subdomain === 'festival' ||
+    pathname.startsWith('/festival') ||
+    pathname === '/events/science-festival-2026'
+  ) {
+    return {
+      title: 'Science Orbit Festival 2K26 (SOF-26) · Science Orbit Forum',
+      favicon: 'festival',
+    };
+  }
+
+  // Standalone aliases without subdomain prefix
+  if (pathname === '/venue') {
+    return { title: 'Venue & Travel Guide · ICRAST-26', favicon: 'icrast' };
+  }
+  if (pathname === '/submit') {
+    return { title: 'Abstract Submission · ICRAST-26', favicon: 'icrast' };
+  }
+
+  // 3. Main Science Orbit Forum domain pages
+  switch (pathname) {
+    case '/':
+      return {
+        title: 'Science Orbit Forum · Where Curiosity Meets Science',
+        favicon: 'main',
+      };
+    case '/who-we-are':
+      return { title: 'Who We Are · Science Orbit Forum', favicon: 'main' };
+    case '/mission':
+      return { title: 'Our Mission · Science Orbit Forum', favicon: 'main' };
+    case '/vision':
+      return { title: 'Our Vision · Science Orbit Forum', favicon: 'main' };
+    case '/events':
+      return {
+        title: 'Programmes & Events · Science Orbit Forum',
+        favicon: 'main',
+      };
+    case '/updates':
+      return { title: 'Latest Updates · Science Orbit Forum', favicon: 'main' };
+    case '/people':
+      return {
+        title: 'People & Leadership · Science Orbit Forum',
+        favicon: 'main',
+      };
+    case '/join':
+      return {
+        title: 'Join Science Orbit · Membership Categories & Benefits',
+        favicon: 'main',
+      };
+    case '/join/apply':
+      return {
+        title: 'Individual Membership Application · Science Orbit Forum',
+        favicon: 'main',
+      };
+    case '/support':
+      return { title: 'Funding & Support · Science Orbit Forum', favicon: 'main' };
+    case '/privacy':
+      return { title: 'Privacy Policy · Science Orbit Forum', favicon: 'main' };
+    case '/terms':
+      return { title: 'Terms & Conditions · Science Orbit Forum', favicon: 'main' };
+    case '/contact':
+      return { title: 'Who We Are · Science Orbit Forum', favicon: 'main' };
+    case '/design-system':
+      return { title: 'Design System Showcase · Science Orbit Forum', favicon: 'main' };
+    default:
+      if (pathname.startsWith('/events/')) {
+        return { title: 'Event Details · Science Orbit Forum', favicon: 'main' };
+      }
+      if (pathname.startsWith('/updates/')) {
+        return { title: 'News & Updates · Science Orbit Forum', favicon: 'main' };
+      }
+      return {
+        title: 'Science Orbit Forum · Where Curiosity Meets Science',
+        favicon: 'main',
+      };
+  }
+}
+
 const rootRoute = createRootRoute({
   component: RootComponent,
   notFoundComponent: NotFound,
@@ -84,6 +186,12 @@ function RootComponent() {
     pathname.startsWith('/festival') ||
     subdomain === 'festival' ||
     pathname === '/events/science-festival-2026';
+
+  useEffect(() => {
+    const meta = getRouteMetadata(pathname, subdomain);
+    setDocumentTitle(meta.title);
+    setFavicon(meta.favicon);
+  }, [pathname, subdomain]);
 
   return (
     <>
@@ -221,6 +329,12 @@ const supportRoute = createRoute({
   component: SupportPage,
 });
 
+const donateRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/donate',
+  component: SupportPage,
+});
+
 const privacyRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/privacy',
@@ -260,6 +374,7 @@ const routeTree = rootRoute.addChildren([
   joinRoute,
   joinApplyRoute,
   supportRoute,
+  donateRoute,
   privacyRoute,
   termsRoute,
   designSystemRoute,

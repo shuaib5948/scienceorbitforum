@@ -110,6 +110,12 @@ export default function MembershipApplyPage() {
     }
   }, []);
 
+  useEffect(() => {
+    if (submittedData) {
+      document.title = 'Application Submitted Successfully · Science Orbit Forum';
+    }
+  }, [submittedData]);
+
   const currentCategoryInfo = CATEGORY_DETAILS[selectedCategory];
 
   const handleCategorySelect = (catKey: 'platinum' | 'gold' | 'silver') => {

@@ -80,3 +80,29 @@ export const SUPPORT_TRANSPARENCY = {
   contactNote:
     'For funding proposals, institutional partnerships, sponsorship opportunities, or other forms of support, please contact us through our official communication channels.',
 };
+
+export interface UpiConfig {
+  vpa: string;
+  payeeName: string;
+  note: string;
+  bankDetails: {
+    accountName: string;
+    accountNumber: string;
+    ifsc: string;
+    bankName: string;
+    branch: string;
+  };
+}
+
+export const UPI_CONFIG: UpiConfig = {
+  vpa: 'scienceorbitforum@upi',
+  payeeName: 'Science Orbit Forum',
+  note: 'Contribution to Science Orbit Forum',
+  bankDetails: {
+    accountName: 'Science Orbit Forum',
+    accountNumber: 'Official account details provided upon receipt request',
+    ifsc: 'SBIN0000000',
+    bankName: 'State Bank of India',
+    branch: 'Calicut (Kozhikode), Kerala',
+  },
+};
