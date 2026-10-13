@@ -47,10 +47,10 @@ export const HEADER_NAV: HeaderNavSection[] = [
   },
   {
     label: 'Support',
-    match: ['/support'],
+    match: ['/support', '/donate'],
     items: [
       { label: 'Funding & Support', to: '/support' },
-      { label: 'Donate Now', href: '/support#donate' },
+      { label: 'Donate Now', to: '/donate' },
     ],
   },
 ];
@@ -219,13 +219,13 @@ export const Header: React.FC = () => {
 
             {/* Action CTA & Mobile Menu Toggle */}
             <div className="floating-header__actions">
-              <a
-                href="/support#donate"
+              <Link
+                to="/donate"
                 className="floating-header__btn"
               >
                 <span>Donate</span>
                 <ArrowRight size={14} />
-              </a>
+              </Link>
 
               <button
                 type="button"

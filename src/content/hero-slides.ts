@@ -25,7 +25,7 @@ export const heroSlidesData: HeroSlide[] = [
       text: "“Nothing in life is to be feared, it is only to be understood. Now is the time to understand more, so that we may fear less.”",
       author: "Marie Curie",
     },
-    image: "/images/marie-curie-lab.jpg",
+    image: "/images/marie-curie-lab.png",
     primaryCta: {
       label: "Join Science Orbit",
       to: "/join",

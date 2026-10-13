@@ -23,6 +23,7 @@ import PeoplePage from './pages/PeoplePage';
 import JoinPage from './pages/JoinPage';
 import MembershipApplyPage from './pages/MembershipApplyPage';
 import SupportPage from './pages/SupportPage';
+import DonatePage from './pages/DonatePage';
 import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
 import IcrastPortalPage from './pages/IcrastPortalPage';
@@ -332,7 +333,7 @@ const supportRoute = createRoute({
 const donateRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/donate',
-  component: SupportPage,
+  component: DonatePage,
 });
 
 const privacyRoute = createRoute({
