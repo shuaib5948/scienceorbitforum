@@ -1,115 +1,36 @@
 import type { Update } from '../types';
 
 /**
- * Science Orbit Forum — Updates / blog (Phase 2 content-model seed).
- * Mirrors `public/data/updates.json` for the fetch-with-fallback loader.
+ * Science Orbit Forum — Official News & Updates.
+ * The two official featured news releases:
+ * 1. Science Orbit Festival 2K26 Launch
+ * 2. ICRAST-26 International Conference Announcement
  */
 export const updates: Update[] = [
   {
-    slug: 'bioblitz-2025-a-photo-essay',
-    title: 'BioBlitz 2025 — A Photo Essay',
-    date: '2025-03-08T00:00:00+00:00',
-    author: 'Aditi Khan',
-    tag: 'Event Reports',
-    excerpt: 'Through more than 300 observations, students documented 87 species across campus in a single day, revealing how biodiversity shifts across habitats, seasons, and everyday campus life.',
-    cover: 'https://images.unsplash.com/photo-1480044965905-02098d419757?auto=format&fit=crop&w=1200&q=40',
+    slug: 'science-orbit-festival-2k26-launched',
+    title:
+      'Science Orbit Festival 2K26 Launched to Celebrate Science, Innovation and Discovery',
+    date: '2026-10-01T00:00:00+00:00',
+    author: 'Science Orbit Forum Secretariat',
+    tag: 'Flagship Festival',
+    excerpt:
+      'Science Orbit Forum has initiated Science Orbit Festival 2K26 (SOF-26) under the theme “From Atoms to Ecosystems: The Continuum of Life”, culminating in December 2026 in Kozhikode (Calicut), Kerala.',
+    cover: '/images/science-orbit-festival.jpg',
+    content:
+      'Science Orbit Forum has initiated Science Orbit Festival 2K26 (SOF-26) in October 2026, launching a series of science-focused programmes under the theme “From Atoms to Ecosystems: The Continuum of Life.” The festival aims to promote scientific curiosity, research, innovation, and public engagement through a diverse range of upcoming events, including scientific conferences, workshops, exhibitions, competitions, and other academic and outreach activities. Bringing together students, researchers, educators, and science enthusiasts, the festival seeks to create opportunities for knowledge-sharing and interdisciplinary collaboration across various fields of science and technology. The International Conference on Recent Advancements in Science and Technology 2026 (ICRAST-26), organised in collaboration with the Prof. M.S. Swaminathan Chair for Science Popularisation and Research at the University of Calicut, is among the programmes featured as part of the festival. With several more initiatives planned in the coming weeks, SOF-26 will culminate in December 2026 in Kozhikode (Calicut), Kerala, marking the conclusion of a festival dedicated to exploring the connections between the smallest building blocks of matter and the complexity of life and ecosystems.',
   },
   {
-    slug: 'inside-the-quantum-coffee-talks',
-    title: 'Inside the Quantum Coffee Talks',
-    date: '2025-02-15T00:00:00+00:00',
-    author: 'Dr. Farah Ibrahim',
-    tag: 'Science',
-    excerpt: 'A recap of the conversations that emerged when we asked: what does “measurement” really mean in quantum optics, and how do scientists turn uncertainty into insight?',
-  },
-  {
-    slug: 'research-notes-green-catalysis',
-    title: 'Research Notes: Green Catalysis, Clean Pharmaceuticals',
-    date: '2025-01-22T00:00:00+00:00',
-    author: 'Meera Sharma',
-    tag: 'Research',
-    excerpt: 'How enzyme-driven catalysis is reshaping the synthesis of small-molecule drugs, reducing waste while making greener pharmaceutical production more practical and scalable.',
-    cover: 'https://images.unsplash.com/photo-1582719775-829c8b2c0f4a?auto=format&fit=crop&w=1200&q=40',
-  },
-  {
-    slug: 'call-for-paper-icrast-26',
-    title: 'Call for Paper ICRAST-26',
-    date: '2026-09-27T00:00:00+00:00',
-    author: 'Science Orbit Forum Team',
-    tag: 'Announcements',
-    excerpt: 'Free registration, hybrid mode, abstract submission deadline 27th Sep 2026 and full paper submission on 11th Oct 2026.',
-    cover: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=40',
-  },
-  {
-    slug: 'science-festival-announcement',
-    title: 'Announcing Science Festival 2026',
-    date: '2025-12-01T00:00:00+00:00',
-    author: 'Science Orbit Forum Team',
-    tag: 'Announcements',
-    excerpt: 'Mark your calendars for our biggest event of the year — a three-day celebration of science for everyone.',
-    cover: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1200&q=40',
-  },
-  {
-    slug: 'student-award-national-competition',
-    title: 'Student Achievement: National Science Competition Winner',
-    date: '2025-11-15T00:00:00+00:00',
-    author: 'Science Orbit Forum Team',
-    tag: 'Student Achievements',
-    excerpt: 'Congratulations to our student who secured first place in the National Young Scientist Competition.',
-    cover: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=1200&q=40',
-  },
-  {
-    slug: 'community-science-workshop',
-    title: 'Community Science Workshop: Bringing Science to Local Schools',
-    date: '2025-10-20T00:00:00+00:00',
-    author: 'Rahul Menon',
-    tag: 'Community Stories',
-    excerpt: 'How our volunteers are inspiring the next generation of scientists through hands-on workshops.',
-    cover: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&q=40',
-  },
-  {
-    slug: 'science-awareness-climate',
-    title: 'Science Awareness: Understanding Climate Change',
-    date: '2025-09-10T00:00:00+00:00',
-    author: 'Dr. Priya Nair',
-    tag: 'Science Awareness',
-    excerpt: 'A public lecture series helping communities understand the science behind climate change and local impacts.',
-    cover: 'https://images.unsplash.com/photo-1569163139599-0f4517e36f51?auto=format&fit=crop&w=1200&q=40',
-  },
-  {
-    slug: 'mathematics-olympiad-prep',
-    title: 'Activities: Mathematics Olympiad Preparation Programme',
-    date: '2025-08-05T00:00:00+00:00',
-    author: 'Prof. Arun Kumar',
-    tag: 'Activities',
-    excerpt: 'Weekly sessions helping students prepare for regional and national mathematics competitions.',
-    cover: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=1200&q=40',
-  },
-  {
-    slug: 'research-publication-journal',
-    title: 'Research: Student Paper Published in International Journal',
-    date: '2025-07-18T00:00:00+00:00',
-    author: 'Dr. Anjali Verma',
-    tag: 'Research',
-    excerpt: 'A milestone achievement as undergraduate research gets published in a peer-reviewed scientific journal.',
-    cover: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=40',
-  },
-  {
-    slug: 'astronomy-night-observation',
-    title: 'Event Report: Astronomy Night Observation Session',
-    date: '2025-06-12T00:00:00+00:00',
-    author: 'Vikram Singh',
-    tag: 'Event Reports',
-    excerpt: 'Over 100 participants joined us for an evening of stargazing and planetary observation.',
-    cover: 'https://images.unsplash.com/photo-1534447675924-e2a6b4f4e8a3?auto=format&fit=crop&w=1200&q=40',
-  },
-  {
-    slug: 'new-laboratory-equipment',
-    title: 'Announcements: New Laboratory Equipment Arrives',
-    date: '2025-05-25T00:00:00+00:00',
-    author: 'Science Orbit Forum Team',
-    tag: 'Announcements',
-    excerpt: 'State-of-the-art equipment now available for student research projects and advanced experiments.',
-    cover: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=1200&q=40',
+    slug: 'icrast-26-international-conference-announced',
+    title:
+      'Science Orbit Forum Announces ICRAST-26 International Conference at the University of Calicut',
+    date: '2026-10-10T00:00:00+00:00',
+    author: 'ICRAST Organizing Secretariat',
+    tag: 'International Conference',
+    excerpt:
+      'Science Orbit Forum is set to host ICRAST-26 on 21 November 2026 at the University of Calicut in hybrid mode with free registration, exploring advances in biotechnology and frontier sciences.',
+    cover: '/images/icrast-biotech-globe.jpg',
+    content:
+      'Science Orbit Forum is set to host the International Conference on Recent Advancements in Science and Technology 2026 (ICRAST-26) on 21 November 2026 at the University of Calicut, in collaboration with the Prof. M.S. Swaminathan Chair for Science Popularisation and Research. Organised in hybrid mode, the conference will explore the theme “Advances in Biotechnology and Frontier Sciences for Human Well-Being,” bringing together researchers, academicians, students, and science enthusiasts to exchange ideas and discuss emerging scientific developments. The conference will feature oral presentations in both online and offline modes, alongside offline poster presentations, across eleven thematic areas, including molecular biology and genetic engineering, advanced functional materials, regenerative medicine, biosensors, marine and space biotechnology, precision agriculture, environmental engineering, renewable energy, chemical engineering, and nanoscience and nanotechnology. Registration is free of charge. The deadline for abstract submission is 30 October 2026, with acceptance notifications scheduled for 9 November 2026 and full-paper submission due by 15 November 2026. Through ICRAST-26, Science Orbit Forum aims to foster scientific collaboration, encourage research-driven innovation, and promote the application of frontier sciences for human well-being.',
   },
 ];

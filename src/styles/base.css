@@ -21,7 +21,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   font-synthesis-weight: none;
-}
   letter-spacing: var(--tracking-body);
   color: var(--color-text);
   background-color: var(--color-bg);

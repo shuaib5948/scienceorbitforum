@@ -1,40 +1,29 @@
 export default function VisionPage() {
   return (
-    <section className="vision-page">
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-      }}>
-        <h1 style={{
-          margin: 0,
-          fontSize: 'clamp(1.2rem, 1.5vw, 1.5rem)',
-          lineHeight: 1.2,
-          fontWeight: 700,
-          letterSpacing: '0.12em',
-          textTransform: 'uppercase',
-          color: '#081d3a',
-        }}>
-          Our Vision
-        </h1>
+    <section className="statement-screen vision-page">
+      <div className="statement-screen__container">
+        <div className="statement-screen__content">
+          <span className="statement-screen__eyebrow">
+            Our Aspiration
+          </span>
 
-        <p style={{
-          margin: '1.5rem 0 0',
-          fontSize: 'clamp(1.05rem, 1.5vw, 1.45rem)',
-          lineHeight: 1.7,
-          color: '#1c2f4e',
-          maxWidth: 620,
-        }}>
-          To advance humanity by fostering scientific excellence, technological innovation, and lifelong learning, enabling every talented individual to contribute meaningfully to a more equitable, sustainable, and technologically advanced world.
-        </p>
+          <h1 className="statement-screen__title">
+            Our Vision
+          </h1>
+
+          <p className="statement-screen__desc">
+            To advance humanity by fostering scientific excellence, technological innovation, and lifelong learning, enabling every talented individual to contribute meaningfully to a more equitable, sustainable, and technologically advanced world.
+          </p>
+        </div>
+
+        <div className="statement-screen__media">
+          <img
+            src="https://images.unsplash.com/photo-1507668077129-56e32842fceb?auto=format&fit=crop&w=1000&q=75"
+            alt="Futuristic science and technology vision for human progress"
+            loading="eager"
+          />
+        </div>
       </div>
-
-      <div style={{
-        minHeight: '460px',
-        borderRadius: '28px',
-        background: 'linear-gradient(135deg, #dfeaf8 0%, #9db9d7 100%)',
-        boxShadow: '0 18px 40px rgba(8, 29, 58, 0.12)',
-      }} />
     </section>
   );
 }

@@ -3,14 +3,18 @@ import { Logo } from '../ui/Logo';
 import { SocialIcon, type SocialName } from '../ui/Links';
 import { Mail, MapPin } from 'lucide-react';
 
-const EXPLORE = [
+const ABOUT_LINKS = [
   { label: 'Who We Are', to: '/who-we-are' },
-  { label: 'Mission', to: '/mission' },
-  { label: 'Vision', to: '/vision' },
-  { label: 'Events', to: '/events' },
-  { label: 'Updates', to: '/updates' },
-  { label: 'People', to: '/people' },
-  { label: 'Join Science Orbit Forum', to: '/join' },
+  { label: 'Our Mission', to: '/mission' },
+  { label: 'Our Vision', to: '/vision' },
+  { label: 'Leadership', to: '/people' },
+];
+
+const PROGRAMME_LINKS = [
+  { label: 'All Events', to: '/events' },
+  { label: 'Latest Updates', to: '/updates' },
+  { label: 'ICRAST-26 Portal', to: '/icrast' },
+  { label: 'Science Festival', to: '/festival' },
 ];
 
 const SOCIALS: Array<{ name: SocialName; label: string; href: string }> = [
@@ -23,59 +27,91 @@ const SOCIALS: Array<{ name: SocialName; label: string; href: string }> = [
 const CONTACT_EMAIL = 'info@scienceorbitforum.org';
 
 /**
- * Footer — Navy surface with a thin cyan top border. Four columns:
- * brand + tagline · explore links · contact info · social icons.
- * Stacks to a single column on mobile; copyright bar below a thin rule.
+ * Footer — Standard, well-organized 4-column institutional layout:
+ * 1. Brand, tagline & social links
+ * 2. About navigation
+ * 3. Programmes & News navigation
+ * 4. Contact details & Join link
+ * Followed by a clean copyright & legal bar.
  */
 export function Footer() {
   return (
     <footer className="footer">
-      <div className="container section" style={{ paddingBottom: 0 }}>
+      <div className="container footer__inner">
         <div className="footer__grid">
+          {/* Column 1: Brand & Socials */}
           <div className="footer__brand">
-            <Logo tone="dark" size={38} layout="horizontal" />
+            <Logo tone="dark" size={34} layout="horizontal" />
             <p className="footer__tagline">
-              Science Forum for Curious Minds — where scientific curiosity orbits
-              into research, innovation and impact.
+              Science Forum for Curious Minds — advancing scientific inquiry,
+              research collaboration, and public science engagement.
             </p>
-          </div>
-
-          <nav className="footer__col" aria-label="Explore">
-            <span className="footer__heading">Explore</span>
-            {EXPLORE.map((item) => (
-              <Link key={item.to} to={item.to} className="footer__link">
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="footer__col">
-            <span className="footer__heading">Contact</span>
-            <a className="footer__link footer__contact" href={`mailto:${CONTACT_EMAIL}`}>
-              <Mail size={16} /> {CONTACT_EMAIL}
-            </a>
-            <span className="footer__link footer__contact">
-              <MapPin size={16} /> Science Building, Room 302
-            </span>
-          </div>
-
-          <div className="footer__col">
-            <span className="footer__heading">Follow</span>
             <div className="footer__social">
               {SOCIALS.map((s) => (
                 <SocialIcon key={s.name} name={s.name} href={s.href} label={s.label} />
               ))}
             </div>
           </div>
+
+          {/* Column 2: About */}
+          <nav className="footer__col" aria-label="About">
+            <span className="footer__heading">About</span>
+            <div className="footer__list">
+              {ABOUT_LINKS.map((item) => (
+                <Link key={item.to} to={item.to} className="footer__link">
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </nav>
+
+          {/* Column 3: Programmes */}
+          <nav className="footer__col" aria-label="Programmes">
+            <span className="footer__heading">Programmes</span>
+            <div className="footer__list">
+              {PROGRAMME_LINKS.map((item) => (
+                <Link key={item.to} to={item.to} className="footer__link">
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </nav>
+
+          {/* Column 4: Contact */}
+          <div className="footer__col">
+            <span className="footer__heading">Contact</span>
+            <div className="footer__list">
+              <a className="footer__link footer__contact" href={`mailto:${CONTACT_EMAIL}`}>
+                <Mail size={15} />
+                <span>{CONTACT_EMAIL}</span>
+              </a>
+              <span className="footer__link footer__contact">
+                <MapPin size={15} />
+                <span>Kozhikode, Kerala, India</span>
+              </span>
+              <Link to="/join" className="footer__cta-link">
+                Join Science Orbit Forum →
+              </Link>
+            </div>
+          </div>
         </div>
 
         <div className="footer__bar">
           <span className="footer__note">
-            © {new Date().getFullYear()} Science Orbit Forum — All rights reserved.
+            © {new Date().getFullYear()} Science Orbit Forum. All rights reserved.
           </span>
-          <span className="footer__note">Privacy Policy · Terms</span>
+          <div className="footer__legal">
+            <Link to="/privacy" className="footer__legal-link">
+              Privacy Policy
+            </Link>
+            <span className="footer__legal-sep" aria-hidden="true">·</span>
+            <Link to="/terms" className="footer__legal-link">
+              Terms of Use
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
   );
 }
+

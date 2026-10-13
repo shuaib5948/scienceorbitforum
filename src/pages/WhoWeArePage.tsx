@@ -1,40 +1,29 @@
 export default function WhoWeArePage() {
   return (
-    <section className="who-we-are-page">
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-      }}>
-        <h1 style={{
-          margin: 0,
-          fontSize: 'clamp(1.2rem, 1.5vw, 1.5rem)',
-          lineHeight: 1.2,
-          fontWeight: 700,
-          letterSpacing: '0.12em',
-          textTransform: 'uppercase',
-          color: '#081d3a',
-        }}>
-          Who We Are
-        </h1>
+    <section className="statement-screen who-we-are-page">
+      <div className="statement-screen__container">
+        <div className="statement-screen__content">
+          <span className="statement-screen__eyebrow">
+            About Science Orbit Forum
+          </span>
 
-        <p style={{
-          margin: '1.5rem 0 0',
-          fontSize: 'clamp(1.05rem, 1.5vw, 1.45rem)',
-          lineHeight: 1.7,
-          color: '#1c2f4e',
-          maxWidth: 620,
-        }}>
-          Science Orbit Forum brings together students, researchers, educators, innovators and curious minds to explore science through conversation, participation and shared learning in a community built for open inquiry and collaboration.
-        </p>
+          <h1 className="statement-screen__title">
+            Who We Are
+          </h1>
+
+          <p className="statement-screen__desc">
+            Science Orbit Forum brings together students, researchers, educators, innovators and curious minds to explore science through conversation, participation and shared learning in a community built for open inquiry and collaboration.
+          </p>
+        </div>
+
+        <div className="statement-screen__media">
+          <img
+            src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1000&q=75"
+            alt="Science Orbit Forum community discussing research and collaboration"
+            loading="eager"
+          />
+        </div>
       </div>
-
-      <div style={{
-        minHeight: '460px',
-        borderRadius: '28px',
-        background: 'linear-gradient(135deg, #dfeaf8 0%, #9db9d7 100%)',
-        boxShadow: '0 18px 40px rgba(8, 29, 58, 0.12)',
-      }} />
     </section>
   );
 }

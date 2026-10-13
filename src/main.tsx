@@ -8,5 +8,6 @@ import './styles/components-ui.css';
 import './styles/layout.css';
 import './styles/pages.css';
 import './styles/site.css';
+import './styles/hero-slider.css';
 
 createRoot(document.getElementById('root')!).render(<RouterProvider router={router} />);

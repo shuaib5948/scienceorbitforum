@@ -31,6 +31,7 @@ export interface EventItem {
   image: string;
   excerpt: string;
   featured?: boolean;
+  subdomain?: string;
 }
 
 export interface Update {
@@ -41,6 +42,7 @@ export interface Update {
   tag: string;
   excerpt: string;
   cover?: string;
+  content?: string;
 }
 
 export interface ResearchItem {

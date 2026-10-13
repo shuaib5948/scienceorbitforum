@@ -127,7 +127,7 @@ export default function EventDetailPage() {
                     <Tag variant="navy">{u.tag}</Tag>
                     <h4 style={{ marginTop: 'var(--space-2)', fontSize: 'var(--text-h4)' }}>{u.title}</h4>
                     <p style={{ color: 'var(--color-text-muted)', marginTop: 'var(--space-2)', fontSize: 'var(--text-body-small)' }}>{u.excerpt}</p>
-                    <Link to={`/updates/${u.slug}`} style={{ color: 'var(--color-secondary)', fontSize: 'var(--text-body-small)', fontWeight: 600, marginTop: 'var(--space-3)', display: 'inline-block' }}>
+                    <Link to="/updates" style={{ color: 'var(--color-secondary)', fontSize: 'var(--text-body-small)', fontWeight: 600, marginTop: 'var(--space-3)', display: 'inline-block' }}>
                       Read more →
                     </Link>
                   </div>

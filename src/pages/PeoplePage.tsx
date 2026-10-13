@@ -1,105 +1,71 @@
 import { PageHero } from '../components/site/PageHero';
+import { Reveal } from '../components/ui/Reveal';
 
-const presidentImage = 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&q=80';
-const secretaryImage = 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=900&q=80';
+const presidentImage = '/images/rasheed.jpg';
+const secretaryImage = '/images/shabeer.jpg';
 
 export default function PeoplePage() {
   return (
     <>
       <PageHero
-        eyebrow="OUR PEOPLE"
+        className="page-hero--people-gradient"
+        eyebrow="Our People"
         title="The People Behind Science Orbit Forum"
         lede="Meet the people who guide, coordinate and contribute to the work of Science Orbit Forum."
-        align="center"
       />
 
-      <section className="container section people-page" style={{ paddingTop: 'var(--space-7)' }}>
-        <h2 style={{
-          margin: 0,
-          fontFamily: 'var(--font-subhead)',
-          fontSize: 'clamp(0.95rem, 1.2vw, 1.1rem)',
-          fontWeight: 700,
-          letterSpacing: '0.16em',
-          textTransform: 'uppercase',
-          color: 'var(--color-text-muted)',
-        }}>
-          Leadership
-        </h2>
+      {/* Clean Leadership Section */}
+      <section className="people-leadership-section">
+        <div className="container">
+          <div className="people-leadership-rows">
+            {/* Row 1: President */}
+            <Reveal>
+              <article className="leader-row">
+                <div className="leader-row__photo-col">
+                  <div className="leader-row__photo-wrap">
+                    <img
+                      src={presidentImage}
+                      alt="Portrait of M. Rasheed T. P."
+                      className="leader-row__photo"
+                      loading="lazy"
+                    />
+                  </div>
+                </div>
 
-        <div className="people-page__leadership-grid" style={{ marginTop: 'var(--space-5)' }}>
-          <article className="people-page__profile">
-            <div className="people-page__photo">
-              <img
-                src={presidentImage}
-                alt="Portrait of M. Rasheed T. P."
-              />
-            </div>
+                <div className="leader-row__content">
+                  <p className="leader-row__role">President · Science Orbit Forum</p>
+                  <h2 className="leader-row__name">M. Rasheed T. P.</h2>
+                  <p className="leader-row__bio">
+                    M. Rasheed T. P. holds a Master’s degree in Physics from the Central University of Uttarakhand, along with a Bachelor’s degree in Physics from the University of Calicut and a Bachelor’s degree in Education from Tamil Nadu Teachers Education University. With over five and a half years of experience in STEM education and administration, he has developed extensive expertise in educational initiatives, academic coordination, and organizational administration. His experience and commitment to advancing science and STEM education contribute to the organization’s vision of fostering scientific learning, innovation, and collaboration.
+                  </p>
+                </div>
+              </article>
+            </Reveal>
 
-            <div>
-              <p style={{
-                margin: 0,
-                color: 'var(--color-text-muted)',
-                fontSize: 'var(--text-body-small)',
-                fontWeight: 700,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-              }}>
-                President
-              </p>
+            {/* Row 2: Secretary */}
+            <Reveal>
+              <article className="leader-row leader-row--reverse">
+                <div className="leader-row__content">
+                  <p className="leader-row__role">Secretary · Science Orbit Forum</p>
+                  <h2 className="leader-row__name">M. Shabeer U.</h2>
+                  <p className="leader-row__bio">
+                    M Shabeer U holds a Bachelor’s degree in Chemistry from the University of Calicut and a Master’s degree in Chemistry from the National Institute of Technology Calicut. He is currently a Research Scholar at the Materials Research Laboratory, Department of Chemistry, National Institute of Technology Calicut, where he is engaged in research in the field of materials chemistry. With an academic and research-oriented background, he contributes to the organization’s objectives of promoting scientific research, innovation, and meaningful engagement with science and technology.
+                  </p>
+                </div>
 
-              <h3 style={{
-                margin: 'var(--space-2) 0 0',
-                fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(1.6rem, 2vw, 2.2rem)',
-                lineHeight: 1.15,
-                color: 'var(--color-text)',
-              }}>
-                M. Rasheed T. P.
-              </h3>
-
-              <p style={{
-                marginTop: 'var(--space-3)',
-                fontSize: 'clamp(0.96rem, 1.15vw, 1.07rem)',
-                lineHeight: 1.8,
-                color: 'var(--color-text)',
-                maxWidth: 680,
-              }}>
-                M. Rasheed T. P. holds a Master’s degree in Physics from the Central University of Uttarakhand, along with a Bachelor’s degree in Physics from the University of Calicut and a Bachelor’s degree in Education from Tamil Nadu Teachers Education University. With over five and a half years of experience in STEM education and administration, he has developed extensive expertise in educational initiatives, academic coordination, and organizational administration. His experience and commitment to advancing science and STEM education contribute to the organization’s vision of fostering scientific learning, innovation, and collaboration.
-              </p>
-            </div>
-          </article>
-
-          <article className="people-page__profile people-page__profile--reverse">
-            <div>
-              <p style={{
-                margin: 0,
-                color: 'var(--color-text-muted)',
-                fontSize: 'var(--text-body-small)',
-                fontWeight: 700,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-              }}>
-                Secretary
-              </p>
-
-              <h3 style={{
-                margin: 'var(--space-2) 0 0',
-                fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(1.6rem, 2vw, 2.2rem)',
-                lineHeight: 1.15,
-                color: 'var(--color-text)',
-              }}>
-                M. Shabeer U.
-              </h3>
-            </div>
-
-            <div className="people-page__photo">
-              <img
-                src={secretaryImage}
-                alt="Portrait of M. Shabeer U."
-              />
-            </div>
-          </article>
+                <div className="leader-row__photo-col">
+                  <div className="leader-row__photo-wrap">
+                    <img
+                      src={secretaryImage}
+                      alt="Portrait of M. Shabeer U."
+                      className="leader-row__photo"
+                      loading="lazy"
+                    />
+                  </div>
+                </div>
+              </article>
+            </Reveal>
+          </div>
         </div>
       </section>
     </>
