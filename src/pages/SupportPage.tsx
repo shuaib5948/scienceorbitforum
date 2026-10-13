@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
+import { Link } from '@tanstack/react-router';
 import { PageHero } from '../components/site/PageHero';
 import { Reveal } from '../components/ui/Reveal';
 import { UpiPaymentModal } from '../components/donate/UpiPaymentModal';
@@ -164,10 +165,10 @@ export default function SupportPage() {
                   <Mail size={16} />
                   <span>info@scienceorbitforum.org</span>
                 </a>
-                <a href="#donate" className="support-aside-cta">
+                <Link to="/donate" className="support-aside-cta">
                   <span>Donate Now</span>
                   <ArrowRight size={15} />
-                </a>
+                </Link>
               </div>
             </div>
           </Reveal>
