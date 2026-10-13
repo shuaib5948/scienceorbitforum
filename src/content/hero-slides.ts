@@ -37,32 +37,32 @@ export const heroSlidesData: HeroSlide[] = [
   },
   {
     id: 'hero-slide-2',
-    eyebrow: "Annual Flagship Event",
-    titlePrimary: "SCIENCE ORBIT FESTIVAL",
-    subdescription: "A celebration of scientific exploration featuring exhibitions, interactive experiments, demonstrations and collaborative discoveries.",
-    image: "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1920&q=75",
-    primaryCta: {
-      label: "Festival Highlights",
-      to: "/events/science-festival-2026",
-    },
-    secondaryCta: {
-      label: "Explore Events",
-      to: "/events",
-    },
-  },
-  {
-    id: 'hero-slide-3',
     eyebrow: "Global Research Symposium",
-    titlePrimary: "ICRAST 2026",
-    subdescription: "International Conference on Recent Advancements in Science and Technology — uniting researchers, academicians and innovators.",
+    titlePrimary: "ICRAST-26",
+    subdescription: "International Conference on Recent Advances in Science & Technology — uniting researchers, academicians and innovators at Aryabhata Hall, University of Calicut on 21 November 2026.",
     image: "/images/icrast-biotech-globe.jpg",
     primaryCta: {
       label: "Explore ICRAST-26",
       to: "/icrast",
     },
     secondaryCta: {
-      label: "Participate Now",
-      to: "/icrast",
+      label: "Submit Abstract",
+      to: "/icrast/submit",
+    },
+  },
+  {
+    id: 'hero-slide-3',
+    eyebrow: "Annual Flagship Event",
+    titlePrimary: "SCIENCE ORBIT FESTIVAL 2K26",
+    subdescription: "“From Atoms to Ecosystems: The Continuum of Life” — our signature science celebration uniting students, innovators and educators across live science exhibitions, workshops and interactive labs.",
+    image: "/images/science-orbit-festival.jpg",
+    primaryCta: {
+      label: "Festival Highlights",
+      to: "/festival",
+    },
+    secondaryCta: {
+      label: "Explore Events",
+      to: "/events",
     },
   },
 ];
