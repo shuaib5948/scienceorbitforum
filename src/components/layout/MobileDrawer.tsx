@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from '@tanstack/react-router';
-import { X, ChevronDown, Sparkles, BookOpen, Mail, MapPin, ArrowRight, Award } from 'lucide-react';
+import { X, ChevronDown, ArrowRight, Heart } from 'lucide-react';
 import { Logo } from '../ui/Logo';
 import { HEADER_NAV } from './Header';
 
@@ -114,74 +114,20 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) =
                 </div>
               );
             })}
-
-            {/* Flagship Spotlights */}
-            <div className="mobile-drawer-spotlights">
-              <span className="mobile-drawer-spotlights-title">
-                Spotlights
-              </span>
-
-              <Link
-                to="/icrast/submit"
-                onClick={onClose}
-                className="mobile-drawer-card mobile-drawer-card--primary"
-                style={{ borderColor: 'rgba(230, 57, 70, 0.4)' }}
-              >
-                <div className="mobile-drawer-card-info">
-                  <Award size={16} style={{ color: '#e63946' }} />
-                  <span>ICRAST-26 Abstract</span>
-                </div>
-                <span className="mobile-drawer-tag" style={{ background: '#e63946', color: '#ffffff' }}>Submit</span>
-              </Link>
-
-              <Link
-                to="/events"
-                onClick={onClose}
-                className="mobile-drawer-card mobile-drawer-card--primary"
-              >
-                <div className="mobile-drawer-card-info">
-                  <Sparkles size={16} className="text-cyan" />
-                  <span>Conclave 2026</span>
-                </div>
-                <span className="mobile-drawer-tag">Major</span>
-              </Link>
-
-              <Link
-                to="/updates"
-                onClick={onClose}
-                className="mobile-drawer-card"
-              >
-                <div className="mobile-drawer-card-info">
-                  <BookOpen size={16} className="text-cyan" />
-                  <span>SciVerse Forum</span>
-                </div>
-                <span className="mobile-drawer-tag mobile-drawer-tag--faint">Journal</span>
-              </Link>
-            </div>
           </nav>
         </div>
 
-        {/* Bottom CTA & Contact */}
+        {/* Bottom CTA */}
         <div className="mobile-drawer-footer">
           <Link
             to="/donate"
             onClick={onClose}
             className="mobile-drawer-btn"
           >
-            <span>Donate</span>
+            <Heart size={16} />
+            <span>Donate to Science Orbit</span>
             <ArrowRight size={16} />
           </Link>
-
-          <div className="mobile-drawer-contact">
-            <div className="mobile-drawer-contact-item">
-              <Mail size={14} className="text-cyan" />
-              <span>info@scienceorbitforum.org</span>
-            </div>
-            <div className="mobile-drawer-contact-item">
-              <MapPin size={14} className="text-cyan" />
-              <span>Department of Science & Tech, JM</span>
-            </div>
-          </div>
         </div>
       </div>
     </div>

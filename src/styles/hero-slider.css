@@ -268,6 +268,23 @@
   box-shadow: 0 8px 24px rgba(255, 255, 255, 0.4);
 }
 
+@media (max-width: 520px) {
+  .hero-slider__content {
+    padding-top: 1.25rem;
+    padding-inline: 1.15rem;
+  }
+  .hero-slider__actions {
+    gap: 0.65rem;
+    margin-top: 1.35rem;
+    width: 100%;
+  }
+  .hero-slider__btn-primary,
+  .hero-slider__btn-secondary {
+    padding: 0.72rem 1.35rem;
+    font-size: 0.8rem;
+  }
+}
+
 /* Prev / Next Navigation Arrows */
 .hero-slider__arrow {
   position: absolute;
