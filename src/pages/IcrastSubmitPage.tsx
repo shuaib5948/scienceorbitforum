@@ -201,6 +201,16 @@ export default function IcrastSubmitPage() {
     e.preventDefault();
     setSubmissionError(null);
 
+    // Section IV Validation: File Upload (Mandatory)
+    if (!editableDoc.file) {
+      setSubmissionError('Please upload your abstract in editable Word document format (.docx or .doc) before submitting.');
+      const fileInput = document.getElementById('editableDoc');
+      if (fileInput) {
+        fileInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+
     // Section V Validation
     if (!guidelineAgreement) {
       setSubmissionError('You must agree to comply with the ICRAST-26 presentation guidelines.');
@@ -829,21 +839,22 @@ export default function IcrastSubmitPage() {
                   <div className="membership-doc-upload-grid">
                     {/* Editable Document Format (DOC / DOCX) */}
                     <div className="membership-doc-card">
-                      <label className="membership-doc-label">
-                        Editable document format
-                        <span className="membership-doc-hint">(Microsoft Word: .doc, .docx)</span>
+                      <label className="membership-doc-label" htmlFor="editableDoc">
+                        Editable document format <span style={{ color: '#ef4444' }}>*</span>
+                        <span className="membership-doc-hint">(Microsoft Word: .doc, .docx — Required)</span>
                       </label>
                       <div className="membership-file-box">
                         <input
                           type="file"
                           id="editableDoc"
+                          required
                           accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                           onChange={(e) => handleFileProcess(e, setEditableDoc, ['.doc', '.docx'])}
                           className="membership-file-input"
                         />
                         <div className="membership-file-label">
                           <Upload size={18} />
-                          <span>{editableDoc.file ? 'Replace Word File' : 'Upload Word Document (.docx)'}</span>
+                          <span>{editableDoc.file ? 'Replace Word File' : 'Upload Word Document (.docx) *'}</span>
                         </div>
                       </div>
 
@@ -863,9 +874,9 @@ export default function IcrastSubmitPage() {
 
                     {/* PDF Version */}
                     <div className="membership-doc-card">
-                      <label className="membership-doc-label">
+                      <label className="membership-doc-label" htmlFor="pdfDoc">
                         PDF version
-                        <span className="membership-doc-hint">(Formatted Portable Document: .pdf)</span>
+                        <span className="membership-doc-hint">(Formatted Portable Document: .pdf — Optional)</span>
                       </label>
                       <div className="membership-file-box">
                         <input

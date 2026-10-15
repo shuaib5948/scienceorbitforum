@@ -110,6 +110,11 @@ function doPost(e) {
     if (!preferences.presentationCategory) validationErrors.push('Please select a presentation category.');
     if (!preferences.presentationMode) validationErrors.push('Please select a presentation mode.');
 
+    const files = payload.files || {};
+    if (!files.editableDoc || !files.editableDoc.base64Data) {
+      validationErrors.push('Editable Word document (.docx or .doc) is required.');
+    }
+
     if (validationErrors.length > 0) {
       return jsonResponse({
         ok: false,

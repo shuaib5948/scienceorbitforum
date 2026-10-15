@@ -140,6 +140,12 @@ function handleIcrastSubmission(payload, config, uploadedFileIds) {
   if (!abstractInfo.researchArea || !abstractInfo.researchArea.trim()) validationErrors.push('Research area is required.');
   if (!abstractInfo.typeOfResearch || !abstractInfo.typeOfResearch.trim()) validationErrors.push('Type of research is required.');
 
+  // Section IV Validation
+  const files = payload.files || {};
+  if (!files.editableDoc || !files.editableDoc.base64Data) {
+    validationErrors.push('Editable Word document (.docx or .doc) is required.');
+  }
+
   // Section V Validation
   const preferences = payload.preferences || {};
   if (!preferences.presentationCategory) validationErrors.push('Please select a preferred presentation category.');
