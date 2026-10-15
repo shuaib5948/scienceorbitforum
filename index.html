@@ -26,7 +26,8 @@
     <meta name="twitter:image" content="/og-image.png" />
     
     <title>Science Orbit Forum · Where Curiosity Meets Science</title>
-    <link rel="icon" id="site-favicon" href="/logo-mark.svg" type="image/svg+xml" />
+    <link rel="icon" id="site-favicon" href="/logo.png" type="image/png" />
+    <link rel="apple-touch-icon" href="/logo.png" />
     <script>
       (function() {
         try {
@@ -42,6 +43,8 @@
           } else if (isFestival) {
             document.title = 'Science Orbit Festival 2K26 (SOF-26) · Science Orbit Forum';
             if (fav) { fav.href = '/festival-favicon.png'; fav.type = 'image/png'; }
+          } else {
+            if (fav) { fav.href = '/logo.png'; fav.type = 'image/png'; }
           }
         } catch (e) {}
       })();

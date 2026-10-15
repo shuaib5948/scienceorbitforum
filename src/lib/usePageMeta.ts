@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 export type FaviconType = 'main' | 'icrast' | 'festival';
 
 const FAVICONS: Record<FaviconType, { href: string; type: string }> = {
-  main: { href: '/logo-mark.svg', type: 'image/svg+xml' },
+  main: { href: '/logo.png', type: 'image/png' },
   icrast: { href: '/icrast-favicon.png', type: 'image/png' },
   festival: { href: '/festival-favicon.png', type: 'image/png' },
 };
