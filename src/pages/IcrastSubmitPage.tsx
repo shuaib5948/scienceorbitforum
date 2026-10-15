@@ -408,8 +408,7 @@ export default function IcrastSubmitPage() {
               </div>
             </Reveal>
           ) : (
-            <Reveal>
-              <form onSubmit={handleFormPreSubmit} className="membership-form-card">
+            <form onSubmit={handleFormPreSubmit} className="membership-form-card">
                 <div className="membership-form-card__header">
                   <span className="membership-category-pill" style={{ background: 'rgba(245, 22, 22, 0.1)', color: '#f51616' }}>
                     Application Form
@@ -1105,7 +1104,6 @@ export default function IcrastSubmitPage() {
                   </p>
                 </div>
               </form>
-            </Reveal>
           )}
         </div>
       </section>

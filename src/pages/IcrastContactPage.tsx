@@ -93,7 +93,7 @@ export default function IcrastContactPage() {
                   Helpline / Secretariat Desk
                 </span>
                 <h2 className="icrast-contact-card__title">
-                  +91 81118 05948
+                  +91 96569 30916
                 </h2>
                 <p className="icrast-contact-card__text">
                   Reach out directly by phone or WhatsApp for urgent delegate
@@ -101,11 +101,11 @@ export default function IcrastContactPage() {
                 </p>
                 <div className="icrast-contact-card__actions-list">
                   <a
-                    href="tel:+918111805948"
+                    href="tel:+919656930916"
                     className="icrast-contact-card__primary-link icrast-contact-card__primary-link--phone"
                   >
                     <PhoneCall size={16} />
-                    <span>Call +91 81118 05948</span>
+                    <span>Call +91 96569 30916</span>
                   </a>
                 </div>
                 <div className="icrast-contact-card__footer-info">

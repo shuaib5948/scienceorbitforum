@@ -1,6 +1,6 @@
-import type { ReactNode } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import { Link, useLocation } from '@tanstack/react-router';
-import { ArrowUpRight, Mail, MapPin, Phone } from 'lucide-react';
+import { ArrowUpRight, Mail, MapPin, Phone, Menu, X } from 'lucide-react';
 
 /**
  * Direct Google Forms links for Submit Abstract and Register Free.
@@ -37,10 +37,15 @@ interface IcrastLayoutProps {
 
 export function IcrastLayout({ children }: IcrastLayoutProps) {
   const { pathname } = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const mainSiteUrl = getMainSiteUrl();
   const isContactPage = pathname.endsWith('/contact');
   const isVenuePage = pathname.endsWith('/venue');
   const isHomePage = !isContactPage && !isVenuePage;
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
 
   const isSubdomain =
     typeof window !== 'undefined' &&
@@ -110,7 +115,7 @@ export function IcrastLayout({ children }: IcrastLayoutProps) {
             </Link>
           </nav>
 
-          {/* Primary Action Button: Link to dedicated Abstract Submission Form */}
+          {/* Primary Action Button on Desktop: Participate Now */}
           <div className="icrast-topbar__actions">
             <Link
               to={submitPath}
@@ -120,7 +125,82 @@ export function IcrastLayout({ children }: IcrastLayoutProps) {
               <ArrowUpRight size={15} />
             </Link>
           </div>
+
+          {/* Mobile Hamburger Toggle Button */}
+          <button
+            type="button"
+            className="icrast-topbar__mobile-toggle"
+            onClick={() => setMobileMenuOpen((prev) => !prev)}
+            aria-label={mobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
+            aria-expanded={mobileMenuOpen}
+          >
+            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
         </div>
+
+        {/* Mobile Option Bar (Dropdown Menu on Mobile View) */}
+        {mobileMenuOpen && (
+          <div className="icrast-mobile-menu" role="dialog" aria-label="Conference Mobile Navigation">
+            <div className="container">
+              <nav className="icrast-mobile-menu__links" aria-label="Mobile Links">
+                <Link
+                  to={homePath}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`icrast-mobile-menu__link ${isHomePage ? 'is-active' : ''}`}
+                >
+                  <span>Home</span>
+                </Link>
+                <a
+                  href={aboutHref}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="icrast-mobile-menu__link"
+                >
+                  <span>About</span>
+                </a>
+                <a
+                  href={themesHref}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="icrast-mobile-menu__link"
+                >
+                  <span>Themes</span>
+                </a>
+                <a
+                  href={datesHref}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="icrast-mobile-menu__link"
+                >
+                  <span>Important Dates</span>
+                </a>
+                <Link
+                  to={venuePath}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`icrast-mobile-menu__link ${isVenuePage ? 'is-active' : ''}`}
+                >
+                  <span>Venue</span>
+                </Link>
+                <Link
+                  to={contactPath}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`icrast-mobile-menu__link ${isContactPage ? 'is-active' : ''}`}
+                >
+                  <span>Contact</span>
+                </Link>
+              </nav>
+
+              {/* Participate Now button placed inside the hamburger menu */}
+              <div className="icrast-mobile-menu__action">
+                <Link
+                  to={submitPath}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="icrast-btn icrast-btn--primary icrast-mobile-menu__btn"
+                >
+                  <span>Participate Now</span>
+                  <ArrowUpRight size={16} />
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Main Content */}
@@ -168,9 +248,9 @@ export function IcrastLayout({ children }: IcrastLayoutProps) {
                 <Mail size={14} />
                 <span>info@scienceorbitforum.org</span>
               </a>
-              <a href="tel:+918111805948">
+              <a href="tel:+919656930916">
                 <Phone size={14} />
-                <span>+91 81118 05948</span>
+                <span>+91 96569 30916</span>
               </a>
             </div>
           </div>

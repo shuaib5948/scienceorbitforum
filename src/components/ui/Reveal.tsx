@@ -26,7 +26,7 @@ export function Reveal({ children, className = '', delay = 0, as: Tag = 'div', s
           observer.disconnect();
         }
       },
-      { threshold: 0.18 },
+      { threshold: 0.01, rootMargin: '0px 0px 60px 0px' },
     );
     observer.observe(el);
     return () => observer.disconnect();

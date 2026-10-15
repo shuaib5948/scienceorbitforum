@@ -366,9 +366,7 @@ export default function MembershipApplyPage() {
               </div>
             </Reveal>
           ) : (
-            <Reveal>
-              {/* Main Application Form */}
-              <form onSubmit={handleSubmit} className="membership-form-card" noValidate={false}>
+            <form onSubmit={handleSubmit} className="membership-form-card" noValidate={false}>
                 <div className="membership-form-card__header">
                   <span className="membership-category-pill">
                     {currentCategoryInfo.title} ({currentCategoryInfo.costText})
@@ -810,7 +808,6 @@ export default function MembershipApplyPage() {
                   </p>
                 </div>
               </form>
-            </Reveal>
           )}
         </div>
       </section>

@@ -3528,6 +3528,27 @@
   gap: 0.65rem;
 }
 
+.icrast-topbar__mobile-toggle {
+  display: none;
+  background: none;
+  border: 1px solid var(--icrast-border);
+  border-radius: 10px;
+  color: var(--icrast-navy);
+  padding: 0.5rem;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.icrast-topbar__mobile-toggle:hover {
+  background: rgba(11, 27, 51, 0.05);
+}
+
+.icrast-mobile-menu {
+  display: none;
+}
+
 /* Buttons */
 .icrast-btn {
   display: inline-flex;
@@ -5123,6 +5144,70 @@
 @media (max-width: 1024px) {
   .icrast-topbar__nav {
     display: none;
+  }
+  .icrast-topbar__actions {
+    display: none;
+  }
+  .icrast-topbar__mobile-toggle {
+    display: inline-flex;
+  }
+  .icrast-mobile-menu {
+    display: block;
+    background: #ffffff;
+    border-bottom: 1px solid var(--icrast-border);
+    box-shadow: 0 16px 36px rgba(10, 37, 64, 0.08);
+    padding: 1.15rem 0 1.5rem;
+    animation: icrast-menu-slide 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes icrast-menu-slide {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .icrast-mobile-menu__links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .icrast-mobile-menu__link {
+    display: flex;
+    align-items: center;
+    padding: 0.7rem 0.95rem;
+    border-radius: 10px;
+    font-family: var(--font-subhead);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--icrast-navy);
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+
+  .icrast-mobile-menu__link:hover,
+  .icrast-mobile-menu__link.is-active {
+    background: rgba(41, 182, 246, 0.08);
+    color: var(--icrast-vivid-blue);
+    font-weight: 700;
+  }
+
+  .icrast-mobile-menu__action {
+    margin-top: 0.85rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--icrast-border);
+  }
+
+  .icrast-mobile-menu__btn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.85rem 1.25rem;
+    font-size: 0.92rem;
   }
   .icrast-hero__layout,
   .icrast-about-grid,

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from '@tanstack/react-router';
-import { X, ChevronDown, Sparkles, BookOpen, Mail, MapPin, ArrowRight } from 'lucide-react';
+import { X, ChevronDown, Sparkles, BookOpen, Mail, MapPin, ArrowRight, Award } from 'lucide-react';
 import { Logo } from '../ui/Logo';
 import { HEADER_NAV } from './Header';
 
@@ -120,6 +120,19 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) =
               <span className="mobile-drawer-spotlights-title">
                 Spotlights
               </span>
+
+              <Link
+                to="/icrast/submit"
+                onClick={onClose}
+                className="mobile-drawer-card mobile-drawer-card--primary"
+                style={{ borderColor: 'rgba(230, 57, 70, 0.4)' }}
+              >
+                <div className="mobile-drawer-card-info">
+                  <Award size={16} style={{ color: '#e63946' }} />
+                  <span>ICRAST-26 Abstract</span>
+                </div>
+                <span className="mobile-drawer-tag" style={{ background: '#e63946', color: '#ffffff' }}>Submit</span>
+              </Link>
 
               <Link
                 to="/events"
