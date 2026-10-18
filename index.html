@@ -45,9 +45,12 @@
     />
     <meta name="twitter:image" content="https://scienceorbitforum.org/og-image.png" />
 
-    <!-- Icons -->
-    <link rel="icon" id="site-favicon" href="/logo.png" type="image/png" />
-    <link rel="apple-touch-icon" href="/logo.png" />
+    <!-- Icons (Googlebot-Favicon Compliant) -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" id="site-favicon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 
     <!-- Fast Subdomain Title & Favicon Handshake -->
     <script>
@@ -66,7 +69,7 @@
             document.title = 'Science Orbit Festival 2K26 (SOF-26) · Science Orbit Forum';
             if (fav) { fav.href = '/festival-favicon.png'; fav.type = 'image/png'; }
           } else {
-            if (fav) { fav.href = '/logo.png'; fav.type = 'image/png'; }
+            if (fav) { fav.href = '/favicon-48x48.png'; fav.type = 'image/png'; }
           }
         } catch (e) {}
       })();

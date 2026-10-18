@@ -4,7 +4,7 @@ import { updateSeoHead, type PageSeoConfig } from './seo';
 export type FaviconType = 'main' | 'icrast' | 'festival';
 
 const FAVICONS: Record<FaviconType, { href: string; type: string }> = {
-  main: { href: '/logo.png', type: 'image/png' },
+  main: { href: '/favicon-48x48.png', type: 'image/png' },
   icrast: { href: '/icrast-favicon.png', type: 'image/png' },
   festival: { href: '/festival-favicon.png', type: 'image/png' },
 };
