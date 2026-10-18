@@ -39,7 +39,7 @@ export default function EventDetailPage() {
 
   return (
     <>
-      <section className="container section">
+      <section className="container section" style={{ paddingTop: 'clamp(5.5rem, 10vh, 7rem)', paddingBottom: 'var(--space-4)' }}>
         <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Events', href: '/events' }, { label: item.title }]} />
       </section>
 
@@ -47,7 +47,7 @@ export default function EventDetailPage() {
         <div style={{ maxWidth: 960, margin: '0 auto' }}>
           <Reveal>
             <Tag variant="accent">{item.tag}</Tag>
-            <h1 style={{ fontSize: 'var(--text-h1)', lineHeight: 'var(--leading-h1)', marginTop: 'var(--space-4)' }}>{item.title}</h1>
+            <h1 style={{ fontSize: 'clamp(1.75rem, 4vw, var(--text-h1))', lineHeight: 'var(--leading-h1)', marginTop: 'var(--space-4)' }}>{item.title}</h1>
             <p style={{ color: 'var(--color-text-muted)', marginTop: 'var(--space-3)', fontSize: 'var(--text-body-large)' }}>
               <DateLabel date={formatDateRange(item.date, item.endDate)} />
               <span style={{ margin: '0 12px', color: 'var(--color-border-strong)' }}>•</span>
@@ -85,7 +85,7 @@ export default function EventDetailPage() {
                 ['Location', item.location],
                 ['Category', item.tag],
               ].map(([k, v]) => (
-                <div key={k} style={{ display: 'flex', gap: 'var(--space-4)', alignItems: 'baseline', paddingBottom: 'var(--space-4)', borderBottom: '1px solid var(--color-border)' }}>
+                <div key={k} style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2) var(--space-4)', alignItems: 'baseline', paddingBottom: 'var(--space-4)', borderBottom: '1px solid var(--color-border)' }}>
                   <CategoryLabel>{k}</CategoryLabel>
                   <span style={{ color: 'var(--color-text)' }}>{v}</span>
                 </div>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Reveal } from '../components/ui/Reveal';
 import { MEMBERSHIP_CATEGORIES } from '../data/membership';
+import { Analytics } from '../lib/analytics';
 import {
   ArrowLeft,
   CheckCircle2,
@@ -281,6 +282,7 @@ export default function MembershipApplyPage() {
       const result: SubmissionResponse = await response.json();
 
       if (result.ok) {
+        Analytics.trackMembershipApplication('submitted');
         setSubmittedData({
           reference: result.reference,
           timestamp: result.timestamp,

@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { updateSeoHead, type PageSeoConfig } from './seo';
 
 export type FaviconType = 'main' | 'icrast' | 'festival';
 
@@ -40,19 +41,29 @@ export function setDocumentTitle(title: string) {
 }
 
 /**
- * React hook for pages that want to set their own custom page title and favicon.
+ * React hook for pages that want to set custom SEO meta tags, title, and favicon.
  */
 export function usePageMeta({
   title,
   favicon,
+  seo,
 }: {
   title: string;
   favicon?: FaviconType;
+  seo?: Partial<PageSeoConfig>;
 }) {
   useEffect(() => {
     setDocumentTitle(title);
     if (favicon) {
       setFavicon(favicon);
     }
-  }, [title, favicon]);
+    if (seo) {
+      updateSeoHead({
+        title,
+        ...seo,
+      });
+    }
+  }, [title, favicon, JSON.stringify(seo)]);
 }
+
+export { updateSeoHead, type PageSeoConfig } from './seo';

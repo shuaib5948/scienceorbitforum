@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from '@tanstack/react-router';
 import { Reveal } from '../components/ui/Reveal';
 import { PageHero } from '../components/site/PageHero';
 import { NewsModal } from '../components/ui/NewsModal';
@@ -14,7 +15,32 @@ function formatDate(date: string) {
 }
 
 export default function UpdatesPage() {
+  const params = useParams({ strict: false }) as { updateSlug?: string };
+  const navigate = useNavigate();
   const [selectedArticle, setSelectedArticle] = useState<(typeof updates)[0] | null>(null);
+
+  useEffect(() => {
+    if (params?.updateSlug) {
+      const match = updates.find((u) => u.slug === params.updateSlug);
+      if (match) {
+        setSelectedArticle(match);
+      }
+    } else {
+      setSelectedArticle(null);
+    }
+  }, [params?.updateSlug]);
+
+  const handleOpenArticle = (item: (typeof updates)[0]) => {
+    setSelectedArticle(item);
+    navigate({ to: `/updates/${item.slug}` });
+  };
+
+  const handleCloseArticle = () => {
+    setSelectedArticle(null);
+    if (params?.updateSlug) {
+      navigate({ to: '/updates' });
+    }
+  };
 
   return (
     <>
@@ -32,11 +58,11 @@ export default function UpdatesPage() {
               <div
                 role="button"
                 tabIndex={0}
-                onClick={() => setSelectedArticle(item)}
+                onClick={() => handleOpenArticle(item)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
-                    setSelectedArticle(item);
+                    handleOpenArticle(item);
                   }
                 }}
                 className="event-duo-card"
@@ -92,7 +118,7 @@ export default function UpdatesPage() {
       {/* Reader Modal */}
       <NewsModal
         article={selectedArticle}
-        onClose={() => setSelectedArticle(null)}
+        onClose={handleCloseArticle}
       />
     </>
   );

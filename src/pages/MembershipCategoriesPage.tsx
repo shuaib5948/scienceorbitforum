@@ -119,8 +119,8 @@ export default function MembershipCategoriesPage() {
                 </ul>
 
                 <div style={{ marginTop: 'auto', paddingTop: 'var(--space-5)' }}>
-                  <ButtonLink href="/join" variant={item.highlight ? 'inverse' : 'primary'} withArrow>
-                    Subscribe
+                  <ButtonLink href="/join" variant={item.highlight ? 'inverse' : 'primary'} className="btn--block" withArrow>
+                    Apply for {item.title}
                   </ButtonLink>
                 </div>
               </div>

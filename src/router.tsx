@@ -6,7 +6,18 @@ import {
   Outlet,
   useLocation,
 } from '@tanstack/react-router';
-import { setDocumentTitle, setFavicon, type FaviconType } from './lib/usePageMeta';
+import { setFavicon, type FaviconType } from './lib/usePageMeta';
+import {
+  updateSeoHead,
+  ROUTE_SEO,
+  BASE_SITE_URL,
+  ICRAST_EVENT_SCHEMA,
+  FESTIVAL_EVENT_SCHEMA,
+  type PageSeoConfig,
+} from './lib/seo';
+import { initAnalytics, trackPageView } from './lib/analytics';
+import { events } from './data/events';
+import { updates } from './data/updates';
 import { Header } from './components/layout/Header';
 import { Footer } from './components/layout/Footer';
 import { SkipLink } from './components/site/SkipLink';
@@ -49,43 +60,34 @@ function RootIndexComponent() {
 }
 
 /**
- * Science Orbit Forum — Phase 2 route graph (code-first TanStack Router).
- *
- * URL structure (clean, no unnecessary nesting):
- *   /                Home (or ICRAST / Festival portal when accessed via subdomain)
- *   /icrast          ICRAST-26 Conference Portal
- *   /festival        Science Orbit Festival 2026 Portal
- *   /who-we-are      Who We Are
- *   /mission         Mission
- *   /vision          Vision
- *   /events          Events
- *   /events/[slug]   Event detail
- *   /updates         Updates
- *   /updates/[slug]  Update detail
- *   /people          People
- *   /join            Membership Hub (Categories, Benefits, Regulations)
- *   /join/apply      Membership Application Form
- *   /privacy         Privacy
- *   /terms           Terms
- *   /design-system   Phase 1 showcase (preserved for reference)
+ * Science Orbit Forum — Dynamic Route Metadata & SEO Resolution.
  */
 function getRouteMetadata(
   pathname: string,
   subdomain: 'icrast' | 'festival' | null
-): { title: string; favicon: FaviconType } {
+): PageSeoConfig & { favicon: FaviconType } {
   // 1. ICRAST Portal or Subdomain
   if (subdomain === 'icrast' || pathname.startsWith('/icrast')) {
     if (pathname === '/venue' || pathname === '/icrast/venue') {
-      return { title: 'Venue & Travel Guide · ICRAST-26', favicon: 'icrast' };
+      return {
+        ...ROUTE_SEO['/icrast/venue'],
+        favicon: 'icrast',
+      };
     }
     if (pathname === '/contact' || pathname === '/icrast/contact') {
-      return { title: 'Contact & Secretariat · ICRAST-26', favicon: 'icrast' };
+      return {
+        ...ROUTE_SEO['/icrast/contact'],
+        favicon: 'icrast',
+      };
     }
     if (pathname === '/submit' || pathname === '/icrast/submit') {
-      return { title: 'Abstract Submission · ICRAST-26', favicon: 'icrast' };
+      return {
+        ...ROUTE_SEO['/icrast/submit'],
+        favicon: 'icrast',
+      };
     }
     return {
-      title: 'ICRAST-26 · International Conference on Recent Advances in Science & Technology',
+      ...ROUTE_SEO['/icrast'],
       favicon: 'icrast',
     };
   }
@@ -97,76 +99,96 @@ function getRouteMetadata(
     pathname === '/events/science-festival-2026'
   ) {
     return {
-      title: 'Science Orbit Festival 2K26 (SOF-26) · Science Orbit Forum',
+      ...ROUTE_SEO['/festival'],
       favicon: 'festival',
     };
   }
 
   // Standalone aliases without subdomain prefix
   if (pathname === '/venue') {
-    return { title: 'Venue & Travel Guide · ICRAST-26', favicon: 'icrast' };
+    return { ...ROUTE_SEO['/icrast/venue'], favicon: 'icrast' };
   }
   if (pathname === '/submit') {
-    return { title: 'Abstract Submission · ICRAST-26', favicon: 'icrast' };
+    return { ...ROUTE_SEO['/icrast/submit'], favicon: 'icrast' };
   }
 
-  // 3. Main Science Orbit Forum domain pages
-  switch (pathname) {
-    case '/':
+  // Dynamic route for /events/:eventSlug
+  if (pathname.startsWith('/events/')) {
+    const slug = pathname.replace('/events/', '');
+    const item = events.find((e) => e.slug === slug);
+    if (item) {
+      const isIcrast = item.subdomain === 'icrast' || item.id === 'icrast-26';
+      const isFest = item.subdomain === 'festival' || item.id === 'science-festival-2026';
       return {
-        title: 'Science Orbit Forum · Where Curiosity Meets Science',
-        favicon: 'main',
+        title: `${item.title} · Science Orbit Forum`,
+        description: item.excerpt,
+        keywords: `${item.title}, Science Orbit Forum, academic conference, scientific research, ${item.location}`,
+        canonicalPath: `/events/${item.slug}`,
+        ogImage: item.image?.startsWith('http') ? item.image : `${BASE_SITE_URL}${item.image || '/og-image.png'}`,
+        ogType: 'event',
+        structuredData: isIcrast ? ICRAST_EVENT_SCHEMA : isFest ? FESTIVAL_EVENT_SCHEMA : undefined,
+        favicon: isIcrast ? 'icrast' : isFest ? 'festival' : 'main',
       };
-    case '/who-we-are':
-      return { title: 'Who We Are · Science Orbit Forum', favicon: 'main' };
-    case '/mission':
-      return { title: 'Our Mission · Science Orbit Forum', favicon: 'main' };
-    case '/vision':
-      return { title: 'Our Vision · Science Orbit Forum', favicon: 'main' };
-    case '/events':
-      return {
-        title: 'Programmes & Events · Science Orbit Forum',
-        favicon: 'main',
-      };
-    case '/updates':
-      return { title: 'Latest Updates · Science Orbit Forum', favicon: 'main' };
-    case '/people':
-      return {
-        title: 'People & Leadership · Science Orbit Forum',
-        favicon: 'main',
-      };
-    case '/join':
-      return {
-        title: 'Join Science Orbit · Membership Categories & Benefits',
-        favicon: 'main',
-      };
-    case '/join/apply':
-      return {
-        title: 'Individual Membership Application · Science Orbit Forum',
-        favicon: 'main',
-      };
-    case '/support':
-      return { title: 'Funding & Support · Science Orbit Forum', favicon: 'main' };
-    case '/privacy':
-      return { title: 'Privacy Policy · Science Orbit Forum', favicon: 'main' };
-    case '/terms':
-      return { title: 'Terms & Conditions · Science Orbit Forum', favicon: 'main' };
-    case '/contact':
-      return { title: 'Who We Are · Science Orbit Forum', favicon: 'main' };
-    case '/design-system':
-      return { title: 'Design System Showcase · Science Orbit Forum', favicon: 'main' };
-    default:
-      if (pathname.startsWith('/events/')) {
-        return { title: 'Event Details · Science Orbit Forum', favicon: 'main' };
-      }
-      if (pathname.startsWith('/updates/')) {
-        return { title: 'News & Updates · Science Orbit Forum', favicon: 'main' };
-      }
-      return {
-        title: 'Science Orbit Forum · Where Curiosity Meets Science',
-        favicon: 'main',
-      };
+    }
   }
+
+  // Dynamic route for /updates/:updateSlug
+  if (pathname.startsWith('/updates/')) {
+    const slug = pathname.replace('/updates/', '');
+    const item = updates.find((u) => u.slug === slug);
+    if (item) {
+      const coverUrl = item.cover?.startsWith('http')
+        ? item.cover
+        : `${BASE_SITE_URL}${item.cover || '/og-image.png'}`;
+      return {
+        title: `${item.title} · Science Orbit Forum`,
+        description: item.excerpt,
+        keywords: `${item.title}, Science Orbit Forum, official announcement, scientific research`,
+        canonicalPath: `/updates/${item.slug}`,
+        ogImage: coverUrl,
+        ogType: 'article',
+        structuredData: {
+          '@context': 'https://schema.org',
+          '@type': 'NewsArticle',
+          headline: item.title,
+          description: item.excerpt,
+          image: [coverUrl],
+          datePublished: item.date,
+          author: {
+            '@type': 'Organization',
+            name: item.author || 'Science Orbit Forum Secretariat',
+          },
+          publisher: {
+            '@type': 'Organization',
+            name: 'Science Orbit Forum',
+            logo: {
+              '@type': 'ImageObject',
+              url: `${BASE_SITE_URL}/logo.png`,
+            },
+          },
+        },
+        favicon: 'main',
+      };
+    }
+  }
+
+  // Pre-configured route metadata
+  const known = ROUTE_SEO[pathname];
+  if (known) {
+    return {
+      ...known,
+      favicon: 'main',
+    };
+  }
+
+  // Fallback
+  return {
+    title: 'Science Orbit Forum · Where Curiosity Meets Science',
+    description:
+      'Science Orbit Forum brings together students, researchers, innovators and educators through high-impact scientific conferences and outreach programmes.',
+    canonicalPath: pathname,
+    favicon: 'main',
+  };
 }
 
 const rootRoute = createRootRoute({
@@ -188,10 +210,17 @@ function RootComponent() {
     subdomain === 'festival' ||
     pathname === '/events/science-festival-2026';
 
+  // Initialize analytics once on mount
+  useEffect(() => {
+    initAnalytics();
+  }, []);
+
+  // Update dynamic SEO tags, canonical URL, structured data, and send virtual SPA pageviews
   useEffect(() => {
     const meta = getRouteMetadata(pathname, subdomain);
-    setDocumentTitle(meta.title);
+    updateSeoHead(meta);
     setFavicon(meta.favicon);
+    trackPageView(pathname, meta.title);
   }, [pathname, subdomain]);
 
   return (
@@ -306,6 +335,12 @@ const updatesRoute = createRoute({
   component: UpdatesPage,
 });
 
+const updateDetailRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/updates/$updateSlug',
+  component: UpdatesPage,
+});
+
 const peopleRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/people',
@@ -371,6 +406,7 @@ const routeTree = rootRoute.addChildren([
   eventsRoute,
   eventDetailRoute,
   updatesRoute,
+  updateDetailRoute,
   peopleRoute,
   joinRoute,
   joinApplyRoute,

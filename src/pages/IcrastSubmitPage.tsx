@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Reveal } from '../components/ui/Reveal';
 import { IcrastLayout, ICRAST_TEMPLATE_DOWNLOAD_URL } from '../components/icrast/IcrastLayout';
+import { Analytics } from '../lib/analytics';
 import {
   ArrowLeft,
   CheckCircle2,
@@ -328,6 +329,7 @@ export default function IcrastSubmitPage() {
       const result = await response.json();
 
       if (result.ok) {
+        Analytics.trackIcrastSubmission('submitted');
         setSubmittedData({
           reference: result.reference,
           timestamp: result.timestamp,
@@ -337,6 +339,7 @@ export default function IcrastSubmitPage() {
         });
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
+        Analytics.trackIcrastSubmission('failed');
         const errorMsg =
           result.details && result.details.length > 0
             ? `${result.error || 'Validation failed'}: ${result.details.join(' • ')}`
@@ -352,7 +355,7 @@ export default function IcrastSubmitPage() {
 
   return (
     <IcrastLayout>
-      <section className="container section icrast-submit-section" style={{ paddingBlock: 'clamp(2.5rem, 5vh, 4.5rem)' }}>
+      <section className="container section icrast-submit-section" style={{ paddingTop: 'clamp(5.5rem, 9vh, 7rem)', paddingBottom: 'clamp(3.5rem, 6vh, 5rem)' }}>
         <div style={{ maxWidth: '860px', marginInline: 'auto' }}>
           {submittedData ? (
             <Reveal>
@@ -828,6 +831,7 @@ export default function IcrastSubmitPage() {
                     <a
                       href={ICRAST_TEMPLATE_DOWNLOAD_URL}
                       download="ICRAST-26-Abstract-Template.pdf"
+                      onClick={() => Analytics.trackDownload('ICRAST-26-Abstract-Template.pdf')}
                       className="icrast-btn icrast-btn--ghost"
                       style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem' }}
                     >
