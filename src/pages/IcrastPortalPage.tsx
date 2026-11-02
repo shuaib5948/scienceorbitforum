@@ -33,14 +33,15 @@ const RESEARCH_THEMES = [
 const IMPORTANT_DATES = [
   {
     step: '01',
-    day: '30',
-    month: 'OCT 2026',
+    day: '05',
+    month: 'NOV 2026',
     label: 'Abstract Submission Deadline',
     color: 'red',
+    badge: 'Extended',
   },
   {
     step: '02',
-    day: '09',
+    day: '12',
     month: 'NOV 2026',
     label: 'Acceptance Notification',
     color: 'amber',
@@ -88,6 +89,14 @@ export default function IcrastPortalPage() {
           <Reveal>
             <div className="icrast-hero__layout">
               <div className="icrast-hero__main">
+                {/* Date Extension Notice */}
+                <div className="icrast-hero__alert">
+                  <span className="icrast-hero__alert-badge">Notice</span>
+                  <span className="icrast-hero__alert-text">
+                    Abstract Submission Deadline extended to <strong>05 Nov 2026</strong>
+                  </span>
+                </div>
+
                 {/* 1. Concise Main Heading */}
                 <h1 className="icrast-hero__heading">
                   International Conference on Recent Advancements in Science and
@@ -155,6 +164,11 @@ export default function IcrastPortalPage() {
                 >
                   <span className="icrast-ticker__item icrast-ticker__item--code">
                     ICRAST-26
+                  </span>
+                  <span className="icrast-ticker__dot" />
+                  <span className="icrast-ticker__item icrast-ticker__item--extended">
+                    <span className="icrast-ticker__tag">Extended</span>
+                    Abstract Deadline: 05 Nov 2026
                   </span>
                   <span className="icrast-ticker__dot" />
                   <span className="icrast-ticker__item">21th Nov 2026</span>
@@ -365,6 +379,11 @@ export default function IcrastPortalPage() {
                     </div>
 
                     <div className="icrast-step-node__card">
+                      {item.badge && (
+                        <span className="icrast-step-node__corner-badge">
+                          {item.badge}
+                        </span>
+                      )}
                       <div className="icrast-step-node__cal">
                         <span className="icrast-step-node__month">
                           {item.month}
@@ -413,8 +432,8 @@ export default function IcrastPortalPage() {
                   <span className="icrast-submission-banner__pill">
                     100% Free Registration
                   </span>
-                  <span className="icrast-submission-banner__pill">
-                    Deadline: 30th Oct 2026
+                  <span className="icrast-submission-banner__pill icrast-submission-banner__pill--highlight">
+                    Deadline: 5th Nov 2026 (Extended)
                   </span>
                 </div>
 

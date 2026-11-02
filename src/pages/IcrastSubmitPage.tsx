@@ -22,6 +22,7 @@ import {
   Info,
   X,
   HelpCircle,
+  Calendar,
 } from 'lucide-react';
 import {
   DESIGNATION_OPTIONS,
@@ -431,6 +432,17 @@ export default function IcrastSubmitPage() {
                   </h2>
                   <p className="membership-form-card__subtitle">
                     Theme: <em>“Biotechnology and Frontier Sciences for the Betterment of Human Life”</em>
+                  </p>
+                </div>
+
+                {/* Date Extension Notice */}
+                <div className="icrast-submit-notice">
+                  <div className="icrast-submit-notice__header">
+                    <Calendar size={18} className="icrast-submit-notice__icon" />
+                    <strong>Abstract Submission Deadline Extended</strong>
+                  </div>
+                  <p className="icrast-submit-notice__text">
+                    Abstract submission is open until <strong>05 November 2026</strong>. Acceptance notifications will be communicated to authors on <strong>12 November 2026</strong>.
                   </p>
                 </div>
 

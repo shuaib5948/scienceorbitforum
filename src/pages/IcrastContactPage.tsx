@@ -175,7 +175,7 @@ export default function IcrastContactPage() {
                   <p className="icrast-contact-cta-box__text">
                     Abstract submission is currently open with zero registration
                     fees. Review presentation formats or submit your work
-                    before <strong>30 October 2026</strong>.
+                    before <strong>5 November 2026 (Extended)</strong>.
                   </p>
                 </div>
                 <div className="icrast-contact-cta-box__actions">

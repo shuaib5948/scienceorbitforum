@@ -3713,6 +3713,45 @@
   color: var(--icrast-vivid-blue);
 }
 
+/* ICRAST Hero Date Extension Alert */
+.icrast-hero__alert {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.35rem 0.85rem;
+  background: rgba(245, 22, 22, 0.07);
+  border: 1px solid rgba(245, 22, 22, 0.22);
+  border-radius: 999px;
+  margin-bottom: 0.85rem;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.icrast-hero__alert-badge {
+  display: inline-block;
+  background: var(--icrast-vivid-red, #f51616);
+  color: #ffffff;
+  font-family: var(--font-subhead);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.12rem 0.5rem;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.icrast-hero__alert-text {
+  font-family: var(--font-subhead);
+  font-size: 0.8rem;
+  color: #0b1b33;
+}
+
+.icrast-hero__alert-text strong {
+  color: #f51616;
+  font-weight: 700;
+}
+
 /* 1. Concise Main Heading (Lighter 700 weight, balanced size) */
 .icrast-hero__heading {
   margin: 0;
@@ -3890,6 +3929,26 @@
 .icrast-ticker__item--free {
   color: var(--icrast-orange-yellow);
   font-weight: 800;
+}
+
+.icrast-ticker__item--extended {
+  color: #ff6b6b;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.icrast-ticker__tag {
+  background: var(--icrast-vivid-red, #f51616);
+  color: #ffffff;
+  font-size: 0.62rem;
+  padding: 0.12rem 0.45rem;
+  border-radius: 4px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  line-height: 1.2;
 }
 
 .icrast-ticker__dot {
@@ -4352,6 +4411,8 @@
 }
 
 .icrast-step-node__card {
+  position: relative;
+  overflow: hidden;
   width: 100%;
   background: #ffffff;
   border: 1px solid var(--icrast-border);
@@ -4363,6 +4424,24 @@
   align-items: center;
   box-shadow: 0 3px 12px rgba(10, 37, 64, 0.03);
   transition: all 0.2s ease;
+}
+
+.icrast-step-node__corner-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: var(--icrast-vivid-red, #f51616);
+  color: #ffffff;
+  font-family: var(--font-subhead);
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.22rem 0.65rem;
+  border-bottom-left-radius: 9px;
+  box-shadow: 0 2px 6px rgba(245, 22, 22, 0.25);
+  line-height: 1.2;
+  z-index: 2;
 }
 
 .icrast-step-node:hover .icrast-step-node__card {
@@ -4417,6 +4496,21 @@
 
 .icrast-step-node--blue .icrast-step-node__day {
   color: var(--icrast-vivid-blue);
+}
+
+.icrast-step-node__badge {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 0.35rem;
+  padding: 0.15rem 0.55rem;
+  background: rgba(245, 22, 22, 0.1);
+  color: #f51616;
+  border-radius: 999px;
+  font-family: var(--font-subhead);
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .icrast-step-node__title {
@@ -4522,6 +4616,51 @@
   font-weight: 700;
   letter-spacing: 0.03em;
   color: rgba(255, 255, 255, 0.92);
+}
+
+.icrast-submission-banner__pill--highlight {
+  background: rgba(245, 22, 22, 0.25);
+  border-color: rgba(245, 22, 22, 0.55);
+  color: #ffffff;
+}
+
+/* ICRAST Submit Page Extension Notice Box */
+.icrast-submit-notice {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.95rem 1.25rem;
+  background: rgba(245, 22, 22, 0.05);
+  border: 1px solid rgba(245, 22, 22, 0.18);
+  border-left: 4px solid var(--icrast-vivid-red, #f51616);
+  border-radius: 0 14px 14px 0;
+  margin-bottom: 1.5rem;
+}
+
+.icrast-submit-notice__header {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #0b1b33;
+  font-size: 0.9rem;
+  font-family: var(--font-subhead);
+  font-weight: 700;
+}
+
+.icrast-submit-notice__icon {
+  color: var(--icrast-vivid-red, #f51616);
+  flex-shrink: 0;
+}
+
+.icrast-submit-notice__text {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: #334155;
+}
+
+.icrast-submit-notice__text strong {
+  color: #0b1b33;
 }
 
 .icrast-submission-banner__actions {
