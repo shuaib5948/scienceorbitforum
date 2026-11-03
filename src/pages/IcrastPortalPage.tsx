@@ -99,9 +99,9 @@ const GUESTS_AND_SPEAKERS: IcrastGuest[] = [
   },
   {
     id: 'ali-muhammed',
-    name: 'Dr. Ali Muhammed K. S.',
-    designation: 'Senior Scientist',
-    institution: 'Molecular Cyclotrons',
+    name: 'Dr. Ali Muhammad K. S.',
+    designation: 'Senior Chemist &\nAPI Specialist',
+    institution: 'Molecular Radionuclide Pharmacy Pvt Ltd. Kochi',
     image: '/images/guest-ali.jpg',
     accentColor: '#29b6f6',
   },
