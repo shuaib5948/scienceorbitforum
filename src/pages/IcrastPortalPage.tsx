@@ -63,6 +63,66 @@ const IMPORTANT_DATES = [
   },
 ];
 
+interface IcrastGuest {
+  id: string;
+  name: string;
+  designation: string;
+  institution?: string;
+  image: string;
+  accentColor?: string;
+}
+
+const GUESTS_AND_SPEAKERS: IcrastGuest[] = [
+  {
+    id: 'raveendran',
+    name: 'Dr. P. Raveendran',
+    designation: 'Vice Chancellor',
+    institution: 'University of Calicut',
+    image: '/images/guest-raveendran.jpg',
+    accentColor: '#f51616',
+  },
+  {
+    id: 'shafi',
+    name: 'Dr. P. Muhammed Shafi',
+    designation: 'Inspire Faculty,\nDepartment of Physics',
+    institution: 'NIT Calicut',
+    image: '/images/guest-shafi.jpg',
+    accentColor: '#3355ff',
+  },
+  {
+    id: 'pramod',
+    name: 'Dr. Pramod C.',
+    designation: 'Assistant Professor,\nDepartment of Botany',
+    institution: 'University of Calicut',
+    image: '/images/guest-pramod.jpg',
+    accentColor: '#f9ae3b',
+  },
+  {
+    id: 'ali-muhammed',
+    name: 'Dr. Ali Muhammed K. S.',
+    designation: 'Senior Scientist',
+    institution: 'Molecular Cyclotrons',
+    image: '/images/guest-ali.jpg',
+    accentColor: '#29b6f6',
+  },
+  {
+    id: 'rasheed',
+    name: 'Mr. M. Rasheed T. P.',
+    designation: 'President',
+    institution: 'Science Orbit Forum',
+    image: '/images/guest-rasheed.jpg',
+    accentColor: '#f51616',
+  },
+  {
+    id: 'shabeer',
+    name: 'Mr. M. Shabeer U.',
+    designation: 'Secretary',
+    institution: 'Science Orbit Forum',
+    image: '/images/guest-shabeer.jpg',
+    accentColor: '#3355ff',
+  },
+];
+
 export default function IcrastPortalPage() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -308,8 +368,70 @@ export default function IcrastPortalPage() {
         </div>
       </section>
 
-      {/* 03. Research Themes */}
-      <section id="themes" className="icrast-section icrast-section--muted">
+      {/* 03. Distinguished Guests & Speakers */}
+      <section id="guests" className="icrast-section icrast-section--guests">
+        <div className="container">
+          <Reveal>
+            <div className="icrast-section-head">
+              <span className="icrast-kicker">Distinguished Dignitaries</span>
+              <h2 className="icrast-section-title">
+                Guests of Honour &amp; Keynote Speakers
+              </h2>
+              <p className="icrast-section-sub">
+                Eminent academicians, scientists, and leadership gracing
+                ICRAST-26:
+              </p>
+            </div>
+          </Reveal>
+
+          <div className="icrast-guests-grid">
+            {GUESTS_AND_SPEAKERS.map((guest, index) => (
+              <Reveal key={guest.id} delay={index * 35}>
+                <div
+                  className="icrast-guest-card"
+                  style={
+                    {
+                      '--guest-accent': guest.accentColor,
+                      '--guest-border': `${guest.accentColor}33`,
+                    } as React.CSSProperties
+                  }
+                >
+                  <div className="icrast-guest-card__image-wrap">
+                    <img
+                      src={guest.image}
+                      alt={guest.name}
+                      className="icrast-guest-card__image"
+                      loading="lazy"
+                    />
+                  </div>
+
+                  <div className="icrast-guest-card__content">
+                    <h3 className="icrast-guest-card__name">{guest.name}</h3>
+                    <p className="icrast-guest-card__designation">
+                      {guest.designation}
+                    </p>
+                    {guest.institution && (
+                      <p className="icrast-guest-card__institution">
+                        {guest.institution}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+
+          {/* Centered Academic Notice: Upcoming Guests */}
+          <Reveal delay={120}>
+            <p className="icrast-guests-note">
+              More distinguished keynote speakers and guests will be announced soon.
+            </p>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* 04. Research Themes */}
+      <section id="themes" className="icrast-section">
         <div className="container">
           <Reveal>
             <div className="icrast-section-head">
@@ -347,8 +469,8 @@ export default function IcrastPortalPage() {
         </div>
       </section>
 
-      {/* 04. Important Dates */}
-      <section id="dates" className="icrast-section">
+      {/* 05. Important Dates */}
+      <section id="dates" className="icrast-section icrast-section--muted">
         <div className="container">
           <Reveal>
             <div className="icrast-section-head">

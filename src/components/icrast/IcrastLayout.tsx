@@ -53,6 +53,7 @@ export function IcrastLayout({ children }: IcrastLayoutProps) {
 
   const homePath = isSubdomain ? '/' : '/icrast';
   const aboutHref = isSubdomain ? '/#about' : '/icrast#about';
+  const guestsHref = isSubdomain ? '/#guests' : '/icrast#guests';
   const themesHref = isSubdomain ? '/#themes' : '/icrast#themes';
   const datesHref = isSubdomain ? '/#dates' : '/icrast#dates';
   const venuePath = isSubdomain ? '/venue' : '/icrast/venue';
@@ -92,6 +93,9 @@ export function IcrastLayout({ children }: IcrastLayoutProps) {
             </Link>
             <a href={aboutHref} className="icrast-topbar__link">
               About
+            </a>
+            <a href={guestsHref} className="icrast-topbar__link">
+              Guests
             </a>
             <a href={themesHref} className="icrast-topbar__link">
               Themes
@@ -156,6 +160,13 @@ export function IcrastLayout({ children }: IcrastLayoutProps) {
                   className="icrast-mobile-menu__link"
                 >
                   <span>About</span>
+                </a>
+                <a
+                  href={guestsHref}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="icrast-mobile-menu__link"
+                >
+                  <span>Guests</span>
                 </a>
                 <a
                   href={themesHref}
