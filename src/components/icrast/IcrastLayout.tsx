@@ -8,7 +8,7 @@ import { ArrowUpRight, Mail, MapPin, Phone, Menu, X } from 'lucide-react';
  */
 export const ICRAST_PARTICIPATE_URL = '/icrast/submit';
 export const ICRAST_SUBMIT_ABSTRACT_URL = '/icrast/submit';
-export const ICRAST_REGISTER_FREE_URL = '/icrast/submit';
+export const ICRAST_REGISTER_FREE_URL = '/icrast/register';
 export const ICRAST_GUIDELINES_DOWNLOAD_URL =
   '/docs/ICRAST-26-Presentation-Guidelines.pdf';
 export const ICRAST_TEMPLATE_DOWNLOAD_URL =
@@ -59,6 +59,7 @@ export function IcrastLayout({ children }: IcrastLayoutProps) {
   const venuePath = isSubdomain ? '/venue' : '/icrast/venue';
   const contactPath = isSubdomain ? '/contact' : '/icrast/contact';
   const submitPath = isSubdomain ? '/submit' : '/icrast/submit';
+  const registerPath = isSubdomain ? '/register' : '/icrast/register';
 
   return (
     <div className="icrast-portal">
@@ -119,7 +120,7 @@ export function IcrastLayout({ children }: IcrastLayoutProps) {
             </Link>
           </nav>
 
-          {/* Primary Action Button on Desktop: Participate Now */}
+          {/* Primary Action Buttons on Desktop */}
           <div className="icrast-topbar__actions">
             <Link
               to={submitPath}
@@ -127,6 +128,12 @@ export function IcrastLayout({ children }: IcrastLayoutProps) {
             >
               <span>Participate Now</span>
               <ArrowUpRight size={15} />
+            </Link>
+            <Link
+              to={registerPath}
+              className="icrast-btn icrast-btn--outline-red"
+            >
+              <span>Register Now</span>
             </Link>
           </div>
 
@@ -198,7 +205,7 @@ export function IcrastLayout({ children }: IcrastLayoutProps) {
                 </Link>
               </nav>
 
-              {/* Participate Now button placed inside the hamburger menu */}
+              {/* Action buttons placed inside the hamburger menu */}
               <div className="icrast-mobile-menu__action">
                 <Link
                   to={submitPath}
@@ -207,6 +214,14 @@ export function IcrastLayout({ children }: IcrastLayoutProps) {
                 >
                   <span>Participate Now</span>
                   <ArrowUpRight size={16} />
+                </Link>
+                <Link
+                  to={registerPath}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="icrast-btn icrast-btn--outline-red icrast-mobile-menu__btn"
+                  style={{ marginTop: '0.5rem' }}
+                >
+                  <span>Register Now</span>
                 </Link>
               </div>
             </div>

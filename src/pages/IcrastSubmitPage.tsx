@@ -442,7 +442,7 @@ export default function IcrastSubmitPage() {
                     <strong>Abstract Submission Deadline Extended</strong>
                   </div>
                   <p className="icrast-submit-notice__text">
-                    Abstract submission is open until <strong>05 November 2026</strong>. Acceptance notifications will be communicated to authors on <strong>12 November 2026</strong>.
+                    Abstract submission is open until <strong>06 November 2026</strong>. Acceptance notifications will be communicated to authors on <strong>12 November 2026</strong>.
                   </p>
                 </div>
 

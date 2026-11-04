@@ -41,6 +41,7 @@ import IcrastPortalPage from './pages/IcrastPortalPage';
 import IcrastContactPage from './pages/IcrastContactPage';
 import IcrastVenuePage from './pages/IcrastVenuePage';
 import IcrastSubmitPage from './pages/IcrastSubmitPage';
+import IcrastRegisterPage from './pages/IcrastRegisterPage';
 import FestivalPortalPage from './pages/FestivalPortalPage';
 import { DesignSystem } from './showcase/DesignSystem';
 
@@ -86,6 +87,15 @@ function getRouteMetadata(
         favicon: 'icrast',
       };
     }
+    if (pathname === '/register' || pathname === '/icrast/register') {
+      return {
+        title: 'Conference Registration · ICRAST-26 · Science Orbit Forum',
+        description:
+          'Register for the International Conference on Recent Advancements in Science and Technology (ICRAST-26) organized by Science Orbit Forum.',
+        canonicalPath: '/icrast/register',
+        favicon: 'icrast',
+      };
+    }
     return {
       ...ROUTE_SEO['/icrast'],
       favicon: 'icrast',
@@ -110,6 +120,15 @@ function getRouteMetadata(
   }
   if (pathname === '/submit') {
     return { ...ROUTE_SEO['/icrast/submit'], favicon: 'icrast' };
+  }
+  if (pathname === '/register') {
+    return {
+      title: 'Conference Registration · ICRAST-26 · Science Orbit Forum',
+      description:
+        'Register for the International Conference on Recent Advancements in Science and Technology (ICRAST-26) organized by Science Orbit Forum.',
+      canonicalPath: '/icrast/register',
+      favicon: 'icrast',
+    };
   }
 
   // Dynamic route for /events/:eventSlug
@@ -204,6 +223,7 @@ function RootComponent() {
     pathname.startsWith('/icrast') ||
     pathname === '/venue' ||
     pathname === '/submit' ||
+    pathname === '/register' ||
     (pathname === '/contact' && subdomain === 'icrast') ||
     subdomain === 'icrast' ||
     pathname.startsWith('/festival') ||
@@ -285,6 +305,18 @@ const icrastSubmitSubdomainRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/submit',
   component: IcrastSubmitPage,
+});
+
+const icrastRegisterRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/icrast/register',
+  component: IcrastRegisterPage,
+});
+
+const icrastRegisterSubdomainRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/register',
+  component: IcrastRegisterPage,
 });
 
 const festivalRoute = createRoute({
@@ -398,6 +430,8 @@ const routeTree = rootRoute.addChildren([
   icrastVenueSubdomainRoute,
   icrastSubmitRoute,
   icrastSubmitSubdomainRoute,
+  icrastRegisterRoute,
+  icrastRegisterSubdomainRoute,
   festivalRoute,
   scienceFestivalAliasRoute,
   whoWeAreRoute,

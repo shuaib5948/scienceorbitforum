@@ -135,9 +135,54 @@ export const PRESENTATION_MODES = [
   'Live online presentation',
 ] as const;
 
+// Types for Conference Participation Registration (Audience / Attendee)
+export const ATTENDEE_DESIGNATION_OPTIONS = [
+  'Student',
+  'Research Scholar',
+  'Faculty / Professor',
+  'Scientist / Researcher',
+  'Industry Professional',
+  'Other',
+] as const;
+
+export const PARTICIPATION_MODES = [
+  'Offline – On Campus',
+  'Online – Virtual Participation',
+] as const;
+
+export const PARTICIPATION_AREAS_OF_INTEREST = [
+  'Biotechnology',
+  'Life Sciences',
+  'Physical Sciences',
+  'Computer Science and Artificial Intelligence',
+  'Environmental Science',
+  'Materials Science and Technology',
+  'Other',
+] as const;
+
+export interface IcrastAttendeeRegistrationPayload {
+  formType: 'icrast_attendee_registration';
+  fullName: string;
+  email: string;
+  phone: string;
+  country: string;
+  institution: string;
+  department: string;
+  designation: string;
+  participationMode: string;
+  areaOfInterest?: string;
+  accurateConfirmed: boolean;
+  updatesAgreed: boolean;
+}
+
 // Script endpoint for ICRAST abstract submission (falls back to unified MEMBERSHIP_SCRIPT_URL if not distinct)
 export const ICRAST_SCRIPT_URL =
   import.meta.env.VITE_ICRAST_SCRIPT_URL ||
   import.meta.env.VITE_MEMBERSHIP_SCRIPT_URL ||
   '';
+
+// Script endpoint for ICRAST attendee registration
+export const ICRAST_REGISTER_SCRIPT_URL =
+  import.meta.env.VITE_ICRAST_REGISTER_SCRIPT_URL ||
+  ICRAST_SCRIPT_URL;
 

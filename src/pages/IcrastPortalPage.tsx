@@ -33,7 +33,7 @@ const RESEARCH_THEMES = [
 const IMPORTANT_DATES = [
   {
     step: '01',
-    day: '05',
+    day: '06',
     month: 'NOV 2026',
     label: 'Abstract Submission Deadline',
     color: 'red',
@@ -70,6 +70,7 @@ interface IcrastGuest {
   institution?: string;
   image: string;
   accentColor?: string;
+  customStyle?: React.CSSProperties;
 }
 
 const GUESTS_AND_SPEAKERS: IcrastGuest[] = [
@@ -104,6 +105,18 @@ const GUESTS_AND_SPEAKERS: IcrastGuest[] = [
     institution: 'Molecular Radionuclide Pharmacy Pvt Ltd. Kochi',
     image: '/images/guest-ali.jpg',
     accentColor: '#29b6f6',
+  },
+  {
+    id: 'sara',
+    name: 'Dr. Sara Bologna',
+    designation: 'Postdoc',
+    institution: 'CEITEC MU, Brno, Czech Republic',
+    image: '/images/guest-sara.jpg',
+    accentColor: '#3355ff',
+    customStyle: {
+      transform: 'scale(1.18)',
+      objectPosition: 'center 15%',
+    },
   },
   {
     id: 'rasheed',
@@ -153,7 +166,7 @@ export default function IcrastPortalPage() {
                 <div className="icrast-hero__alert">
                   <span className="icrast-hero__alert-badge">Notice</span>
                   <span className="icrast-hero__alert-text">
-                    Abstract Submission Deadline extended to <strong>05 Nov 2026</strong>
+                    Abstract Submission Deadline extended to <strong>06 Nov 2026</strong>
                   </span>
                 </div>
 
@@ -179,7 +192,7 @@ export default function IcrastPortalPage() {
                   </strong>
                 </p>
 
-                {/* 3. Action Button */}
+                {/* 3. Action Buttons */}
                 <div className="icrast-hero__ctas">
                   <Link
                     to="/icrast/submit"
@@ -188,13 +201,19 @@ export default function IcrastPortalPage() {
                     <span>Participate Now</span>
                     <ArrowUpRight size={16} />
                   </Link>
+                  <Link
+                    to="/icrast/register"
+                    className="icrast-btn icrast-btn--outline-blue icrast-btn--lg"
+                  >
+                    <span>Register Now</span>
+                  </Link>
                   <a
                     href={ICRAST_GUIDELINES_DOWNLOAD_URL}
                     download="ICRAST-26-Presentation-Guidelines.pdf"
-                    className="icrast-btn icrast-btn--outline-blue icrast-btn--lg"
+                    className="icrast-btn icrast-btn--ghost icrast-btn--lg"
                   >
                     <Download size={15} />
-                    <span>Presentation Guidelines</span>
+                    <span>Guidelines</span>
                   </a>
                 </div>
               </div>
@@ -228,7 +247,7 @@ export default function IcrastPortalPage() {
                   <span className="icrast-ticker__dot" />
                   <span className="icrast-ticker__item icrast-ticker__item--extended">
                     <span className="icrast-ticker__tag">Extended</span>
-                    Abstract Deadline: 05 Nov 2026
+                    Abstract Deadline: 06 Nov 2026
                   </span>
                   <span className="icrast-ticker__dot" />
                   <span className="icrast-ticker__item">21th Nov 2026</span>
@@ -401,6 +420,7 @@ export default function IcrastPortalPage() {
                       src={guest.image}
                       alt={guest.name}
                       className="icrast-guest-card__image"
+                      style={guest.customStyle}
                       loading="lazy"
                     />
                   </div>
@@ -566,6 +586,12 @@ export default function IcrastPortalPage() {
                   >
                     <span>Participate Now</span>
                     <ArrowUpRight size={16} />
+                  </Link>
+                  <Link
+                    to="/icrast/register"
+                    className="icrast-btn icrast-btn--outline-white icrast-btn--lg"
+                  >
+                    <span>Register Now</span>
                   </Link>
                 </div>
               </div>
