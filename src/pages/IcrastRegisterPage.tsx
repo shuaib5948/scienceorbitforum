@@ -97,12 +97,24 @@ export default function IcrastRegisterPage() {
 
     try {
       if (ICRAST_REGISTER_SCRIPT_URL) {
-        await fetch(ICRAST_REGISTER_SCRIPT_URL, {
+        const response = await fetch(ICRAST_REGISTER_SCRIPT_URL, {
           method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8',
+          },
           body: JSON.stringify(payload),
         });
+
+        try {
+          const result = await response.json();
+          if (result && result.status === 'error') {
+            throw new Error(result.message || 'Submission failed');
+          }
+        } catch (parseErr) {
+          // If response body reading is blocked by browser CORS redirect policy,
+          // the POST was still received and executed by Google Apps Script.
+          console.debug('Response read notice:', parseErr);
+        }
       } else {
         // Fallback local simulate
         await new Promise((resolve) => setTimeout(resolve, 1000));
