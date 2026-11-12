@@ -6,8 +6,8 @@ import { ArrowUpRight, Mail, MapPin, Phone, Menu, X } from 'lucide-react';
  * Direct Google Forms links for Submit Abstract and Register Free.
  * Replace these placeholder Google Form URLs with your live form links when ready.
  */
-export const ICRAST_PARTICIPATE_URL = '/icrast/submit';
-export const ICRAST_SUBMIT_ABSTRACT_URL = '/icrast/submit';
+export const ICRAST_PARTICIPATE_URL = '/icrast/full-paper';
+export const ICRAST_SUBMIT_ABSTRACT_URL = '/icrast/full-paper';
 export const ICRAST_REGISTER_FREE_URL = '/icrast/register';
 export const ICRAST_GUIDELINES_DOWNLOAD_URL =
   '/docs/ICRAST-26-Presentation-Guidelines.pdf';

@@ -46,8 +46,8 @@ export const heroSlidesData: HeroSlide[] = [
       to: "/icrast",
     },
     secondaryCta: {
-      label: "Submit Abstract",
-      to: "/icrast/submit",
+      label: "Submit Paper",
+      to: "/icrast/full-paper",
     },
   },
   {

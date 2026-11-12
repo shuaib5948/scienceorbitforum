@@ -41,6 +41,7 @@ import IcrastPortalPage from './pages/IcrastPortalPage';
 import IcrastContactPage from './pages/IcrastContactPage';
 import IcrastVenuePage from './pages/IcrastVenuePage';
 import IcrastSubmitPage from './pages/IcrastSubmitPage';
+import IcrastSubmitClosedPage from './pages/IcrastSubmitClosedPage';
 import IcrastRegisterPage from './pages/IcrastRegisterPage';
 import IcrastFullPaperPage from './pages/IcrastFullPaperPage';
 import FestivalPortalPage from './pages/FestivalPortalPage';
@@ -84,7 +85,10 @@ function getRouteMetadata(
     }
     if (pathname === '/submit' || pathname === '/icrast/submit') {
       return {
-        ...ROUTE_SEO['/icrast/submit'],
+        title: 'Abstract Submissions Closed · ICRAST-26 · Science Orbit Forum',
+        description:
+          'Abstract submissions for the International Conference on Recent Advancements in Science and Technology (ICRAST-26) are now closed.',
+        canonicalPath: '/icrast/submit',
         favicon: 'icrast',
       };
     }
@@ -134,7 +138,13 @@ function getRouteMetadata(
     return { ...ROUTE_SEO['/icrast/venue'], favicon: 'icrast' };
   }
   if (pathname === '/submit') {
-    return { ...ROUTE_SEO['/icrast/submit'], favicon: 'icrast' };
+    return {
+      title: 'Abstract Submissions Closed · ICRAST-26 · Science Orbit Forum',
+      description:
+        'Abstract submissions for the International Conference on Recent Advancements in Science and Technology (ICRAST-26) are now closed.',
+      canonicalPath: '/icrast/submit',
+      favicon: 'icrast',
+    };
   }
   if (pathname === '/register') {
     return {
@@ -324,13 +334,13 @@ const icrastVenueSubdomainRoute = createRoute({
 const icrastSubmitRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/icrast/submit',
-  component: IcrastSubmitPage,
+  component: IcrastSubmitClosedPage,
 });
 
 const icrastSubmitSubdomainRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/submit',
-  component: IcrastSubmitPage,
+  component: IcrastSubmitClosedPage,
 });
 
 const icrastRegisterRoute = createRoute({

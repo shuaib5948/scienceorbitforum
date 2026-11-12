@@ -173,17 +173,15 @@ export default function IcrastContactPage() {
                     Ready to participate in ICRAST-26?
                   </h3>
                   <p className="icrast-contact-cta-box__text">
-                    Abstract submission is currently open with zero registration
-                    fees. Review presentation formats or submit your work
-                    before <strong>6 November 2026 (Extended)</strong>.
+                    Abstract submission is closed. Accepted authors can submit their full paper, and delegates can register to attend with zero registration fees.
                   </p>
                 </div>
                 <div className="icrast-contact-cta-box__actions">
                   <Link
-                    to="/icrast/submit"
+                    to="/icrast/full-paper"
                     className="icrast-btn icrast-btn--red icrast-btn--lg"
                   >
-                    <span>Participate Now</span>
+                    <span>Submit Paper</span>
                     <ArrowUpRight size={15} />
                   </Link>
                 </div>
