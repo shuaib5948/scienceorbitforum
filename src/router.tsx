@@ -42,6 +42,7 @@ import IcrastContactPage from './pages/IcrastContactPage';
 import IcrastVenuePage from './pages/IcrastVenuePage';
 import IcrastSubmitPage from './pages/IcrastSubmitPage';
 import IcrastRegisterPage from './pages/IcrastRegisterPage';
+import IcrastFullPaperPage from './pages/IcrastFullPaperPage';
 import FestivalPortalPage from './pages/FestivalPortalPage';
 import { DesignSystem } from './showcase/DesignSystem';
 
@@ -96,6 +97,20 @@ function getRouteMetadata(
         favicon: 'icrast',
       };
     }
+    if (
+      pathname === '/full-paper' ||
+      pathname === '/icrast/full-paper' ||
+      pathname === '/upload-paper' ||
+      pathname === '/icrast/upload-paper'
+    ) {
+      return {
+        title: 'Full Paper Submission · ICRAST-26 · Science Orbit Forum',
+        description:
+          'Full paper submission portal for accepted ICRAST-26 candidates to upload papers.',
+        canonicalPath: '/icrast/full-paper',
+        favicon: 'icrast',
+      };
+    }
     return {
       ...ROUTE_SEO['/icrast'],
       favicon: 'icrast',
@@ -127,6 +142,15 @@ function getRouteMetadata(
       description:
         'Register for the International Conference on Recent Advancements in Science and Technology (ICRAST-26) organized by Science Orbit Forum.',
       canonicalPath: '/icrast/register',
+      favicon: 'icrast',
+    };
+  }
+  if (pathname === '/full-paper' || pathname === '/upload-paper') {
+    return {
+      title: 'Full Paper Submission · ICRAST-26 · Science Orbit Forum',
+      description:
+        'Full paper submission portal for accepted ICRAST-26 candidates to upload papers.',
+      canonicalPath: '/icrast/full-paper',
       favicon: 'icrast',
     };
   }
@@ -224,6 +248,8 @@ function RootComponent() {
     pathname === '/venue' ||
     pathname === '/submit' ||
     pathname === '/register' ||
+    pathname === '/full-paper' ||
+    pathname === '/upload-paper' ||
     (pathname === '/contact' && subdomain === 'icrast') ||
     subdomain === 'icrast' ||
     pathname.startsWith('/festival') ||
@@ -317,6 +343,30 @@ const icrastRegisterSubdomainRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/register',
   component: IcrastRegisterPage,
+});
+
+const icrastFullPaperRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/icrast/full-paper',
+  component: IcrastFullPaperPage,
+});
+
+const icrastFullPaperSubdomainRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/full-paper',
+  component: IcrastFullPaperPage,
+});
+
+const icrastUploadPaperAliasRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/icrast/upload-paper',
+  component: IcrastFullPaperPage,
+});
+
+const icrastUploadPaperSubdomainRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/upload-paper',
+  component: IcrastFullPaperPage,
 });
 
 const festivalRoute = createRoute({
@@ -432,6 +482,10 @@ const routeTree = rootRoute.addChildren([
   icrastSubmitSubdomainRoute,
   icrastRegisterRoute,
   icrastRegisterSubdomainRoute,
+  icrastFullPaperRoute,
+  icrastFullPaperSubdomainRoute,
+  icrastUploadPaperAliasRoute,
+  icrastUploadPaperSubdomainRoute,
   festivalRoute,
   scienceFestivalAliasRoute,
   whoWeAreRoute,

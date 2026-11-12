@@ -186,3 +186,22 @@ export const ICRAST_REGISTER_SCRIPT_URL =
   import.meta.env.VITE_ICRAST_REGISTER_SCRIPT_URL ||
   ICRAST_SCRIPT_URL;
 
+// Script endpoint for ICRAST full paper submissions
+export const ICRAST_FULL_PAPER_SCRIPT_URL =
+  import.meta.env.VITE_ICRAST_FULL_PAPER_SCRIPT_URL ||
+  'https://script.google.com/macros/s/AKfycby9AGhRTqwMejvNN8L0HzAXwWM0TM8d1bRjpfdX8upzTtXDkWQ_-a2ONDAmCB_sTeIg/exec';
+
+export interface CandidateVerificationResult {
+  ok: boolean;
+  referenceId?: string;
+  authorName?: string;
+  paperTitle?: string;
+  category?: string;
+  mode?: string;
+  hasUploaded?: boolean;
+  existingPdfLink?: string;
+  uploadTime?: string;
+  reason?: string;
+  message?: string;
+}
+

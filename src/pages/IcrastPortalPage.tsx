@@ -162,14 +162,6 @@ export default function IcrastPortalPage() {
           <Reveal>
             <div className="icrast-hero__layout">
               <div className="icrast-hero__main">
-                {/* Date Extension Notice */}
-                <div className="icrast-hero__alert">
-                  <span className="icrast-hero__alert-badge">Notice</span>
-                  <span className="icrast-hero__alert-text">
-                    Abstract Submission Deadline extended to <strong>06 Nov 2026</strong>
-                  </span>
-                </div>
-
                 {/* 1. Concise Main Heading */}
                 <h1 className="icrast-hero__heading">
                   International Conference on Recent Advancements in Science and
@@ -195,10 +187,10 @@ export default function IcrastPortalPage() {
                 {/* 3. Action Buttons */}
                 <div className="icrast-hero__ctas">
                   <Link
-                    to="/icrast/submit"
+                    to="/icrast/full-paper"
                     className="icrast-btn icrast-btn--red icrast-btn--lg"
                   >
-                    <span>Participate Now</span>
+                    <span>Submit Paper</span>
                     <ArrowUpRight size={16} />
                   </Link>
                   <Link
@@ -246,8 +238,8 @@ export default function IcrastPortalPage() {
                   </span>
                   <span className="icrast-ticker__dot" />
                   <span className="icrast-ticker__item icrast-ticker__item--extended">
-                    <span className="icrast-ticker__tag">Extended</span>
-                    Abstract Deadline: 06 Nov 2026
+                    <span className="icrast-ticker__tag">Active</span>
+                    Full Paper Submission Open
                   </span>
                   <span className="icrast-ticker__dot" />
                   <span className="icrast-ticker__item">21th Nov 2026</span>
@@ -575,16 +567,16 @@ export default function IcrastPortalPage() {
                     100% Free Registration
                   </span>
                   <span className="icrast-submission-banner__pill icrast-submission-banner__pill--highlight">
-                    Deadline: 5th Nov 2026 (Extended)
+                    Full Paper Submission Active
                   </span>
                 </div>
 
                 <div className="icrast-submission-banner__actions">
                   <Link
-                    to="/icrast/submit"
+                    to="/icrast/full-paper"
                     className="icrast-btn icrast-btn--red icrast-btn--lg"
                   >
-                    <span>Participate Now</span>
+                    <span>Submit Paper</span>
                     <ArrowUpRight size={16} />
                   </Link>
                   <Link

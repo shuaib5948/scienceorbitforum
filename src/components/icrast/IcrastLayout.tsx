@@ -60,6 +60,7 @@ export function IcrastLayout({ children }: IcrastLayoutProps) {
   const contactPath = isSubdomain ? '/contact' : '/icrast/contact';
   const submitPath = isSubdomain ? '/submit' : '/icrast/submit';
   const registerPath = isSubdomain ? '/register' : '/icrast/register';
+  const fullPaperPath = isSubdomain ? '/full-paper' : '/icrast/full-paper';
 
   return (
     <div className="icrast-portal">
@@ -123,17 +124,17 @@ export function IcrastLayout({ children }: IcrastLayoutProps) {
           {/* Primary Action Buttons on Desktop */}
           <div className="icrast-topbar__actions">
             <Link
-              to={submitPath}
+              to={fullPaperPath}
               className="icrast-btn icrast-btn--primary"
             >
-              <span>Participate Now</span>
+              <span>Submit Paper</span>
               <ArrowUpRight size={15} />
             </Link>
             <Link
               to={registerPath}
               className="icrast-btn icrast-btn--outline-red"
             >
-              <span>Register Now</span>
+              <span>Register</span>
             </Link>
           </div>
 
@@ -208,11 +209,11 @@ export function IcrastLayout({ children }: IcrastLayoutProps) {
               {/* Action buttons placed inside the hamburger menu */}
               <div className="icrast-mobile-menu__action">
                 <Link
-                  to={submitPath}
+                  to={fullPaperPath}
                   onClick={() => setMobileMenuOpen(false)}
                   className="icrast-btn icrast-btn--primary icrast-mobile-menu__btn"
                 >
-                  <span>Participate Now</span>
+                  <span>Submit Paper</span>
                   <ArrowUpRight size={16} />
                 </Link>
                 <Link
