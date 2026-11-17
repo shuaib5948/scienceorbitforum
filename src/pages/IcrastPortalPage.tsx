@@ -107,6 +107,17 @@ const GUESTS_AND_SPEAKERS: IcrastGuest[] = [
     accentColor: '#29b6f6',
   },
   {
+    id: 'deepti',
+    name: 'Dr. Deepti M',
+    designation: 'Assistant Professor,\nDepartment of Biotechnology',
+    institution: 'University of Calicut & Director, Students and Industry Relations, Biocodez LLP',
+    image: '/images/guest-deepti.jpg',
+    accentColor: '#10b981',
+    customStyle: {
+      objectPosition: 'center 18%',
+    },
+  },
+  {
     id: 'sara',
     name: 'Dr. Sara Bologna',
     designation: 'Postdoc',
