@@ -118,6 +118,17 @@ const GUESTS_AND_SPEAKERS: IcrastGuest[] = [
     },
   },
   {
+    id: 'muzammil',
+    name: 'Dr. Muzammil NM',
+    designation: 'Research Associate',
+    institution: 'Center for Nonlinear Dynamics, Trichy',
+    image: '/images/guest-muzammil.jpg',
+    accentColor: '#f9ae3b',
+    customStyle: {
+      objectPosition: 'center 15%',
+    },
+  },
+  {
     id: 'sara',
     name: 'Dr. Sara Bologna',
     designation: 'Postdoc',
@@ -128,22 +139,6 @@ const GUESTS_AND_SPEAKERS: IcrastGuest[] = [
       transform: 'scale(1.18)',
       objectPosition: 'center 15%',
     },
-  },
-  {
-    id: 'rasheed',
-    name: 'Mr. M. Rasheed T. P.',
-    designation: 'President',
-    institution: 'Science Orbit Forum',
-    image: '/images/guest-rasheed.jpg',
-    accentColor: '#f51616',
-  },
-  {
-    id: 'shabeer',
-    name: 'Mr. M. Shabeer U.',
-    designation: 'Secretary',
-    institution: 'Science Orbit Forum',
-    image: '/images/guest-shabeer.jpg',
-    accentColor: '#3355ff',
   },
 ];
 

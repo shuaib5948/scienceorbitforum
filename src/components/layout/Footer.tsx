@@ -7,7 +7,6 @@ const ABOUT_LINKS = [
   { label: 'Who We Are', to: '/who-we-are' },
   { label: 'Our Mission', to: '/mission' },
   { label: 'Our Vision', to: '/vision' },
-  { label: 'Leadership', to: '/people' },
 ];
 
 const PROGRAMME_LINKS = [

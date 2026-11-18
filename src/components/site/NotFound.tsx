@@ -18,8 +18,8 @@ export function NotFound() {
         <ButtonLink href="/" variant="primary">
           Back to Science Orbit Forum
         </ButtonLink>
-        <ButtonLink href="/people" variant="secondary">
-          Browse people
+        <ButtonLink href="/events" variant="secondary">
+          Explore events
         </ButtonLink>
       </div>
     </section>

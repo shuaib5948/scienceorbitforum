@@ -262,13 +262,6 @@ export const ROUTE_SEO: Record<string, PageSeoConfig> = {
     keywords: 'Science Orbit news, science forum announcements, conference notifications, research updates',
     canonicalPath: '/updates',
   },
-  '/people': {
-    title: 'Leadership & Academic Council · Science Orbit Forum',
-    description:
-      'Meet the scientists, researchers, faculty mentors, and student leaders steering Science Orbit Forum initiatives and collaborations.',
-    keywords: 'Science Orbit Forum leadership, scientific advisors, research directors, academic mentors',
-    canonicalPath: '/people',
-  },
   '/join': {
     title: 'Join Science Orbit Forum · Membership Categories & Benefits',
     description:

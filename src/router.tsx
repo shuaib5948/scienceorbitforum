@@ -30,7 +30,6 @@ import VisionPage from './pages/VisionPage';
 import EventsPage from './pages/EventsPage';
 import EventDetailPage from './pages/EventDetailPage';
 import UpdatesPage from './pages/UpdatesPage';
-import PeoplePage from './pages/PeoplePage';
 import JoinPage from './pages/JoinPage';
 import MembershipApplyPage from './pages/MembershipApplyPage';
 import SupportPage from './pages/SupportPage';
@@ -433,12 +432,6 @@ const updateDetailRoute = createRoute({
   component: UpdatesPage,
 });
 
-const peopleRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/people',
-  component: PeoplePage,
-});
-
 const joinRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/join',
@@ -505,7 +498,6 @@ const routeTree = rootRoute.addChildren([
   eventDetailRoute,
   updatesRoute,
   updateDetailRoute,
-  peopleRoute,
   joinRoute,
   joinApplyRoute,
   supportRoute,

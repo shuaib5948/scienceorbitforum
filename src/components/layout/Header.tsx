@@ -19,12 +19,11 @@ export interface HeaderNavSection {
 export const HEADER_NAV: HeaderNavSection[] = [
   {
     label: 'About',
-    match: ['/who-we-are', '/mission', '/vision', '/people'],
+    match: ['/who-we-are', '/mission', '/vision'],
     items: [
       { label: 'Who We Are', to: '/who-we-are' },
       { label: 'Mission', to: '/mission' },
       { label: 'Vision', to: '/vision' },
-      { label: 'People', to: '/people' },
     ],
   },
   {
