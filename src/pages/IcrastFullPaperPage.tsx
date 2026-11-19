@@ -200,7 +200,7 @@ export default function IcrastFullPaperPage() {
         body: JSON.stringify({
           action: 'upload_full_paper',
           email: email.trim(),
-          referenceId: candidate?.referenceId || referenceId.trim(),
+          referenceId: candidate?.referenceId || '',
           file: {
             filename: pdfDoc.filename,
             base64Data: pdfDoc.base64Data,

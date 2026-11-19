@@ -61,7 +61,6 @@ export function IcrastLayout({ children }: IcrastLayoutProps) {
   const submitPath = isSubdomain ? '/submit' : '/icrast/submit';
   const registerPath = isSubdomain ? '/register' : '/icrast/register';
   const fullPaperPath = isSubdomain ? '/full-paper' : '/icrast/full-paper';
-  const delegatePath = isSubdomain ? '/delegate' : '/icrast/delegate';
 
   return (
     <div className="icrast-portal">
@@ -119,14 +118,6 @@ export function IcrastLayout({ children }: IcrastLayoutProps) {
               }`}
             >
               Contact
-            </Link>
-            <Link
-              to={delegatePath}
-              className={`icrast-topbar__link ${
-                pathname.includes('/delegate') ? 'is-active' : ''
-              }`}
-            >
-              Delegate Pass
             </Link>
           </nav>
 
@@ -213,13 +204,6 @@ export function IcrastLayout({ children }: IcrastLayoutProps) {
                 >
                   <span>Contact</span>
                 </Link>
-                <Link
-                  to={delegatePath}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`icrast-mobile-menu__link ${pathname.includes('/delegate') ? 'is-active' : ''}`}
-                >
-                  <span>Delegate Pass</span>
-                </Link>
               </nav>
 
               {/* Action buttons placed inside the hamburger menu */}
@@ -277,7 +261,6 @@ export function IcrastLayout({ children }: IcrastLayoutProps) {
               <a href={themesHref}>Themes</a>
               <a href={datesHref}>Dates</a>
               <Link to={venuePath}>Venue</Link>
-              <Link to={delegatePath}>Delegate Pass</Link>
               <a
                 href={ICRAST_GUIDELINES_DOWNLOAD_URL}
                 download="ICRAST-26-Presentation-Guidelines.pdf"

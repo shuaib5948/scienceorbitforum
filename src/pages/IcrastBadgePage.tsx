@@ -13,19 +13,14 @@ import {
   Phone,
   CheckCircle2,
   Clock,
-  Printer,
-  Share2,
+  Download,
   RefreshCw,
   Search,
   Building,
   GraduationCap,
   MapPin,
-  Sparkles,
-  ShieldCheck,
   AlertCircle,
-  ExternalLink,
-  ChevronRight,
-  UserCheck,
+  X,
 } from 'lucide-react';
 
 function normalizePhone(p: string): string {
@@ -43,6 +38,7 @@ export default function IcrastBadgePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [delegate, setDelegate] = useState<DelegateLookupResult | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState<string>('');
   const [copiedLink, setCopiedLink] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -58,6 +54,25 @@ export default function IcrastBadgePage() {
       handleLookup(initialPhone.trim());
     }
   }, []);
+
+  // Handle ESC key and scroll-lock for modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isModalOpen) {
+        setIsModalOpen(false);
+      }
+    };
+    if (isModalOpen) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+    return () => {
+      document.body.style.overflow = 'auto';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isModalOpen]);
 
   const handleLookup = async (phoneToQuery: string) => {
     const cleanPhone = normalizePhone(phoneToQuery);
@@ -81,44 +96,54 @@ export default function IcrastBadgePage() {
         }),
       });
 
-      const data: DelegateLookupResult = await response.json();
+      const data = await response.json();
 
-      if (data.ok && data.fullName) {
+      if (data && data.ok && data.fullName) {
         setDelegate(data);
+        setIsModalOpen(true);
         generateQrCode(data.phone || cleanPhone, data.delegateId || 'ICRAST26-DELEGATE');
         trackEvent('icrast_delegate_portal', 'lookup', 'success');
       } else {
         setDelegate(null);
-        setErrorMessage(
-          data.message ||
-            'No registration record found for this mobile number. Please check your number or contact the registration desk.'
-        );
+        setIsModalOpen(false);
+        // Guard: If old Apps Script ran (which returns "Registration recorded successfully"), do NOT show that confusing text!
+        let msg = 'No registration record found for this mobile number. Please check the 10-digit number used during registration.';
+        if (data && data.message && data.message !== 'Registration recorded successfully') {
+          msg = data.message;
+        } else if (data && data.message === 'Registration recorded successfully') {
+          msg = 'The registration database has not yet enabled digital badge lookups. Please verify your mobile number or contact the organizers.';
+        }
+        setErrorMessage(msg);
         trackEvent('icrast_delegate_portal', 'lookup', 'not_found');
       }
     } catch (err) {
       console.error('Delegate lookup failed:', err);
       setErrorMessage(
-        'Unable to reach the registration server. Please check your internet connection or visit the helpdesk at Aryabhata Hall.'
+        'Unable to reach the registration server. Please check your internet connection and try again.'
       );
     } finally {
       setIsLoading(false);
     }
   };
 
+  const [isDownloading, setIsDownloading] = useState(false);
+
   const generateQrCode = async (phone: string, delegateId: string) => {
     try {
+      const cleanPhone = normalizePhone(phone);
+      const cleanId = (delegateId || '').trim();
       const checkinUrl = `https://icrast.scienceorbitforum.org/checkin?phone=${encodeURIComponent(
-        normalizePhone(phone)
-      )}&id=${encodeURIComponent(delegateId)}`;
+        cleanPhone
+      )}&id=${encodeURIComponent(cleanId)}`;
 
       const dataUrl = await QRCode.toDataURL(checkinUrl, {
-        width: 320,
+        width: 360,
         margin: 1,
         color: {
           dark: '#0b1b33',
           light: '#ffffff',
         },
-        errorCorrectionLevel: 'M',
+        errorCorrectionLevel: 'H',
       });
       setQrDataUrl(dataUrl);
     } catch (err) {
@@ -126,28 +151,173 @@ export default function IcrastBadgePage() {
     }
   };
 
-  const handleRefreshStatus = async () => {
-    if (!delegate?.phone) return;
-    setIsRefreshing(true);
-    await handleLookup(delegate.phone);
-    setIsRefreshing(false);
-  };
+  const handleDownloadBadgeImage = async () => {
+    if (!delegate || !qrDataUrl) return;
+    setIsDownloading(true);
 
-  const handlePrint = () => {
-    window.print();
-    trackEvent('icrast_delegate_badge', 'action', 'print');
-  };
+    try {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
 
-  const handleCopyLink = () => {
-    if (!delegate?.phone) return;
-    const shareUrl = `${window.location.origin}/icrast/delegate?phone=${encodeURIComponent(
-      normalizePhone(delegate.phone)
-    )}`;
-    navigator.clipboard.writeText(shareUrl).then(() => {
-      setCopiedLink(true);
-      setTimeout(() => setCopiedLink(false), 3000);
-      trackEvent('icrast_delegate_badge', 'action', 'copy_link');
-    });
+      const scale = 2;
+      const width = 640;
+      const height = 400;
+      canvas.width = width * scale;
+      canvas.height = height * scale;
+      ctx.scale(scale, scale);
+
+      // Deep Conference Navy Background
+      const bgGrad = ctx.createLinearGradient(0, 0, width, height);
+      bgGrad.addColorStop(0, '#071224');
+      bgGrad.addColorStop(0.5, '#0b1b33');
+      bgGrad.addColorStop(1, '#050c18');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, width, height);
+
+      // Gold Outer Border
+      ctx.strokeStyle = '#d4af37';
+      ctx.lineWidth = 2.5;
+      ctx.strokeRect(10, 10, width - 20, height - 20);
+
+      // Top Ribbon Header
+      const headerGrad = ctx.createLinearGradient(0, 0, width, 0);
+      headerGrad.addColorStop(0, '#0b1b33');
+      headerGrad.addColorStop(0.5, '#1e3a8a');
+      headerGrad.addColorStop(1, '#0b1b33');
+      ctx.fillStyle = headerGrad;
+      ctx.fillRect(10, 10, width - 20, 60);
+
+      // Header Texts
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.fillText('ICRAST-26', 28, 42);
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+      ctx.font = '12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.fillText('University of Calicut & Science Orbit Forum', 28, 58);
+
+      // Official Delegate Pass Pill
+      ctx.fillStyle = 'rgba(212, 175, 55, 0.18)';
+      ctx.strokeStyle = '#d4af37';
+      ctx.lineWidth = 1;
+      const pillX = width - 180;
+      const pillY = 27;
+      ctx.fillRect(pillX, pillY, 152, 26);
+      ctx.strokeRect(pillX, pillY, 152, 26);
+      ctx.fillStyle = '#d4af37';
+      ctx.font = 'bold 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.fillText('OFFICIAL DELEGATE PASS', pillX + 9, pillY + 17);
+
+      // Left Column Details
+      ctx.fillStyle = '#00e5ff';
+      ctx.font = 'bold 13px monospace';
+      ctx.fillText(`ID: ${delegate.delegateId || 'ICRAST26-DELEGATE'}`, 28, 106);
+
+      // Full Name
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 22px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      const nameText = delegate.fullName || '';
+      ctx.fillText(nameText.length > 32 ? nameText.substring(0, 32) + '...' : nameText, 28, 138);
+
+      // Designation
+      ctx.fillStyle = '#93c5fd';
+      ctx.font = 'bold 14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.fillText(delegate.designation || 'Conference Attendee', 28, 166);
+
+      // Department & Institution
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+      ctx.font = '13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      const inst = `${delegate.department ? delegate.department + ', ' : ''}${delegate.institution || 'Calicut University'}`;
+      ctx.fillText(inst.length > 42 ? inst.substring(0, 42) + '...' : inst, 28, 192);
+
+      // Track / Area of Interest
+      if (delegate.areaOfInterest) {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
+        ctx.font = '12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.fillText(`Track: ${delegate.areaOfInterest}`, 28, 216);
+      }
+
+      // Participation Mode Pill
+      const isOnline = delegate.participationMode?.includes('Online');
+      ctx.fillStyle = isOnline ? 'rgba(59, 130, 246, 0.2)' : 'rgba(34, 197, 94, 0.2)';
+      ctx.strokeStyle = isOnline ? '#3b82f6' : '#22c55e';
+      ctx.lineWidth = 1;
+      ctx.fillRect(28, 242, 230, 24);
+      ctx.strokeRect(28, 242, 230, 24);
+      ctx.fillStyle = isOnline ? '#93c5fd' : '#86efac';
+      ctx.font = 'bold 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.fillText(delegate.participationMode || 'Offline – On Campus Participation', 36, 258);
+
+      // Status Badge
+      const isCheckedIn = delegate.checkinStatus === 'Checked In';
+      ctx.fillStyle = isCheckedIn ? 'rgba(34, 197, 94, 0.18)' : 'rgba(212, 175, 55, 0.18)';
+      ctx.strokeStyle = isCheckedIn ? '#22c55e' : '#d4af37';
+      ctx.lineWidth = 1;
+      ctx.fillRect(28, 280, 230, 36);
+      ctx.strokeRect(28, 280, 230, 36);
+      ctx.fillStyle = isCheckedIn ? '#4ade80' : '#facc15';
+      ctx.font = 'bold 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.fillText(isCheckedIn ? 'CHECKED IN · VERIFIED' : 'STATUS: REGISTERED', 40, 303);
+
+      // Load and Draw Candidate's Specific QR Code
+      const qrImg = new Image();
+      qrImg.crossOrigin = 'anonymous';
+      await new Promise<void>((resolve) => {
+        qrImg.onload = () => resolve();
+        qrImg.onerror = () => resolve();
+        qrImg.src = qrDataUrl;
+      });
+
+      // QR Code container
+      const qrX = width - 175;
+      const qrY = 100;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(qrX, qrY, 145, 145);
+      ctx.drawImage(qrImg, qrX + 5, qrY + 5, 135, 135);
+
+      // Bottom Bar
+      ctx.fillStyle = 'rgba(11, 27, 51, 0.95)';
+      ctx.fillRect(10, height - 42, width - 20, 32);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.65)';
+      ctx.font = '11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.fillText('Date & Venue: 21–22 Nov 2026 · Calicut University', 25, height - 22);
+      ctx.textAlign = 'right';
+      ctx.fillText('Science Orbit Forum', width - 25, height - 22);
+      ctx.textAlign = 'left';
+
+      // Safe cross-browser download trigger
+      const filename = `ICRAST26-Badge-${(delegate.delegateId || 'Delegate').replace(/[^a-zA-Z0-9_-]/g, '_')}.png`;
+
+      const triggerDownload = (url: string) => {
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = url;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      };
+
+      if (canvas.toBlob) {
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const blobUrl = URL.createObjectURL(blob);
+            triggerDownload(blobUrl);
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 2000);
+          } else {
+            triggerDownload(canvas.toDataURL('image/png'));
+          }
+        }, 'image/png');
+      } else {
+        triggerDownload(canvas.toDataURL('image/png'));
+      }
+
+      trackEvent('icrast_delegate_badge', 'action', 'download_image');
+    } catch (err) {
+      console.error('Badge download failed:', err);
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   const isCheckedIn = delegate?.checkinStatus === 'Checked In';
@@ -157,61 +327,12 @@ export default function IcrastBadgePage() {
       <section
         className="container section icrast-delegate-portal"
         style={{
-          paddingTop: 'clamp(5.5rem, 9vh, 7rem)',
-          paddingBottom: 'clamp(4rem, 7vh, 6rem)',
+          paddingTop: 'clamp(4.5rem, 7vh, 6rem)',
+          paddingBottom: 'clamp(2.5rem, 4.5vh, 3.5rem)',
         }}
       >
-        <div style={{ maxWidth: '840px', marginInline: 'auto' }}>
-          {/* Header Banner */}
-          <Reveal>
-            <div className="text-center" style={{ marginBottom: '2.5rem' }}>
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  padding: '0.4rem 1rem',
-                  borderRadius: '9999px',
-                  backgroundColor: 'rgba(212, 175, 55, 0.12)',
-                  border: '1px solid rgba(212, 175, 55, 0.3)',
-                  color: '#d4af37',
-                  fontSize: '0.85rem',
-                  fontWeight: 600,
-                  marginBottom: '1rem',
-                  letterSpacing: '0.04em',
-                  textTransform: 'uppercase',
-                }}
-              >
-                <Sparkles size={14} />
-                <span>ICRAST-26 · Aryabhata Hall, Calicut University</span>
-              </div>
-              <h1
-                style={{
-                  fontSize: 'clamp(2rem, 4vw, 2.75rem)',
-                  fontWeight: 800,
-                  color: '#ffffff',
-                  marginBottom: '0.75rem',
-                  letterSpacing: '-0.02em',
-                }}
-              >
-                Digital Delegate ID &amp; QR Pass
-              </h1>
-              <p
-                style={{
-                  color: 'rgba(255, 255, 255, 0.72)',
-                  fontSize: 'clamp(0.95rem, 1.8vw, 1.1rem)',
-                  maxWidth: '620px',
-                  marginInline: 'auto',
-                  lineHeight: 1.6,
-                }}
-              >
-                Access your personalized conference badge and show this QR pass at the
-                Aryabhata Hall check-in desk for event entry and session access.
-              </p>
-            </div>
-          </Reveal>
-
-          {/* Search / Login Box */}
+        <div style={{ maxWidth: '600px', marginInline: 'auto' }}>
+          {/* Standard Professional Input Box Card */}
           <Reveal delay={100}>
             <div
               className="no-print"
@@ -219,12 +340,49 @@ export default function IcrastBadgePage() {
                 backgroundColor: 'rgba(15, 23, 42, 0.85)',
                 border: '1px solid rgba(255, 255, 255, 0.12)',
                 borderRadius: '16px',
-                padding: '1.75rem',
-                marginBottom: '2.5rem',
-                backdropFilter: 'blur(12px)',
-                boxShadow: '0 12px 30px rgba(0, 0, 0, 0.3)',
+                padding: 'clamp(1rem, 2.5vw, 1.35rem)',
+                boxShadow: '0 12px 28px rgba(0, 0, 0, 0.3)',
+                backdropFilter: 'blur(10px)',
               }}
             >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginBottom: '0.85rem',
+                  borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                  paddingBottom: '0.6rem',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <QrCode size={18} style={{ color: '#00e5ff' }} />
+                  <h1
+                    style={{
+                      fontSize: '0.95rem',
+                      fontWeight: 700,
+                      color: '#ffffff',
+                      letterSpacing: '0.02em',
+                      margin: 0,
+                    }}
+                  >
+                    Delegate Verification
+                  </h1>
+                </div>
+                <span
+                  style={{
+                    fontSize: '0.72rem',
+                    color: '#86efac',
+                    backgroundColor: 'rgba(34, 197, 94, 0.12)',
+                    padding: '0.15rem 0.55rem',
+                    borderRadius: '9999px',
+                    fontWeight: 600,
+                  }}
+                >
+                  Live Portal
+                </span>
+              </div>
+
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -235,39 +393,40 @@ export default function IcrastBadgePage() {
                   htmlFor="delegate-phone-input"
                   style={{
                     display: 'block',
-                    fontSize: '0.9rem',
+                    fontSize: '0.82rem',
                     fontWeight: 600,
-                    color: 'rgba(255, 255, 255, 0.9)',
-                    marginBottom: '0.5rem',
+                    color: 'rgba(255, 255, 255, 0.85)',
+                    marginBottom: '0.4rem',
                   }}
                 >
-                  Enter Registered Mobile / WhatsApp Number
+                  Registered Mobile / WhatsApp Number
                 </label>
                 <div
+                  className="icrast-delegate-search-row"
                   style={{
                     display: 'flex',
                     flexWrap: 'wrap',
-                    gap: '0.75rem',
+                    gap: '0.6rem',
                   }}
                 >
                   <div
                     style={{
                       position: 'relative',
-                      flex: '1 1 280px',
+                      flex: '1 1 200px',
                     }}
                   >
                     <div
                       style={{
                         position: 'absolute',
-                        left: '1rem',
+                        left: '0.85rem',
                         top: '50%',
                         transform: 'translateY(-50%)',
-                        color: 'rgba(255, 255, 255, 0.4)',
+                        color: 'rgba(255, 255, 255, 0.45)',
                         display: 'flex',
                         alignItems: 'center',
                       }}
                     >
-                      <Phone size={18} />
+                      <Phone size={16} />
                     </div>
                     <input
                       id="delegate-phone-input"
@@ -276,24 +435,27 @@ export default function IcrastBadgePage() {
                       onChange={(e) => setPhoneInput(e.target.value)}
                       placeholder="e.g. 9876543210"
                       disabled={isLoading}
+                      autoFocus
                       style={{
                         width: '100%',
-                        padding: '0.85rem 1rem 0.85rem 2.85rem',
-                        backgroundColor: 'rgba(11, 27, 51, 0.7)',
+                        height: '44px',
+                        padding: '0.65rem 0.85rem 0.65rem 2.5rem',
+                        backgroundColor: 'rgba(11, 27, 51, 0.75)',
                         border: '1px solid rgba(255, 255, 255, 0.2)',
-                        borderRadius: '10px',
+                        borderRadius: '9px',
                         color: '#ffffff',
-                        fontSize: '1rem',
+                        fontSize: '0.95rem',
                         outline: 'none',
-                        transition: 'border-color 0.2s',
+                        transition: 'border-color 0.2s, box-shadow 0.2s',
                       }}
-                      onFocus={(e) =>
-                        (e.currentTarget.style.borderColor = '#00e5ff')
-                      }
-                      onBlur={(e) =>
-                        (e.currentTarget.style.borderColor =
-                          'rgba(255, 255, 255, 0.2)')
-                      }
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = '#00e5ff';
+                        e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 229, 255, 0.15)';
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                        e.currentTarget.style.boxShadow = 'none';
+                      }}
                     />
                   </div>
                   <button
@@ -301,594 +463,573 @@ export default function IcrastBadgePage() {
                     disabled={isLoading}
                     className="icrast-btn icrast-btn--primary"
                     style={{
-                      padding: '0.85rem 1.75rem',
+                      height: '44px',
+                      padding: '0.65rem 1.4rem',
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: '0.5rem',
-                      fontSize: '0.95rem',
+                      justifyContent: 'center',
+                      gap: '0.45rem',
+                      fontSize: '0.9rem',
+                      fontWeight: 700,
+                      borderRadius: '9px',
                     }}
                   >
                     {isLoading ? (
                       <>
-                        <RefreshCw size={16} className="animate-spin" />
+                        <RefreshCw size={15} className="animate-spin" />
                         <span>Searching...</span>
                       </>
                     ) : (
                       <>
-                        <Search size={16} />
-                        <span>Retrieve Pass</span>
+                        <Search size={15} />
+                        <span>View Pass</span>
                       </>
                     )}
                   </button>
                 </div>
-                <p
+
+                <div
                   style={{
-                    fontSize: '0.8rem',
-                    color: 'rgba(255, 255, 255, 0.55)',
-                    marginTop: '0.65rem',
-                    marginBottom: 0,
+                    textAlign: 'center',
+                    marginTop: '0.85rem',
                   }}
                 >
-                  Enter the 10-digit number used during your conference registration.
-                  Country code prefixes (e.g. +91) will be matched automatically.
-                </p>
+                  <Link
+                    to="/icrast/register"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                      color: 'rgba(255, 255, 255, 0.65)',
+                      textDecoration: 'none',
+                      fontSize: '0.8rem',
+                      fontWeight: 500,
+                      transition: 'color 0.2s ease',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = '#ffffff')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255, 255, 255, 0.65)')}
+                  >
+                    <span>Register here</span>
+                    <span aria-hidden="true">&rarr;</span>
+                  </Link>
+                </div>
               </form>
 
               {errorMessage && (
                 <div
                   style={{
-                    marginTop: '1.25rem',
-                    padding: '0.85rem 1rem',
+                    marginTop: '1rem',
+                    padding: '0.75rem 0.9rem',
                     borderRadius: '8px',
                     backgroundColor: 'rgba(239, 68, 68, 0.15)',
                     border: '1px solid rgba(239, 68, 68, 0.35)',
                     color: '#fca5a5',
-                    fontSize: '0.9rem',
+                    fontSize: '0.85rem',
                     display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '0.65rem',
+                    alignItems: 'center',
+                    gap: '0.55rem',
                   }}
                 >
-                  <AlertCircle size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
-                  <div>
-                    <span>{errorMessage}</span>
-                    <div style={{ marginTop: '0.4rem' }}>
-                      <Link
-                        to="/icrast/register"
-                        style={{
-                          color: '#ffffff',
-                          textDecoration: 'underline',
-                          fontWeight: 600,
-                          fontSize: '0.85rem',
-                        }}
-                      >
-                        Not registered yet? Register for free here &rarr;
-                      </Link>
-                    </div>
-                  </div>
+                  <AlertCircle size={16} style={{ flexShrink: 0 }} />
+                  <span>{errorMessage}</span>
                 </div>
               )}
             </div>
           </Reveal>
 
-          {/* Delegate Badge Display Card */}
-          {delegate && (
-            <Reveal delay={150}>
+          {/* Delegate Badge Modal Overlay */}
+          {isModalOpen && delegate && (
+            <div
+              className="icrast-badge-modal-overlay"
+              onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                  setIsModalOpen(false);
+                }
+              }}
+              style={{
+                position: 'fixed',
+                inset: 0,
+                zIndex: 9999,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: 'rgba(3, 7, 18, 0.85)',
+                backdropFilter: 'blur(8px)',
+                padding: 'clamp(0.75rem, 3vw, 1.5rem)',
+                overflowY: 'auto',
+              }}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Delegate Conference Pass"
+            >
               <div
-                ref={badgeCardRef}
-                className="icrast-delegate-badge-wrap"
                 style={{
                   position: 'relative',
-                  backgroundColor: '#071224',
-                  border: '1px solid rgba(212, 175, 55, 0.4)',
-                  borderRadius: '24px',
-                  overflow: 'hidden',
-                  boxShadow: '0 25px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(212, 175, 55, 0.15)',
-                  marginBottom: '2rem',
+                  width: '100%',
+                  maxWidth: '580px',
+                  margin: 'auto',
                 }}
               >
-                {/* Top Golden / Academic Ribbon */}
-                <div
+                {/* Modal Close Button */}
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="icrast-badge-modal-close no-print"
+                  aria-label="Close Badge Modal"
                   style={{
-                    background: 'linear-gradient(90deg, #0b1b33 0%, #1e3a8a 50%, #0b1b33 100%)',
-                    padding: '1.25rem 2rem',
-                    borderBottom: '1px solid rgba(212, 175, 55, 0.3)',
+                    position: 'absolute',
+                    top: '-12px',
+                    right: '-12px',
+                    zIndex: 20,
+                    width: '34px',
+                    height: '34px',
+                    borderRadius: '50%',
+                    backgroundColor: '#0b1b33',
+                    border: '1px solid rgba(255, 255, 255, 0.3)',
+                    color: '#ffffff',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'space-between',
-                    flexWrap: 'wrap',
-                    gap: '1rem',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 14px rgba(0, 0, 0, 0.6)',
+                    transition: 'transform 0.15s, background-color 0.15s',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#1e3a8a')}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#0b1b33')}
+                >
+                  <X size={18} />
+                </button>
+
+                {/* Badge Card */}
+                <div
+                  ref={badgeCardRef}
+                  className="icrast-delegate-badge-wrap"
+                  style={{
+                    position: 'relative',
+                    backgroundColor: '#071224',
+                    border: '1px solid rgba(212, 175, 55, 0.4)',
+                    borderRadius: '18px',
+                    overflow: 'hidden',
+                    boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(212, 175, 55, 0.15)',
+                    marginBottom: '1rem',
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-                    <img
-                      src="/images/icrast-logo-mark.png"
-                      alt="ICRAST Logo"
-                      style={{ width: '42px', height: '42px', objectFit: 'contain' }}
-                    />
-                    <div>
-                      <div
-                        style={{
-                          fontSize: '1.15rem',
-                          fontWeight: 800,
-                          color: '#ffffff',
-                          letterSpacing: '0.05em',
-                        }}
-                      >
-                        ICRAST-26
-                      </div>
-                      <div
-                        style={{
-                          fontSize: '0.75rem',
-                          color: 'rgba(255, 255, 255, 0.75)',
-                          letterSpacing: '0.02em',
-                        }}
-                      >
-                        University of Calicut &amp; Science Orbit Forum
-                      </div>
-                    </div>
-                  </div>
-
+                  {/* Top Golden / Academic Ribbon */}
                   <div
                     style={{
-                      textAlign: 'right',
+                      background: 'linear-gradient(90deg, #0b1b33 0%, #1e3a8a 50%, #0b1b33 100%)',
+                      padding: '0.75rem 1.25rem',
+                      borderBottom: '1px solid rgba(212, 175, 55, 0.3)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      flexWrap: 'wrap',
+                      gap: '0.65rem',
                     }}
                   >
-                    <span
-                      style={{
-                        display: 'inline-block',
-                        padding: '0.3rem 0.85rem',
-                        borderRadius: '9999px',
-                        backgroundColor: 'rgba(212, 175, 55, 0.15)',
-                        border: '1px solid rgba(212, 175, 55, 0.4)',
-                        color: '#d4af37',
-                        fontSize: '0.8rem',
-                        fontWeight: 700,
-                        letterSpacing: '0.05em',
-                      }}
-                    >
-                      OFFICIAL DELEGATE PASS
-                    </span>
-                  </div>
-                </div>
-
-                {/* Main Badge Content Area */}
-                <div
-                  style={{
-                    padding: '2rem',
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-                    gap: '2rem',
-                    alignItems: 'center',
-                  }}
-                >
-                  {/* Left Column: Delegate Details */}
-                  <div>
-                    {/* Delegate ID Pill */}
-                    <div
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '0.4rem',
-                        padding: '0.25rem 0.75rem',
-                        borderRadius: '6px',
-                        backgroundColor: 'rgba(0, 229, 255, 0.12)',
-                        border: '1px solid rgba(0, 229, 255, 0.3)',
-                        color: '#00e5ff',
-                        fontFamily: 'monospace',
-                        fontSize: '0.85rem',
-                        fontWeight: 700,
-                        marginBottom: '0.75rem',
-                        letterSpacing: '0.06em',
-                      }}
-                    >
-                      <span>ID: {delegate.delegateId || 'ICRAST26-D1001'}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                      <img
+                        src="/images/icrast-logo-mark.png"
+                        alt="ICRAST Logo"
+                        style={{ width: '32px', height: '32px', objectFit: 'contain' }}
+                      />
+                      <div>
+                        <div
+                          style={{
+                            fontSize: '1rem',
+                            fontWeight: 800,
+                            color: '#ffffff',
+                            letterSpacing: '0.04em',
+                            lineHeight: 1.2,
+                          }}
+                        >
+                          ICRAST-26
+                        </div>
+                        <div
+                          style={{
+                            fontSize: '0.72rem',
+                            color: 'rgba(255, 255, 255, 0.72)',
+                            letterSpacing: '0.01em',
+                          }}
+                        >
+                          University of Calicut &amp; Science Orbit Forum
+                        </div>
+                      </div>
                     </div>
 
-                    {/* Full Name */}
-                    <h2
-                      style={{
-                        fontSize: 'clamp(1.4rem, 2.5vw, 1.85rem)',
-                        fontWeight: 800,
-                        color: '#ffffff',
-                        margin: 0,
-                        lineHeight: 1.25,
-                        letterSpacing: '-0.01em',
-                      }}
-                    >
-                      {delegate.fullName}
-                    </h2>
-
-                    {/* Designation / Status */}
-                    <div
-                      style={{
-                        fontSize: '1rem',
-                        color: '#93c5fd',
-                        fontWeight: 600,
-                        marginTop: '0.35rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.4rem',
-                      }}
-                    >
-                      <GraduationCap size={16} />
-                      <span>{delegate.designation || 'Conference Attendee'}</span>
-                    </div>
-
-                    {/* Department & Institution */}
-                    <div
-                      style={{
-                        fontSize: '0.9rem',
-                        color: 'rgba(255, 255, 255, 0.75)',
-                        marginTop: '0.5rem',
-                        lineHeight: 1.5,
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        gap: '0.4rem',
-                      }}
-                    >
-                      <Building size={16} style={{ flexShrink: 0, marginTop: '3px' }} />
-                      <span>
-                        {delegate.department ? `${delegate.department}, ` : ''}
-                        <strong>{delegate.institution || 'Calicut, Kerala'}</strong>
-                      </span>
-                    </div>
-
-                    {/* Area of Interest */}
-                    {delegate.areaOfInterest && (
-                      <div
+                    <div>
+                      <span
                         style={{
-                          fontSize: '0.8rem',
-                          color: 'rgba(255, 255, 255, 0.55)',
-                          marginTop: '0.35rem',
-                          paddingLeft: '1.4rem',
+                          display: 'inline-block',
+                          padding: '0.2rem 0.65rem',
+                          borderRadius: '9999px',
+                          backgroundColor: 'rgba(212, 175, 55, 0.15)',
+                          border: '1px solid rgba(212, 175, 55, 0.4)',
+                          color: '#d4af37',
+                          fontSize: '0.72rem',
+                          fontWeight: 700,
+                          letterSpacing: '0.04em',
                         }}
                       >
-                        Track: {delegate.areaOfInterest}
-                      </div>
-                    )}
+                        OFFICIAL DELEGATE PASS
+                      </span>
+                    </div>
+                  </div>
 
-                    {/* Participation Mode */}
-                    <div style={{ marginTop: '1.25rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                      <span
+                  {/* Main Badge Content Area */}
+                  <div
+                    className="icrast-badge-grid"
+                    style={{
+                      padding: 'clamp(1rem, 2.5vw, 1.35rem)',
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: 'clamp(1rem, 2.5vw, 1.5rem)',
+                      alignItems: 'center',
+                    }}
+                  >
+                    {/* Left Column: Delegate Details */}
+                    <div style={{ flex: '1 1 260px' }}>
+                      {/* Delegate ID Pill */}
+                      <div
                         style={{
                           display: 'inline-flex',
                           alignItems: 'center',
                           gap: '0.35rem',
-                          padding: '0.35rem 0.85rem',
-                          borderRadius: '9999px',
-                          fontSize: '0.8rem',
-                          fontWeight: 600,
-                          backgroundColor:
-                            delegate.participationMode?.includes('Online')
-                              ? 'rgba(59, 130, 246, 0.15)'
-                              : 'rgba(34, 197, 94, 0.15)',
-                          border: delegate.participationMode?.includes('Online')
-                            ? '1px solid rgba(59, 130, 246, 0.4)'
-                            : '1px solid rgba(34, 197, 94, 0.4)',
-                          color: delegate.participationMode?.includes('Online')
-                            ? '#93c5fd'
-                            : '#86efac',
+                          padding: '0.2rem 0.55rem',
+                          borderRadius: '5px',
+                          backgroundColor: 'rgba(0, 229, 255, 0.12)',
+                          border: '1px solid rgba(0, 229, 255, 0.3)',
+                          color: '#00e5ff',
+                          fontFamily: 'monospace',
+                          fontSize: '0.78rem',
+                          fontWeight: 700,
+                          marginBottom: '0.4rem',
+                          letterSpacing: '0.05em',
                         }}
                       >
-                        <MapPin size={13} />
-                        <span>{delegate.participationMode || 'Offline – On Campus Participation'}</span>
-                      </span>
-                    </div>
+                        <span>ID: {delegate.delegateId || 'ICRAST26-D1001'}</span>
+                      </div>
 
-                    {/* Live Check-in Status */}
-                    <div style={{ marginTop: '1.5rem' }}>
-                      {isCheckedIn ? (
+                      {/* Full Name */}
+                      <h2
+                        style={{
+                          fontSize: 'clamp(1.25rem, 2.2vw, 1.55rem)',
+                          fontWeight: 800,
+                          color: '#ffffff',
+                          margin: 0,
+                          lineHeight: 1.25,
+                          letterSpacing: '-0.01em',
+                        }}
+                      >
+                        {delegate.fullName}
+                      </h2>
+
+                      {/* Designation / Status */}
+                      <div
+                        style={{
+                          fontSize: '0.88rem',
+                          color: '#93c5fd',
+                          fontWeight: 600,
+                          marginTop: '0.25rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.35rem',
+                        }}
+                      >
+                        <GraduationCap size={15} />
+                        <span>{delegate.designation || 'Conference Attendee'}</span>
+                      </div>
+
+                      {/* Department & Institution */}
+                      <div
+                        style={{
+                          fontSize: '0.82rem',
+                          color: 'rgba(255, 255, 255, 0.75)',
+                          marginTop: '0.35rem',
+                          lineHeight: 1.45,
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          gap: '0.35rem',
+                        }}
+                      >
+                        <Building size={14} style={{ flexShrink: 0, marginTop: '2px' }} />
+                        <span>
+                          {delegate.department ? `${delegate.department}, ` : ''}
+                          <strong>{delegate.institution || 'Calicut, Kerala'}</strong>
+                        </span>
+                      </div>
+
+                      {/* Area of Interest */}
+                      {delegate.areaOfInterest && (
                         <div
                           style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.65rem',
-                            padding: '0.75rem 1rem',
-                            borderRadius: '12px',
-                            backgroundColor: 'rgba(34, 197, 94, 0.12)',
-                            border: '1px solid rgba(34, 197, 94, 0.35)',
-                            color: '#86efac',
+                            fontSize: '0.75rem',
+                            color: 'rgba(255, 255, 255, 0.55)',
+                            marginTop: '0.25rem',
+                            paddingLeft: '1.2rem',
                           }}
                         >
-                          <CheckCircle2 size={22} style={{ color: '#22c55e', flexShrink: 0 }} />
-                          <div>
-                            <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>
-                              CHECKED IN · VERIFIED
-                            </div>
-                            <div
-                              style={{
-                                fontSize: '0.75rem',
-                                color: 'rgba(255, 255, 255, 0.7)',
-                              }}
-                            >
-                              {delegate.checkinTimestamp
-                                ? `Time: ${delegate.checkinTimestamp}`
-                                : 'Entry verified at Aryabhata Hall'}
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <div
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.65rem',
-                            padding: '0.75rem 1rem',
-                            borderRadius: '12px',
-                            backgroundColor: 'rgba(212, 175, 55, 0.12)',
-                            border: '1px solid rgba(212, 175, 55, 0.35)',
-                            color: '#fef08a',
-                          }}
-                        >
-                          <Clock size={20} style={{ color: '#d4af37', flexShrink: 0 }} />
-                          <div>
-                            <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>
-                              STATUS: REGISTERED
-                            </div>
-                            <div
-                              style={{
-                                fontSize: '0.75rem',
-                                color: 'rgba(255, 255, 255, 0.7)',
-                              }}
-                            >
-                              Show this pass at registration counter to check in
-                            </div>
-                          </div>
+                          Track: {delegate.areaOfInterest}
                         </div>
                       )}
+
+                      {/* Participation Mode */}
+                      <div style={{ marginTop: '0.75rem', display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                        <span
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.3rem',
+                            padding: '0.25rem 0.65rem',
+                            borderRadius: '9999px',
+                            fontSize: '0.75rem',
+                            fontWeight: 600,
+                            backgroundColor:
+                              delegate.participationMode?.includes('Online')
+                                ? 'rgba(59, 130, 246, 0.15)'
+                                : 'rgba(34, 197, 94, 0.15)',
+                            border: delegate.participationMode?.includes('Online')
+                              ? '1px solid rgba(59, 130, 246, 0.4)'
+                              : '1px solid rgba(34, 197, 94, 0.4)',
+                            color: delegate.participationMode?.includes('Online')
+                              ? '#93c5fd'
+                              : '#86efac',
+                          }}
+                        >
+                          <MapPin size={12} />
+                          <span>{delegate.participationMode || 'Offline – On Campus Participation'}</span>
+                        </span>
+                      </div>
+
+                      {/* Live Check-in Status */}
+                      <div style={{ marginTop: '0.85rem' }}>
+                        {isCheckedIn ? (
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.5rem',
+                              padding: '0.55rem 0.8rem',
+                              borderRadius: '10px',
+                              backgroundColor: 'rgba(34, 197, 94, 0.12)',
+                              border: '1px solid rgba(34, 197, 94, 0.35)',
+                              color: '#86efac',
+                            }}
+                          >
+                            <CheckCircle2 size={18} style={{ color: '#22c55e', flexShrink: 0 }} />
+                            <div>
+                              <div style={{ fontWeight: 700, fontSize: '0.82rem' }}>
+                                CHECKED IN · VERIFIED
+                              </div>
+                              <div
+                                style={{
+                                  fontSize: '0.72rem',
+                                  color: 'rgba(255, 255, 255, 0.7)',
+                                }}
+                              >
+                                {delegate.checkinTimestamp
+                                  ? `Time: ${delegate.checkinTimestamp}`
+                                  : 'Entry verified'}
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.5rem',
+                              padding: '0.55rem 0.8rem',
+                              borderRadius: '10px',
+                              backgroundColor: 'rgba(212, 175, 55, 0.12)',
+                              border: '1px solid rgba(212, 175, 55, 0.35)',
+                              color: '#fef08a',
+                            }}
+                          >
+                            <Clock size={17} style={{ color: '#d4af37', flexShrink: 0 }} />
+                            <div>
+                              <div style={{ fontWeight: 700, fontSize: '0.82rem' }}>
+                                STATUS: REGISTERED
+                              </div>
+                              <div
+                                style={{
+                                  fontSize: '0.72rem',
+                                  color: 'rgba(255, 255, 255, 0.7)',
+                                }}
+                              >
+                                Show this pass at registration counter to check in
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Right Column: Scannable QR Code */}
+                    <div
+                      style={{
+                        flex: '0 0 auto',
+                        marginInline: 'auto',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        textAlign: 'center',
+                      }}
+                    >
+                      <div
+                        style={{
+                          backgroundColor: '#ffffff',
+                          padding: '0.65rem',
+                          borderRadius: '12px',
+                          boxShadow: '0 6px 18px rgba(0, 0, 0, 0.35)',
+                          display: 'inline-block',
+                          textAlign: 'center',
+                        }}
+                      >
+                        {qrDataUrl ? (
+                          <>
+                            <img
+                              src={qrDataUrl}
+                              alt={`QR Check-in Pass for ${delegate.fullName}`}
+                              style={{
+                                width: '140px',
+                                height: '140px',
+                                display: 'block',
+                                imageRendering: 'pixelated',
+                              }}
+                            />
+                            <div
+                              style={{
+                                marginTop: '0.35rem',
+                                fontSize: '0.72rem',
+                                fontFamily: 'monospace',
+                                fontWeight: 700,
+                                color: '#0b1b33',
+                                letterSpacing: '0.04em',
+                              }}
+                            >
+                              {delegate.delegateId || 'ICRAST26-PASS'}
+                            </div>
+                          </>
+                        ) : (
+                          <div
+                            style={{
+                              width: '140px',
+                              height: '140px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              color: '#64748b',
+                            }}
+                          >
+                            <QrCode size={40} />
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
-                  {/* Right Column: Scannable QR Code */}
+                  {/* Bottom Event Info Strip */}
                   <div
                     style={{
+                      backgroundColor: 'rgba(11, 27, 51, 0.95)',
+                      padding: '0.65rem 1.25rem',
+                      borderTop: '1px solid rgba(255, 255, 255, 0.08)',
                       display: 'flex',
-                      flexDirection: 'column',
+                      flexWrap: 'wrap',
+                      justifyContent: 'space-between',
                       alignItems: 'center',
-                      textAlign: 'center',
+                      gap: '0.5rem',
+                      fontSize: '0.72rem',
+                      color: 'rgba(255, 255, 255, 0.6)',
                     }}
                   >
-                    <div
-                      style={{
-                        backgroundColor: '#ffffff',
-                        padding: '1rem',
-                        borderRadius: '16px',
-                        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)',
-                        display: 'inline-block',
-                      }}
-                    >
-                      {qrDataUrl ? (
-                        <img
-                          src={qrDataUrl}
-                          alt={`QR Check-in Pass for ${delegate.fullName}`}
-                          style={{
-                            width: '180px',
-                            height: '180px',
-                            display: 'block',
-                          }}
-                        />
-                      ) : (
-                        <div
-                          style={{
-                            width: '180px',
-                            height: '180px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: '#64748b',
-                          }}
-                        >
-                          <QrCode size={48} />
-                        </div>
-                      )}
+                    <div>
+                      <strong>Date &amp; Venue:</strong> 21–22 Nov 2026 · Calicut University
                     </div>
-
-                    <div
-                      style={{
-                        marginTop: '0.85rem',
-                        fontSize: '0.8rem',
-                        color: 'rgba(255, 255, 255, 0.65)',
-                        maxWidth: '220px',
-                        lineHeight: 1.4,
-                      }}
-                    >
-                      Scan at desk for instant check-in at <strong>Aryabhata Hall</strong>
+                    <div>
+                      <strong>Organised by:</strong> Science Orbit Forum &amp; Swaminathan Chair
                     </div>
-
-                    {/* Refresh status button for attendee while waiting */}
-                    <button
-                      type="button"
-                      onClick={handleRefreshStatus}
-                      disabled={isRefreshing}
-                      className="no-print"
-                      style={{
-                        marginTop: '0.75rem',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '0.35rem',
-                        fontSize: '0.75rem',
-                        color: '#00e5ff',
-                        background: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer',
-                        padding: '0.25rem 0.5rem',
-                      }}
-                    >
-                      <RefreshCw size={12} className={isRefreshing ? 'animate-spin' : ''} />
-                      <span>{isRefreshing ? 'Checking...' : 'Refresh status'}</span>
-                    </button>
                   </div>
                 </div>
 
-                {/* Bottom Event Info Strip */}
+                {/* Action Button: Download Badge Image Only */}
                 <div
+                  className="no-print"
                   style={{
-                    backgroundColor: 'rgba(11, 27, 51, 0.95)',
-                    padding: '0.85rem 2rem',
-                    borderTop: '1px solid rgba(255, 255, 255, 0.08)',
                     display: 'flex',
-                    flexWrap: 'wrap',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    gap: '0.75rem',
-                    fontSize: '0.75rem',
-                    color: 'rgba(255, 255, 255, 0.6)',
+                    justifyContent: 'center',
+                    marginTop: '0.25rem',
                   }}
                 >
-                  <div>
-                    <strong>Date &amp; Venue:</strong> 21–22 Nov 2026 · Aryabhata Hall, University of Calicut
-                  </div>
-                  <div>
-                    <strong>Organised by:</strong> Science Orbit Forum &amp; Swaminathan Chair
-                  </div>
+                  <button
+                    type="button"
+                    onClick={handleDownloadBadgeImage}
+                    disabled={isDownloading}
+                    className="icrast-btn icrast-btn--primary"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.5rem',
+                      padding: '0.75rem 1.6rem',
+                      fontSize: '0.9rem',
+                      fontWeight: 700,
+                      borderRadius: '10px',
+                      width: '100%',
+                      maxWidth: '260px',
+                    }}
+                  >
+                    {isDownloading ? (
+                      <>
+                        <RefreshCw size={15} className="animate-spin" />
+                        <span>Generating Image...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Download size={16} />
+                        <span>Download Badge Image</span>
+                      </>
+                    )}
+                  </button>
                 </div>
               </div>
-
-              {/* Action Buttons for Delegate */}
-              <div
-                className="no-print"
-                style={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: '0.75rem',
-                  justifyContent: 'center',
-                  marginBottom: '3rem',
-                }}
-              >
-                <button
-                  type="button"
-                  onClick={handlePrint}
-                  className="icrast-btn icrast-btn--primary"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    padding: '0.75rem 1.5rem',
-                    fontSize: '0.9rem',
-                  }}
-                >
-                  <Printer size={16} />
-                  <span>Print / Save Badge (PDF)</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleCopyLink}
-                  className="icrast-btn icrast-btn--outline-red"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    padding: '0.75rem 1.5rem',
-                    fontSize: '0.9rem',
-                  }}
-                >
-                  <Share2 size={16} />
-                  <span>{copiedLink ? 'Link Copied!' : 'Share / Copy Pass Link'}</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setDelegate(null);
-                    setPhoneInput('');
-                    setQrDataUrl('');
-                  }}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.4rem',
-                    padding: '0.75rem 1.25rem',
-                    fontSize: '0.85rem',
-                    backgroundColor: 'rgba(255, 255, 255, 0.06)',
-                    border: '1px solid rgba(255, 255, 255, 0.15)',
-                    borderRadius: '8px',
-                    color: 'rgba(255, 255, 255, 0.8)',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <span>Switch Delegate</span>
-                </button>
-              </div>
-            </Reveal>
-          )}
-
-          {/* Quick Help / Instructions Card */}
-          <Reveal delay={200}>
-            <div
-              className="no-print"
-              style={{
-                backgroundColor: 'rgba(15, 23, 42, 0.5)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '16px',
-                padding: '1.75rem',
-              }}
-            >
-              <h3
-                style={{
-                  fontSize: '1.1rem',
-                  fontWeight: 700,
-                  color: '#ffffff',
-                  marginBottom: '1rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                }}
-              >
-                <ShieldCheck size={18} style={{ color: '#00e5ff' }} />
-                <span>Instructions for Conference Delegates</span>
-              </h3>
-              <ul
-                style={{
-                  listStyle: 'none',
-                  padding: 0,
-                  margin: 0,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '0.75rem',
-                  color: 'rgba(255, 255, 255, 0.75)',
-                  fontSize: '0.9rem',
-                  lineHeight: 1.5,
-                }}
-              >
-                <li style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
-                  <ChevronRight size={16} style={{ color: '#d4af37', flexShrink: 0, marginTop: '2px' }} />
-                  <span>
-                    <strong>Arrival:</strong> Present this digital badge on your mobile device at the check-in counter in <strong>Aryabhata Hall</strong> upon arrival on 21 November 2026.
-                  </span>
-                </li>
-                <li style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
-                  <ChevronRight size={16} style={{ color: '#d4af37', flexShrink: 0, marginTop: '2px' }} />
-                  <span>
-                    <strong>Instant Check-in:</strong> Our volunteer desk will scan your QR code to record your attendance and hand over your delegate kit and lanyard.
-                  </span>
-                </li>
-                <li style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
-                  <ChevronRight size={16} style={{ color: '#d4af37', flexShrink: 0, marginTop: '2px' }} />
-                  <span>
-                    <strong>Certificates:</strong> Validated attendance via counter check-in is required for issuing the official Certificate of Participation.
-                  </span>
-                </li>
-                <li style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
-                  <ChevronRight size={16} style={{ color: '#d4af37', flexShrink: 0, marginTop: '2px' }} />
-                  <span>
-                    <strong>Need Help?</strong> For any registration discrepancy, please contact the secretariat at <a href="tel:+919656930916" style={{ color: '#93c5fd' }}>+91 96569 30916</a> or email <a href="mailto:info@scienceorbitforum.org" style={{ color: '#93c5fd' }}>info@scienceorbitforum.org</a>.
-                  </span>
-                </li>
-              </ul>
             </div>
-          </Reveal>
+          )}
         </div>
       </section>
 
-      {/* Print-specific style sheet */}
+      {/* Responsive mobile adjustments & Print stylesheet */}
       <style>{`
+        @media (max-width: 520px) {
+          .icrast-delegate-search-row {
+            flex-direction: column !important;
+          }
+          .icrast-delegate-search-row > div {
+            width: 100% !important;
+            flex: 1 1 100% !important;
+          }
+          .icrast-delegate-search-row button {
+            width: 100% !important;
+          }
+          .icrast-badge-grid {
+            flex-direction: column !important;
+            align-items: stretch !important;
+          }
+        }
         @media print {
           body {
             background-color: #ffffff !important;
             color: #000000 !important;
           }
+          .icrast-badge-modal-overlay {
+            position: static !important;
+            background: transparent !important;
+            backdrop-filter: none !important;
+            padding: 0 !important;
+            display: block !important;
+          }
+          .icrast-badge-modal-close,
           .icrast-topbar,
           .icrast-spectrum-bar,
           .icrast-site-footer,
