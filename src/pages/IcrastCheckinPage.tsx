@@ -11,21 +11,17 @@ import {
   CheckCircle2,
   AlertTriangle,
   AlertCircle,
-  QrCode,
-  Search,
   Lock,
   Unlock,
   RefreshCw,
-  UserCheck,
   Building,
   GraduationCap,
-  Users,
-  ShieldCheck,
   ArrowRight,
   Sparkles,
   Camera,
-  CameraOff,
   X,
+  PackageCheck,
+  UserCheck,
 } from 'lucide-react';
 import { Html5Qrcode } from 'html5-qrcode';
 
@@ -73,27 +69,22 @@ export default function IcrastCheckinPage() {
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
   const scanPhone = queryParams.get('phone') || '';
-  const scanId = queryParams.get('id') || '';
 
   // Volunteer PIN Auth
   const [pinInput, setPinInput] = useState('');
   const [pinVerified, setPinVerified] = useState(false);
   const [pinError, setPinError] = useState('');
 
-  // Checkin Search & Action
-  const [manualPhone, setManualPhone] = useState(scanPhone);
+  // Checkin Action & Modal
   const [isProcessing, setIsProcessing] = useState(false);
   const [checkinResult, setCheckinResult] = useState<DelegateCheckinResult | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Live Stats
-  const [stats, setStats] = useState<{ total: number; checkedIn: number } | null>(null);
-  const [isFetchingStats, setIsFetchingStats] = useState(false);
-
-  // Camera QR Scanner
-  const [isCameraActive, setIsCameraActive] = useState(false);
+  // Camera QR Scanner (Always on when unlocked)
   const [cameraError, setCameraError] = useState<string | null>(null);
   const scannerRef = useRef<Html5Qrcode | null>(null);
+  const isScannerRunningRef = useRef(false);
 
   useEffect(() => {
     trackPageView('/icrast/checkin', 'ICRAST-26 Counter Check-in Desk');
@@ -103,18 +94,133 @@ export default function IcrastCheckinPage() {
     const savedPin = sessionStorage.getItem(VOLUNTEER_STORAGE_KEY);
     if (savedPin === '2026') {
       setPinVerified(true);
-      fetchStats(savedPin);
       if (scanPhone) {
         performCheckin(scanPhone, savedPin);
       }
     }
   }, []);
 
-  const stopCamera = async () => {
+  // Handle Escape key and scroll-lock for modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isModalOpen) {
+        handleCloseModal();
+      }
+    };
+    if (isModalOpen) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+    return () => {
+      document.body.style.overflow = 'auto';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isModalOpen]);
+
+  // Start / Stop camera scanner lifecycle
+  const startScanner = () => {
+    if (isScannerRunningRef.current) return;
+    setCameraError(null);
+
+    // Delay slightly to ensure DOM element #icrast-reader exists
+    setTimeout(() => {
+      try {
+        const html5QrCode = new Html5Qrcode('icrast-reader');
+        scannerRef.current = html5QrCode;
+
+        const qrSuccessCallback = (decodedText: string) => {
+          const phoneFound = extractPhoneFromQr(decodedText);
+          if (phoneFound && phoneFound.length >= 10) {
+            // Haptic vibration feedback
+            try {
+              if (typeof navigator !== 'undefined' && navigator.vibrate) {
+                navigator.vibrate(200);
+              }
+            } catch {}
+
+            // Pause scanner immediately so it doesn't multi-scan while processing
+            pauseScanner();
+
+            const activePin = sessionStorage.getItem(VOLUNTEER_STORAGE_KEY) || '2026';
+            performCheckin(phoneFound, activePin);
+          } else {
+            setCameraError(
+              `Scanned QR: "${decodedText.slice(0, 35)}...". No valid delegate phone found.`
+            );
+          }
+        };
+
+        const config = {
+          fps: 12,
+          qrbox: (viewfinderWidth: number, viewfinderHeight: number) => {
+            const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+            const edgeSize = Math.floor(minEdge * 0.72);
+            return { width: edgeSize, height: edgeSize };
+          },
+          aspectRatio: 1.0,
+        };
+
+        html5QrCode
+          .start(
+            { facingMode: 'environment' },
+            config,
+            qrSuccessCallback,
+            () => {
+              // Ignore per-frame non-detection
+            }
+          )
+          .then(() => {
+            isScannerRunningRef.current = true;
+          })
+          .catch((err) => {
+            console.error('Camera start failed:', err);
+            isScannerRunningRef.current = false;
+            setCameraError(
+              typeof err === 'string'
+                ? err
+                : err?.message || 'Could not access camera. Please allow camera permissions in browser settings.'
+            );
+          });
+      } catch (initErr) {
+        console.error('Html5Qrcode init error:', initErr);
+        setCameraError('Unable to initialize camera component.');
+      }
+    }, 150);
+  };
+
+  const pauseScanner = () => {
+    if (scannerRef.current && isScannerRunningRef.current) {
+      try {
+        scannerRef.current.pause(true);
+      } catch {
+        // Fallback to stop if pause fails
+        stopScanner();
+      }
+    }
+  };
+
+  const resumeScanner = () => {
+    setCameraError(null);
+    setErrorMessage('');
+    if (scannerRef.current && isScannerRunningRef.current) {
+      try {
+        scannerRef.current.resume();
+        return;
+      } catch {
+        // Fallback to restart
+        stopScanner();
+      }
+    }
+    startScanner();
+  };
+
+  const stopScanner = () => {
     if (scannerRef.current) {
       try {
         if (scannerRef.current.isScanning) {
-          await scannerRef.current.stop();
+          scannerRef.current.stop().catch(() => {});
         }
         scannerRef.current.clear();
       } catch (err) {
@@ -122,99 +228,18 @@ export default function IcrastCheckinPage() {
       }
       scannerRef.current = null;
     }
-    setIsCameraActive(false);
+    isScannerRunningRef.current = false;
   };
 
-  const handleToggleCamera = () => {
-    if (isCameraActive) {
-      stopCamera();
-    } else {
-      setCameraError(null);
-      setIsCameraActive(true);
-    }
-  };
-
+  // Launch camera automatically whenever unlocked and modal is not open
   useEffect(() => {
-    let isMounted = true;
-
-    if (isCameraActive) {
-      const timer = setTimeout(() => {
-        if (!isMounted) return;
-
-        try {
-          const html5QrCode = new Html5Qrcode('icrast-reader');
-          scannerRef.current = html5QrCode;
-
-          const qrSuccessCallback = (decodedText: string) => {
-            if (!isMounted) return;
-            const phoneFound = extractPhoneFromQr(decodedText);
-            if (phoneFound && phoneFound.length >= 10) {
-              try {
-                if (typeof navigator !== 'undefined' && navigator.vibrate) {
-                  navigator.vibrate(200);
-                }
-              } catch {}
-
-              setManualPhone(phoneFound);
-              stopCamera();
-              const activePin = sessionStorage.getItem(VOLUNTEER_STORAGE_KEY) || '2026';
-              performCheckin(phoneFound, activePin);
-            } else {
-              setCameraError(
-                `Scanned QR content: "${decodedText.slice(0, 35)}...". No valid delegate phone found.`
-              );
-            }
-          };
-
-          const config = {
-            fps: 10,
-            qrbox: (viewfinderWidth: number, viewfinderHeight: number) => {
-              const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
-              const edgeSize = Math.floor(minEdge * 0.72);
-              return { width: edgeSize, height: edgeSize };
-            },
-            aspectRatio: 1.0,
-          };
-
-          html5QrCode
-            .start(
-              { facingMode: 'environment' },
-              config,
-              qrSuccessCallback,
-              () => {
-                // Ignore per-frame non-detection
-              }
-            )
-            .catch((err) => {
-              if (!isMounted) return;
-              console.error('Camera start failed:', err);
-              setCameraError(
-                typeof err === 'string'
-                  ? err
-                  : err?.message || 'Could not access camera. Please allow camera permissions in browser settings.'
-              );
-            });
-        } catch (initErr) {
-          console.error('Html5Qrcode init error:', initErr);
-          setCameraError('Unable to initialize camera component.');
-        }
-      }, 120);
-
-      return () => {
-        isMounted = false;
-        clearTimeout(timer);
-        if (scannerRef.current) {
-          if (scannerRef.current.isScanning) {
-            scannerRef.current.stop().catch(() => {});
-          }
-          try {
-            scannerRef.current.clear();
-          } catch {}
-          scannerRef.current = null;
-        }
-      };
+    if (pinVerified && !isModalOpen) {
+      startScanner();
     }
-  }, [isCameraActive]);
+    return () => {
+      stopScanner();
+    };
+  }, [pinVerified]);
 
   const handleVerifyPin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -223,7 +248,6 @@ export default function IcrastCheckinPage() {
     if (pinInput.trim() === '2026') {
       sessionStorage.setItem(VOLUNTEER_STORAGE_KEY, '2026');
       setPinVerified(true);
-      fetchStats('2026');
       if (scanPhone) {
         performCheckin(scanPhone, '2026');
       }
@@ -232,42 +256,11 @@ export default function IcrastCheckinPage() {
     }
   };
 
-  const handleLock = () => {
-    stopCamera();
-    sessionStorage.removeItem(VOLUNTEER_STORAGE_KEY);
-    setPinVerified(false);
-    setPinInput('');
-    setCheckinResult(null);
-  };
-
-  const fetchStats = async (pin: string) => {
-    setIsFetchingStats(true);
-    try {
-      const response = await fetch(ICRAST_REGISTER_SCRIPT_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'text/plain;charset=utf-8',
-        },
-        body: JSON.stringify({
-          action: 'volunteer_stats',
-          pin: pin,
-        }),
-      });
-      const data = await response.json();
-      if (data.ok && data.stats) {
-        setStats(data.stats);
-      }
-    } catch (err) {
-      console.warn('Could not fetch counter stats:', err);
-    } finally {
-      setIsFetchingStats(false);
-    }
-  };
-
   const performCheckin = async (phoneToProcess: string, activePin: string) => {
     const cleanPhone = normalizePhone(phoneToProcess);
     if (!cleanPhone || cleanPhone.length < 10) {
-      setErrorMessage('Please enter a valid 10-digit mobile number.');
+      setErrorMessage('Please scan a valid delegate pass.');
+      resumeScanner();
       return;
     }
 
@@ -292,41 +285,34 @@ export default function IcrastCheckinPage() {
 
       if (data.ok) {
         setCheckinResult(data);
-        if (data.stats) {
-          setStats(data.stats);
-        } else {
-          fetchStats(activePin);
-        }
+        setIsModalOpen(true);
         trackEvent('icrast_counter_checkin', 'action', data.alreadyCheckedIn ? 'already_checked' : 'new_checkin');
       } else {
         setCheckinResult(null);
         setErrorMessage(
-          data.message || 'No attendee found matching this mobile number. Please check registration.'
+          data.message || 'No attendee found matching this pass. Please verify registration.'
         );
         trackEvent('icrast_counter_checkin', 'action', 'not_found');
+        resumeScanner();
       }
     } catch (err) {
       console.error('Checkin failed:', err);
       setErrorMessage(
-        'Connection error connecting to Google Sheet database. Please check internet connection.'
+        'Connection error reaching the database. Please check internet connection.'
       );
+      resumeScanner();
     } finally {
       setIsProcessing(false);
     }
   };
 
-  const handleManualSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const pin = sessionStorage.getItem(VOLUNTEER_STORAGE_KEY) || '2026';
-    performCheckin(manualPhone, pin);
-  };
-
-  const handleResetForNext = () => {
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
     setCheckinResult(null);
-    setManualPhone('');
     setErrorMessage('');
-    setCameraError(null);
     window.history.replaceState({}, '', window.location.pathname);
+    // Instantly resume camera for next delegate
+    resumeScanner();
   };
 
   return (
@@ -334,21 +320,21 @@ export default function IcrastCheckinPage() {
       <section
         className="container section icrast-checkin-portal"
         style={{
-          paddingTop: 'clamp(2.5rem, 5vh, 4rem)',
+          paddingTop: 'clamp(2rem, 4vh, 3.5rem)',
           paddingBottom: 'clamp(3rem, 6vh, 5rem)',
         }}
       >
-        <div style={{ maxWidth: '720px', marginInline: 'auto' }}>
+        <div style={{ maxWidth: '520px', marginInline: 'auto' }}>
           {/* Volunteer PIN Gate */}
           {!pinVerified ? (
             <Reveal delay={100}>
               <div
                 style={{
-                  backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                  backgroundColor: 'rgba(15, 23, 42, 0.92)',
                   border: '1px solid rgba(255, 255, 255, 0.12)',
                   borderRadius: '20px',
                   padding: '2.5rem 2rem',
-                  maxWidth: '460px',
+                  maxWidth: '440px',
                   marginInline: 'auto',
                   textAlign: 'center',
                   boxShadow: '0 16px 40px rgba(0, 0, 0, 0.5)',
@@ -375,7 +361,7 @@ export default function IcrastCheckinPage() {
                     fontSize: '1.35rem',
                     fontWeight: 700,
                     color: '#ffffff',
-                    marginBottom: '0.5rem',
+                    marginBottom: '0.4rem',
                   }}
                 >
                   Counter Desk Access
@@ -387,7 +373,7 @@ export default function IcrastCheckinPage() {
                     marginBottom: '1.75rem',
                   }}
                 >
-                  Enter the 4-digit volunteer desk PIN to unlock check-in actions.
+                  Enter authorized volunteer PIN to access the camera desk.
                 </p>
 
                 <form onSubmit={handleVerifyPin}>
@@ -396,7 +382,7 @@ export default function IcrastCheckinPage() {
                     maxLength={6}
                     value={pinInput}
                     onChange={(e) => setPinInput(e.target.value)}
-                    placeholder="Enter PIN (e.g. 2026)"
+                    placeholder="Enter PIN"
                     autoFocus
                     style={{
                       width: '100%',
@@ -409,7 +395,7 @@ export default function IcrastCheckinPage() {
                       borderRadius: '10px',
                       color: '#ffffff',
                       outline: 'none',
-                      marginBottom: '1rem',
+                      marginBottom: '1.25rem',
                     }}
                   />
                   <button
@@ -426,7 +412,7 @@ export default function IcrastCheckinPage() {
                     }}
                   >
                     <Unlock size={16} />
-                    <span>Unlock Check-in Desk</span>
+                    <span>Unlock Desk</span>
                   </button>
                 </form>
 
@@ -449,431 +435,421 @@ export default function IcrastCheckinPage() {
             </Reveal>
           ) : (
             <>
-              {/* Authenticated Desk Panel */}
+              {/* Authenticated Always-On Camera Scanner Desk */}
               <Reveal delay={100}>
-                {/* Desk Control Bar & Live Stats */}
                 <div
                   style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    gap: '1rem',
-                    backgroundColor: 'rgba(11, 27, 51, 0.8)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    borderRadius: '14px',
-                    padding: '0.85rem 1.25rem',
-                    marginBottom: '1.5rem',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <div
-                      style={{
-                        width: '10px',
-                        height: '10px',
-                        borderRadius: '50%',
-                        backgroundColor: '#22c55e',
-                        boxShadow: '0 0 10px #22c55e',
-                      }}
-                    />
-                    <span style={{ fontSize: '0.88rem', color: '#ffffff', fontWeight: 600 }}>
-                      Counter Active (PIN: 2026)
-                    </span>
-                  </div>
-
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    {stats && (
-                      <div
-                        style={{
-                          fontSize: '0.85rem',
-                          color: '#93c5fd',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '0.4rem',
-                        }}
-                      >
-                        <Users size={15} />
-                        <span>
-                          Checked In: <strong>{stats.checkedIn}</strong> / {stats.total}
-                        </span>
-                      </div>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => fetchStats('2026')}
-                      disabled={isFetchingStats}
-                      style={{
-                        background: 'transparent',
-                        border: 'none',
-                        color: 'rgba(255, 255, 255, 0.6)',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '0.25rem',
-                      }}
-                      title="Refresh Stats"
-                    >
-                      <RefreshCw size={14} className={isFetchingStats ? 'animate-spin' : ''} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleLock}
-                      style={{
-                        background: 'transparent',
-                        border: '1px solid rgba(255, 255, 255, 0.2)',
-                        borderRadius: '6px',
-                        color: 'rgba(255, 255, 255, 0.7)',
-                        fontSize: '0.75rem',
-                        padding: '0.3rem 0.65rem',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      Lock Desk
-                    </button>
-                  </div>
-                </div>
-
-                {/* Scan / Manual Search Card */}
-                <div
-                  style={{
-                    backgroundColor: 'rgba(15, 23, 42, 0.85)',
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
                     border: '1px solid rgba(255, 255, 255, 0.12)',
-                    borderRadius: '16px',
-                    padding: '1.5rem',
-                    marginBottom: '1.5rem',
-                    boxShadow: '0 12px 30px rgba(0, 0, 0, 0.35)',
+                    borderRadius: '20px',
+                    padding: 'clamp(1.25rem, 3vw, 1.75rem)',
+                    boxShadow: '0 16px 45px rgba(0, 0, 0, 0.5), 0 0 25px rgba(34, 197, 94, 0.1)',
+                    textAlign: 'center',
                   }}
                 >
-                  {/* Top Bar with Camera Button */}
+                  {/* Status Indicator Bar */}
                   <div
                     style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
+                      display: 'inline-flex',
                       alignItems: 'center',
+                      gap: '0.55rem',
+                      padding: '0.35rem 0.9rem',
+                      borderRadius: '9999px',
+                      backgroundColor: 'rgba(34, 197, 94, 0.12)',
+                      border: '1px solid rgba(34, 197, 94, 0.35)',
+                      color: '#86efac',
+                      fontSize: '0.82rem',
+                      fontWeight: 600,
                       marginBottom: '1rem',
-                      flexWrap: 'wrap',
-                      gap: '0.75rem',
+                      letterSpacing: '0.03em',
                     }}
                   >
                     <span
                       style={{
-                        fontSize: '0.95rem',
-                        fontWeight: 600,
-                        color: '#ffffff',
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        backgroundColor: '#22c55e',
+                        boxShadow: '0 0 8px #22c55e',
                       }}
-                    >
-                      Delegate Verification
-                    </span>
-
-                    <button
-                      type="button"
-                      onClick={handleToggleCamera}
-                      style={{
-                        backgroundColor: isCameraActive ? 'rgba(239, 68, 68, 0.18)' : 'rgba(34, 197, 94, 0.15)',
-                        border: isCameraActive ? '1px solid rgba(239, 68, 68, 0.45)' : '1px solid rgba(34, 197, 94, 0.45)',
-                        color: isCameraActive ? '#fca5a5' : '#86efac',
-                        borderRadius: '8px',
-                        padding: '0.45rem 0.95rem',
-                        fontSize: '0.85rem',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '0.45rem',
-                        transition: 'all 0.2s ease',
-                      }}
-                    >
-                      {isCameraActive ? (
-                        <>
-                          <CameraOff size={15} />
-                          <span>Close Camera</span>
-                        </>
-                      ) : (
-                        <>
-                          <Camera size={15} />
-                          <span>Scan with Camera</span>
-                        </>
-                      )}
-                    </button>
+                    />
+                    <span>Live Counter Camera Ready</span>
                   </div>
 
-                  {/* Camera Scanner Viewfinder */}
-                  {isCameraActive && (
-                    <div
-                      style={{
-                        marginBottom: '1.5rem',
-                        padding: '1rem',
-                        backgroundColor: 'rgba(0, 0, 0, 0.45)',
-                        border: '1px solid rgba(34, 197, 94, 0.35)',
-                        borderRadius: '14px',
-                        textAlign: 'center',
-                      }}
-                    >
-                      <div
-                        id="icrast-reader"
-                        style={{
-                          width: '100%',
-                          maxWidth: '340px',
-                          margin: '0 auto',
-                          borderRadius: '12px',
-                          overflow: 'hidden',
-                          border: '2px solid rgba(34, 197, 94, 0.5)',
-                          backgroundColor: '#000000',
-                          minHeight: '240px',
-                        }}
-                      />
-
-                      {cameraError ? (
-                        <div
-                          style={{
-                            marginTop: '0.85rem',
-                            padding: '0.65rem 0.85rem',
-                            borderRadius: '8px',
-                            backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                            border: '1px solid rgba(239, 68, 68, 0.4)',
-                            color: '#fca5a5',
-                            fontSize: '0.82rem',
-                          }}
-                        >
-                          {cameraError}
-                        </div>
-                      ) : (
-                        <p
-                          style={{
-                            marginTop: '0.75rem',
-                            fontSize: '0.82rem',
-                            color: 'rgba(255, 255, 255, 0.7)',
-                            marginBottom: 0,
-                          }}
-                        >
-                          Align delegate QR pass within camera frame to scan automatically.
-                        </p>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Manual Phone / Search Input */}
-                  <form onSubmit={handleManualSubmit}>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
-                      <input
-                        id="manual-phone-input"
-                        type="tel"
-                        value={manualPhone}
-                        onChange={(e) => setManualPhone(e.target.value)}
-                        placeholder="Or type 10-digit phone number"
-                        disabled={isProcessing}
-                        autoFocus
-                        style={{
-                          flex: '1 1 260px',
-                          padding: '0.85rem 1rem',
-                          backgroundColor: 'rgba(11, 27, 51, 0.7)',
-                          border: '1px solid rgba(255, 255, 255, 0.25)',
-                          borderRadius: '10px',
-                          color: '#ffffff',
-                          fontSize: '1rem',
-                          outline: 'none',
-                        }}
-                      />
-                      <button
-                        type="submit"
-                        disabled={isProcessing}
-                        className="icrast-btn icrast-btn--primary"
-                        style={{
-                          padding: '0.85rem 1.6rem',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '0.5rem',
-                          fontSize: '0.92rem',
-                        }}
-                      >
-                        {isProcessing ? (
-                          <>
-                            <RefreshCw size={16} className="animate-spin" />
-                            <span>Checking in...</span>
-                          </>
-                        ) : (
-                          <>
-                            <CheckCircle2 size={16} />
-                            <span>Confirm Check-in</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </form>
-
-                  {errorMessage && (
-                    <div
-                      style={{
-                        marginTop: '1.25rem',
-                        padding: '0.85rem 1rem',
-                        borderRadius: '10px',
-                        backgroundColor: 'rgba(239, 68, 68, 0.15)',
-                        border: '1px solid rgba(239, 68, 68, 0.35)',
-                        color: '#fca5a5',
-                        fontSize: '0.9rem',
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        gap: '0.65rem',
-                      }}
-                    >
-                      <AlertCircle size={20} style={{ flexShrink: 0, marginTop: '2px' }} />
-                      <div>
-                        <strong>Not Found / Error:</strong> {errorMessage}
-                        <div style={{ marginTop: '0.4rem' }}>
-                          <Link
-                            to="/icrast/register"
-                            target="_blank"
-                            style={{
-                              color: '#ffffff',
-                              textDecoration: 'underline',
-                              fontWeight: 600,
-                              fontSize: '0.85rem',
-                            }}
-                          >
-                            Open on-spot registration form &rarr;
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Check-in Result Card */}
-                {checkinResult && (
+                  {/* Always-On Video Viewfinder Box */}
                   <div
                     style={{
-                      borderRadius: '20px',
+                      position: 'relative',
+                      width: '100%',
+                      maxWidth: '420px',
+                      margin: '0 auto',
+                      borderRadius: '16px',
                       overflow: 'hidden',
-                      border: checkinResult.alreadyCheckedIn
-                        ? '2px solid #eab308'
-                        : '2px solid #22c55e',
+                      border: '2px solid rgba(34, 197, 94, 0.45)',
+                      boxShadow: '0 8px 30px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(0, 0, 0, 0.5)',
+                      backgroundColor: '#000000',
+                      minHeight: '300px',
+                    }}
+                  >
+                    <div
+                      id="icrast-reader"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        borderRadius: '14px',
+                      }}
+                    />
+
+                    {/* Scanning guide corners overlay */}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        inset: '16px',
+                        border: '2px dashed rgba(34, 197, 94, 0.4)',
+                        borderRadius: '12px',
+                        pointerEvents: 'none',
+                      }}
+                    />
+
+                    {isProcessing && (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          inset: 0,
+                          backgroundColor: 'rgba(3, 7, 18, 0.75)',
+                          backdropFilter: 'blur(4px)',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '0.75rem',
+                          color: '#86efac',
+                          zIndex: 10,
+                        }}
+                      >
+                        <RefreshCw size={28} className="animate-spin text-green-400" />
+                        <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>
+                          Verifying Attendee...
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Error / Instruction Messages */}
+                  {cameraError ? (
+                    <div
+                      style={{
+                        marginTop: '1rem',
+                        padding: '0.75rem 1rem',
+                        borderRadius: '10px',
+                        backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                        border: '1px solid rgba(239, 68, 68, 0.4)',
+                        color: '#fca5a5',
+                        fontSize: '0.85rem',
+                        textAlign: 'left',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
+                        <AlertCircle size={16} />
+                        <strong>Camera Message:</strong>
+                      </div>
+                      <p style={{ margin: 0, fontSize: '0.82rem' }}>{cameraError}</p>
+                      <button
+                        type="button"
+                        onClick={resumeScanner}
+                        style={{
+                          marginTop: '0.5rem',
+                          background: 'rgba(255, 255, 255, 0.15)',
+                          border: 'none',
+                          color: '#ffffff',
+                          borderRadius: '6px',
+                          padding: '0.3rem 0.75rem',
+                          fontSize: '0.78rem',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Retry Camera
+                      </button>
+                    </div>
+                  ) : errorMessage ? (
+                    <div
+                      style={{
+                        marginTop: '1rem',
+                        padding: '0.75rem 1rem',
+                        borderRadius: '10px',
+                        backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                        border: '1px solid rgba(239, 68, 68, 0.4)',
+                        color: '#fca5a5',
+                        fontSize: '0.85rem',
+                      }}
+                    >
+                      {errorMessage}
+                    </div>
+                  ) : (
+                    <p
+                      style={{
+                        marginTop: '1rem',
+                        fontSize: '0.85rem',
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        marginBottom: 0,
+                      }}
+                    >
+                      Point camera directly at candidate's QR badge pass.
+                    </p>
+                  )}
+                </div>
+              </Reveal>
+            </>
+          )}
+
+          {/* Premium Professional Verification Success Modal */}
+          {isModalOpen && checkinResult && (
+            <div
+              className="icrast-checkin-modal-overlay"
+              onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                  handleCloseModal();
+                }
+              }}
+              style={{
+                position: 'fixed',
+                inset: 0,
+                zIndex: 9999,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: 'rgba(3, 7, 18, 0.88)',
+                backdropFilter: 'blur(8px)',
+                padding: 'clamp(0.75rem, 3vw, 1.5rem)',
+                overflowY: 'auto',
+              }}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Delegate Check-in Status"
+            >
+              <div
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  maxWidth: '520px',
+                  backgroundColor: '#071224',
+                  border: checkinResult.alreadyCheckedIn
+                    ? '2px solid rgba(234, 179, 8, 0.55)'
+                    : '2px solid rgba(34, 197, 94, 0.55)',
+                  borderRadius: '20px',
+                  overflow: 'hidden',
+                  boxShadow: checkinResult.alreadyCheckedIn
+                    ? '0 25px 60px rgba(0, 0, 0, 0.7), 0 0 35px rgba(234, 179, 8, 0.2)'
+                    : '0 25px 60px rgba(0, 0, 0, 0.7), 0 0 35px rgba(34, 197, 94, 0.25)',
+                  margin: 'auto',
+                }}
+              >
+                {/* Modal Top Close Button */}
+                <button
+                  type="button"
+                  onClick={handleCloseModal}
+                  aria-label="Close Modal and Scan Next"
+                  style={{
+                    position: 'absolute',
+                    top: '12px',
+                    right: '12px',
+                    zIndex: 20,
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    backgroundColor: 'rgba(11, 27, 51, 0.8)',
+                    border: '1px solid rgba(255, 255, 255, 0.25)',
+                    color: '#ffffff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.15s',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#1e3a8a')}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'rgba(11, 27, 51, 0.8)')}
+                >
+                  <X size={16} />
+                </button>
+
+                {/* Top Colored Accent Ribbon */}
+                <div
+                  style={{
+                    background: checkinResult.alreadyCheckedIn
+                      ? 'linear-gradient(90deg, #713f12 0%, #a16207 50%, #713f12 100%)'
+                      : 'linear-gradient(90deg, #14532d 0%, #16a34a 50%, #14532d 100%)',
+                    padding: '0.9rem 1.5rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.65rem',
+                  }}
+                >
+                  {checkinResult.alreadyCheckedIn ? (
+                    <AlertTriangle size={20} style={{ color: '#fef08a' }} />
+                  ) : (
+                    <CheckCircle2 size={20} style={{ color: '#bbf7d0' }} />
+                  )}
+                  <span
+                    style={{
+                      fontSize: '0.85rem',
+                      fontWeight: 800,
+                      letterSpacing: '0.06em',
+                      textTransform: 'uppercase',
+                      color: checkinResult.alreadyCheckedIn ? '#fef08a' : '#dcfce7',
+                    }}
+                  >
+                    {checkinResult.alreadyCheckedIn
+                      ? 'ALREADY CHECKED IN'
+                      : 'CHECK-IN VERIFIED & RECORDED'}
+                  </span>
+                </div>
+
+                {/* Modal Body Content */}
+                <div style={{ padding: 'clamp(1.25rem, 3vw, 1.75rem)' }}>
+                  {/* Delegate Name & ID */}
+                  <div style={{ marginBottom: '1.25rem' }}>
+                    <div
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        padding: '0.2rem 0.55rem',
+                        borderRadius: '5px',
+                        backgroundColor: 'rgba(0, 229, 255, 0.12)',
+                        border: '1px solid rgba(0, 229, 255, 0.3)',
+                        color: '#00e5ff',
+                        fontFamily: 'monospace',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        marginBottom: '0.45rem',
+                        letterSpacing: '0.05em',
+                      }}
+                    >
+                      <span>ID: {checkinResult.delegateId || 'ICRAST26-DELEGATE'}</span>
+                    </div>
+
+                    <h2
+                      style={{
+                        fontSize: 'clamp(1.4rem, 2.8vw, 1.75rem)',
+                        fontWeight: 800,
+                        color: '#ffffff',
+                        margin: 0,
+                        lineHeight: 1.25,
+                      }}
+                    >
+                      {checkinResult.fullName}
+                    </h2>
+                  </div>
+
+                  {/* Details Grid */}
+                  <div
+                    style={{
+                      backgroundColor: 'rgba(11, 27, 51, 0.7)',
+                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      borderRadius: '12px',
+                      padding: '1rem',
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                      gap: '0.85rem',
+                      marginBottom: '1.25rem',
+                      fontSize: '0.85rem',
+                    }}
+                  >
+                    <div>
+                      <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '0.72rem', fontWeight: 600 }}>
+                        INSTITUTION
+                      </div>
+                      <strong style={{ color: '#ffffff' }}>
+                        {checkinResult.institution || 'Calicut University'}
+                      </strong>
+                    </div>
+
+                    <div>
+                      <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '0.72rem', fontWeight: 600 }}>
+                        CHECK-IN TIMESTAMP
+                      </div>
+                      <strong style={{ color: '#93c5fd' }}>
+                        {checkinResult.checkinTimestamp || 'Recorded Just Now'}
+                      </strong>
+                    </div>
+                  </div>
+
+                  {/* Delegate Kit Dispatch Highlight Banner */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.75rem',
+                      padding: '0.85rem 1rem',
+                      borderRadius: '12px',
                       backgroundColor: checkinResult.alreadyCheckedIn
-                        ? 'rgba(113, 63, 18, 0.25)'
-                        : 'rgba(20, 83, 45, 0.25)',
-                      backdropFilter: 'blur(10px)',
-                      boxShadow: '0 20px 45px rgba(0, 0, 0, 0.5)',
-                      padding: '2rem',
-                      marginBottom: '2rem',
+                        ? 'rgba(234, 179, 8, 0.12)'
+                        : 'rgba(34, 197, 94, 0.14)',
+                      border: checkinResult.alreadyCheckedIn
+                        ? '1px solid rgba(234, 179, 8, 0.35)'
+                        : '1px solid rgba(34, 197, 94, 0.35)',
+                      marginBottom: '1.5rem',
                     }}
                   >
                     <div
                       style={{
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '50%',
+                        backgroundColor: checkinResult.alreadyCheckedIn
+                          ? 'rgba(234, 179, 8, 0.2)'
+                          : 'rgba(34, 197, 94, 0.25)',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '1rem',
-                        marginBottom: '1.25rem',
+                        justifyContent: 'center',
+                        color: checkinResult.alreadyCheckedIn ? '#facc15' : '#4ade80',
+                        flexShrink: 0,
                       }}
                     >
+                      <PackageCheck size={20} />
+                    </div>
+                    <div>
                       <div
                         style={{
-                          width: '54px',
-                          height: '54px',
-                          borderRadius: '50%',
-                          backgroundColor: checkinResult.alreadyCheckedIn
-                            ? 'rgba(234, 179, 8, 0.2)'
-                            : 'rgba(34, 197, 94, 0.2)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: checkinResult.alreadyCheckedIn ? '#facc15' : '#4ade80',
+                          fontSize: '0.75rem',
+                          fontWeight: 700,
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.04em',
+                          color: checkinResult.alreadyCheckedIn ? '#facc15' : '#86efac',
                         }}
                       >
-                        {checkinResult.alreadyCheckedIn ? (
-                          <AlertTriangle size={30} />
-                        ) : (
-                          <CheckCircle2 size={30} />
-                        )}
+                        Counter Action
                       </div>
-                      <div>
-                        <div
-                          style={{
-                            fontSize: '0.85rem',
-                            fontWeight: 700,
-                            letterSpacing: '0.05em',
-                            textTransform: 'uppercase',
-                            color: checkinResult.alreadyCheckedIn ? '#facc15' : '#4ade80',
-                          }}
-                        >
-                          {checkinResult.alreadyCheckedIn
-                            ? 'ALREADY CHECKED IN PREVIOUSLY'
-                            : 'CHECK-IN VERIFIED & RECORDED'}
-                        </div>
-                        <h2
-                          style={{
-                            fontSize: '1.65rem',
-                            fontWeight: 800,
-                            color: '#ffffff',
-                            margin: 0,
-                          }}
-                        >
-                          {checkinResult.fullName}
-                        </h2>
+                      <div style={{ fontSize: '0.88rem', fontWeight: 600, color: '#ffffff' }}>
+                        Issue Official Conference Kit &amp; Delegate Lanyard
                       </div>
-                    </div>
-
-                    <div
-                      style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-                        gap: '1rem',
-                        backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                        borderRadius: '12px',
-                        padding: '1.25rem',
-                        marginBottom: '1.5rem',
-                        fontSize: '0.9rem',
-                        color: 'rgba(255, 255, 255, 0.85)',
-                      }}
-                    >
-                      <div>
-                        <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '0.75rem' }}>
-                          DELEGATE ID
-                        </div>
-                        <strong style={{ fontFamily: 'monospace', color: '#00e5ff' }}>
-                          {checkinResult.delegateId || 'ICRAST26-DELEGATE'}
-                        </strong>
-                      </div>
-                      <div>
-                        <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '0.75rem' }}>
-                          INSTITUTION
-                        </div>
-                        <strong>{checkinResult.institution || 'Calicut University'}</strong>
-                      </div>
-                      <div>
-                        <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '0.75rem' }}>
-                          CHECK-IN TIMESTAMP
-                        </div>
-                        <strong>{checkinResult.checkinTimestamp || 'Recorded Just Now'}</strong>
-                      </div>
-                      <div>
-                        <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '0.75rem' }}>
-                          KIT &amp; BADGE STATUS
-                        </div>
-                        <strong style={{ color: '#86efac' }}>Issue Delegate Kit &amp; Lanyard</strong>
-                      </div>
-                    </div>
-
-                    {/* Next Scan Action Button */}
-                    <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
-                      <button
-                        type="button"
-                        onClick={handleResetForNext}
-                        className="icrast-btn icrast-btn--primary"
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '0.5rem',
-                          padding: '0.75rem 1.5rem',
-                          fontSize: '0.9rem',
-                        }}
-                      >
-                        <span>Scan Next Attendee</span>
-                        <ArrowRight size={16} />
-                      </button>
                     </div>
                   </div>
-                )}
-              </Reveal>
-            </>
+
+                  {/* Primary Next Scan Button */}
+                  <button
+                    type="button"
+                    onClick={handleCloseModal}
+                    className="icrast-btn icrast-btn--primary"
+                    style={{
+                      width: '100%',
+                      padding: '0.9rem',
+                      fontSize: '0.95rem',
+                      fontWeight: 700,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.55rem',
+                      borderRadius: '10px',
+                    }}
+                  >
+                    <Camera size={18} />
+                    <span>Scan Next Delegate</span>
+                    <ArrowRight size={16} />
+                  </button>
+                </div>
+              </div>
+            </div>
           )}
         </div>
       </section>
