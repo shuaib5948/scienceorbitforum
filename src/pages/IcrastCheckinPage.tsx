@@ -29,15 +29,16 @@ import {
 } from 'lucide-react';
 import { Html5Qrcode } from 'html5-qrcode';
 
-function normalizePhone(p: string): string {
-  if (!p) return '';
-  const digits = p.replace(/\D/g, '');
+function normalizePhone(p: unknown): string {
+  if (p === null || p === undefined) return '';
+  const str = String(p).trim();
+  const digits = str.replace(/\D/g, '');
   return digits.length >= 10 ? digits.slice(-10) : digits;
 }
 
-function extractPhoneFromQr(text: string): string {
+function extractPhoneFromQr(text: unknown): string {
   if (!text) return '';
-  const trimmed = text.trim();
+  const trimmed = String(text).trim();
 
   // Try URL parameter phone=
   try {

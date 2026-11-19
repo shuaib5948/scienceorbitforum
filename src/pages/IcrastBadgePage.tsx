@@ -23,9 +23,10 @@ import {
   X,
 } from 'lucide-react';
 
-function normalizePhone(p: string): string {
-  if (!p) return '';
-  const digits = p.replace(/\D/g, '');
+function normalizePhone(p: unknown): string {
+  if (p === null || p === undefined) return '';
+  const str = String(p).trim();
+  const digits = str.replace(/\D/g, '');
   return digits.length >= 10 ? digits.slice(-10) : digits;
 }
 
@@ -129,10 +130,10 @@ export default function IcrastBadgePage() {
 
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const generateQrCode = async (phone: string, delegateId: string) => {
+  const generateQrCode = async (phone: unknown, delegateId: unknown) => {
     try {
       const cleanPhone = normalizePhone(phone);
-      const cleanId = (delegateId || '').trim();
+      const cleanId = String(delegateId || '').trim();
       const checkinUrl = `https://icrast.scienceorbitforum.org/checkin?phone=${encodeURIComponent(
         cleanPhone
       )}&id=${encodeURIComponent(cleanId)}`;
