@@ -205,3 +205,49 @@ export interface CandidateVerificationResult {
   message?: string;
 }
 
+export interface DelegateRecord {
+  delegateId: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  country: string;
+  institution: string;
+  department: string;
+  designation: string;
+  participationMode: string;
+  areaOfInterest?: string;
+  checkinStatus: 'Registered' | 'Checked In' | string;
+  checkinTimestamp?: string;
+}
+
+export interface DelegateLookupResult {
+  ok: boolean;
+  delegateId?: string;
+  fullName?: string;
+  email?: string;
+  phone?: string;
+  country?: string;
+  institution?: string;
+  department?: string;
+  designation?: string;
+  participationMode?: string;
+  areaOfInterest?: string;
+  checkinStatus?: string;
+  checkinTimestamp?: string;
+  message?: string;
+}
+
+export interface DelegateCheckinResult {
+  ok: boolean;
+  alreadyCheckedIn?: boolean;
+  delegateId?: string;
+  fullName?: string;
+  institution?: string;
+  checkinTimestamp?: string;
+  message?: string;
+  stats?: {
+    total: number;
+    checkedIn: number;
+  };
+}
+

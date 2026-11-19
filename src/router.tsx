@@ -43,6 +43,8 @@ import IcrastSubmitPage from './pages/IcrastSubmitPage';
 import IcrastSubmitClosedPage from './pages/IcrastSubmitClosedPage';
 import IcrastRegisterPage from './pages/IcrastRegisterPage';
 import IcrastFullPaperPage from './pages/IcrastFullPaperPage';
+import IcrastBadgePage from './pages/IcrastBadgePage';
+import IcrastCheckinPage from './pages/IcrastCheckinPage';
 import FestivalPortalPage from './pages/FestivalPortalPage';
 import { DesignSystem } from './showcase/DesignSystem';
 
@@ -114,6 +116,24 @@ function getRouteMetadata(
         favicon: 'icrast',
       };
     }
+    if (pathname === '/delegate' || pathname === '/icrast/delegate') {
+      return {
+        title: 'Digital Delegate ID & QR Pass · ICRAST-26 · Science Orbit Forum',
+        description:
+          'Access your official ICRAST-26 conference badge and check-in QR pass for Aryabhata Hall, University of Calicut.',
+        canonicalPath: '/icrast/delegate',
+        favicon: 'icrast',
+      };
+    }
+    if (pathname === '/checkin' || pathname === '/icrast/checkin') {
+      return {
+        title: 'Volunteer Check-in Counter · ICRAST-26 · Science Orbit Forum',
+        description:
+          'Counter check-in and attendance verification desk for ICRAST-26 delegates at Aryabhata Hall, University of Calicut.',
+        canonicalPath: '/icrast/checkin',
+        favicon: 'icrast',
+      };
+    }
     return {
       ...ROUTE_SEO['/icrast'],
       favicon: 'icrast',
@@ -160,6 +180,24 @@ function getRouteMetadata(
       description:
         'Full paper submission portal for accepted ICRAST-26 candidates to upload papers.',
       canonicalPath: '/icrast/full-paper',
+      favicon: 'icrast',
+    };
+  }
+  if (pathname === '/delegate') {
+    return {
+      title: 'Digital Delegate ID & QR Pass · ICRAST-26 · Science Orbit Forum',
+      description:
+        'Access your official ICRAST-26 conference badge and check-in QR pass for Aryabhata Hall, University of Calicut.',
+      canonicalPath: '/icrast/delegate',
+      favicon: 'icrast',
+    };
+  }
+  if (pathname === '/checkin') {
+    return {
+      title: 'Volunteer Check-in Counter · ICRAST-26 · Science Orbit Forum',
+      description:
+        'Counter check-in and attendance verification desk for ICRAST-26 delegates at Aryabhata Hall, University of Calicut.',
+      canonicalPath: '/icrast/checkin',
       favicon: 'icrast',
     };
   }
@@ -259,6 +297,8 @@ function RootComponent() {
     pathname === '/register' ||
     pathname === '/full-paper' ||
     pathname === '/upload-paper' ||
+    pathname === '/delegate' ||
+    pathname === '/checkin' ||
     (pathname === '/contact' && subdomain === 'icrast') ||
     subdomain === 'icrast' ||
     pathname.startsWith('/festival') ||
@@ -378,6 +418,30 @@ const icrastUploadPaperSubdomainRoute = createRoute({
   component: IcrastFullPaperPage,
 });
 
+const icrastDelegateRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/icrast/delegate',
+  component: IcrastBadgePage,
+});
+
+const icrastDelegateSubdomainRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/delegate',
+  component: IcrastBadgePage,
+});
+
+const icrastCheckinRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/icrast/checkin',
+  component: IcrastCheckinPage,
+});
+
+const icrastCheckinSubdomainRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/checkin',
+  component: IcrastCheckinPage,
+});
+
 const festivalRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/festival',
@@ -489,6 +553,10 @@ const routeTree = rootRoute.addChildren([
   icrastFullPaperSubdomainRoute,
   icrastUploadPaperAliasRoute,
   icrastUploadPaperSubdomainRoute,
+  icrastDelegateRoute,
+  icrastDelegateSubdomainRoute,
+  icrastCheckinRoute,
+  icrastCheckinSubdomainRoute,
   festivalRoute,
   scienceFestivalAliasRoute,
   whoWeAreRoute,
