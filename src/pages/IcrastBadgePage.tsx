@@ -39,6 +39,7 @@ export default function IcrastBadgePage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [delegate, setDelegate] = useState<DelegateLookupResult | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [qrSvg, setQrSvg] = useState<string>('');
   const [qrDataUrl, setQrDataUrl] = useState<string>('');
   const [copiedLink, setCopiedLink] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -100,8 +101,8 @@ export default function IcrastBadgePage() {
 
       if (data && data.ok && data.fullName) {
         setDelegate(data);
+        await generateQrCode(data.phone || cleanPhone, data.delegateId || 'ICRAST26-DELEGATE');
         setIsModalOpen(true);
-        generateQrCode(data.phone || cleanPhone, data.delegateId || 'ICRAST26-DELEGATE');
         trackEvent('icrast_delegate_portal', 'lookup', 'success');
       } else {
         setDelegate(null);
@@ -136,8 +137,9 @@ export default function IcrastBadgePage() {
         cleanPhone
       )}&id=${encodeURIComponent(cleanId)}`;
 
-      const dataUrl = await QRCode.toDataURL(checkinUrl, {
-        width: 360,
+      // 1. Generate guaranteed pure SVG (zero canvas dependency)
+      const svg = await QRCode.toString(checkinUrl, {
+        type: 'svg',
         margin: 1,
         color: {
           dark: '#0b1b33',
@@ -145,14 +147,42 @@ export default function IcrastBadgePage() {
         },
         errorCorrectionLevel: 'H',
       });
+      setQrSvg(svg);
+
+      // 2. Generate PNG Data URL for download
+      let dataUrl = '';
+      try {
+        dataUrl = await QRCode.toDataURL(checkinUrl, {
+          width: 360,
+          margin: 1,
+          color: {
+            dark: '#0b1b33',
+            light: '#ffffff',
+          },
+          errorCorrectionLevel: 'H',
+        });
+      } catch (canvasErr) {
+        console.warn('Canvas toDataURL failed, using SVG fallback:', canvasErr);
+        dataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+      }
       setQrDataUrl(dataUrl);
+      return { svg, dataUrl };
     } catch (err) {
       console.error('QR code generation failed:', err);
+      return null;
     }
   };
 
+  // Ensure QR code is generated whenever delegate data is present
+  useEffect(() => {
+    if (delegate && !qrSvg) {
+      generateQrCode(delegate.phone || phoneInput, delegate.delegateId || 'ICRAST26-DELEGATE');
+    }
+  }, [delegate, qrSvg]);
+
   const handleDownloadBadgeImage = async () => {
-    if (!delegate || !qrDataUrl) return;
+    const qrSource = qrDataUrl || (qrSvg ? `data:image/svg+xml;charset=utf-8,${encodeURIComponent(qrSvg)}` : '');
+    if (!delegate || !qrSource) return;
     setIsDownloading(true);
 
     try {
@@ -266,7 +296,7 @@ export default function IcrastBadgePage() {
       await new Promise<void>((resolve) => {
         qrImg.onload = () => resolve();
         qrImg.onerror = () => resolve();
-        qrImg.src = qrDataUrl;
+        qrImg.src = qrSource;
       });
 
       // QR Code container
@@ -886,7 +916,32 @@ export default function IcrastBadgePage() {
                           textAlign: 'center',
                         }}
                       >
-                        {qrDataUrl ? (
+                        {qrSvg ? (
+                          <>
+                            <div
+                              dangerouslySetInnerHTML={{ __html: qrSvg }}
+                              style={{
+                                width: '140px',
+                                height: '140px',
+                                display: 'block',
+                                borderRadius: '4px',
+                                overflow: 'hidden',
+                              }}
+                            />
+                            <div
+                              style={{
+                                marginTop: '0.35rem',
+                                fontSize: '0.72rem',
+                                fontFamily: 'monospace',
+                                fontWeight: 700,
+                                color: '#0b1b33',
+                                letterSpacing: '0.04em',
+                              }}
+                            >
+                              {delegate.delegateId || 'ICRAST26-PASS'}
+                            </div>
+                          </>
+                        ) : qrDataUrl ? (
                           <>
                             <img
                               src={qrDataUrl}
@@ -917,12 +972,15 @@ export default function IcrastBadgePage() {
                               width: '140px',
                               height: '140px',
                               display: 'flex',
+                              flexDirection: 'column',
                               alignItems: 'center',
                               justifyContent: 'center',
-                              color: '#64748b',
+                              color: '#0b1b33',
+                              gap: '0.5rem',
                             }}
                           >
-                            <QrCode size={40} />
+                            <RefreshCw size={24} className="animate-spin text-blue-900" />
+                            <span style={{ fontSize: '0.72rem', fontWeight: 600 }}>Generating QR...</span>
                           </div>
                         )}
                       </div>
