@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, Link } from '@tanstack/react-router';
 import { IcrastLayout } from '../components/icrast/IcrastLayout';
 import { Reveal } from '../components/ui/Reveal';
@@ -23,12 +23,47 @@ import {
   ShieldCheck,
   ArrowRight,
   Sparkles,
+  Camera,
+  CameraOff,
+  X,
 } from 'lucide-react';
+import { Html5Qrcode } from 'html5-qrcode';
 
 function normalizePhone(p: string): string {
   if (!p) return '';
   const digits = p.replace(/\D/g, '');
   return digits.length >= 10 ? digits.slice(-10) : digits;
+}
+
+function extractPhoneFromQr(text: string): string {
+  if (!text) return '';
+  const trimmed = text.trim();
+
+  // Try URL parameter phone=
+  try {
+    if (trimmed.includes('phone=')) {
+      const match = trimmed.match(/[?&]phone=([^&#]+)/i);
+      if (match && match[1]) {
+        return normalizePhone(decodeURIComponent(match[1]));
+      }
+    }
+  } catch {}
+
+  // Try JSON payload
+  if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (parsed.phone) return normalizePhone(parsed.phone);
+    } catch {}
+  }
+
+  // Look for 10-digit number inside the scanned string
+  const digitMatch = trimmed.match(/\b\d{10}\b/);
+  if (digitMatch) {
+    return digitMatch[0];
+  }
+
+  return normalizePhone(trimmed);
 }
 
 const VOLUNTEER_STORAGE_KEY = 'icrast_volunteer_desk_pin';
@@ -54,6 +89,11 @@ export default function IcrastCheckinPage() {
   const [stats, setStats] = useState<{ total: number; checkedIn: number } | null>(null);
   const [isFetchingStats, setIsFetchingStats] = useState(false);
 
+  // Camera QR Scanner
+  const [isCameraActive, setIsCameraActive] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+  const scannerRef = useRef<Html5Qrcode | null>(null);
+
   useEffect(() => {
     trackPageView('/icrast/checkin', 'ICRAST-26 Counter Check-in Desk');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -68,6 +108,112 @@ export default function IcrastCheckinPage() {
       }
     }
   }, []);
+
+  const stopCamera = async () => {
+    if (scannerRef.current) {
+      try {
+        if (scannerRef.current.isScanning) {
+          await scannerRef.current.stop();
+        }
+        scannerRef.current.clear();
+      } catch (err) {
+        console.warn('Error clearing camera scanner:', err);
+      }
+      scannerRef.current = null;
+    }
+    setIsCameraActive(false);
+  };
+
+  const handleToggleCamera = () => {
+    if (isCameraActive) {
+      stopCamera();
+    } else {
+      setCameraError(null);
+      setIsCameraActive(true);
+    }
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+
+    if (isCameraActive) {
+      const timer = setTimeout(() => {
+        if (!isMounted) return;
+
+        try {
+          const html5QrCode = new Html5Qrcode('icrast-reader');
+          scannerRef.current = html5QrCode;
+
+          const qrSuccessCallback = (decodedText: string) => {
+            if (!isMounted) return;
+            const phoneFound = extractPhoneFromQr(decodedText);
+            if (phoneFound && phoneFound.length >= 10) {
+              try {
+                if (typeof navigator !== 'undefined' && navigator.vibrate) {
+                  navigator.vibrate(200);
+                }
+              } catch {}
+
+              setManualPhone(phoneFound);
+              stopCamera();
+              const activePin = sessionStorage.getItem(VOLUNTEER_STORAGE_KEY) || '2026';
+              performCheckin(phoneFound, activePin);
+            } else {
+              setCameraError(
+                `Scanned QR content: "${decodedText.slice(0, 35)}...". No valid delegate phone found.`
+              );
+            }
+          };
+
+          const config = {
+            fps: 10,
+            qrbox: (viewfinderWidth: number, viewfinderHeight: number) => {
+              const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+              const edgeSize = Math.floor(minEdge * 0.72);
+              return { width: edgeSize, height: edgeSize };
+            },
+            aspectRatio: 1.0,
+          };
+
+          html5QrCode
+            .start(
+              { facingMode: 'environment' },
+              config,
+              qrSuccessCallback,
+              () => {
+                // Ignore per-frame non-detection
+              }
+            )
+            .catch((err) => {
+              if (!isMounted) return;
+              console.error('Camera start failed:', err);
+              setCameraError(
+                typeof err === 'string'
+                  ? err
+                  : err?.message || 'Could not access camera. Please allow camera permissions in browser settings.'
+              );
+            });
+        } catch (initErr) {
+          console.error('Html5Qrcode init error:', initErr);
+          setCameraError('Unable to initialize camera component.');
+        }
+      }, 120);
+
+      return () => {
+        isMounted = false;
+        clearTimeout(timer);
+        if (scannerRef.current) {
+          if (scannerRef.current.isScanning) {
+            scannerRef.current.stop().catch(() => {});
+          }
+          try {
+            scannerRef.current.clear();
+          } catch {}
+          scannerRef.current = null;
+        }
+      };
+    }
+  }, [isCameraActive]);
 
   const handleVerifyPin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,6 +232,7 @@ export default function IcrastCheckinPage() {
   };
 
   const handleLock = () => {
+    stopCamera();
     sessionStorage.removeItem(VOLUNTEER_STORAGE_KEY);
     setPinVerified(false);
     setPinInput('');
@@ -177,7 +324,7 @@ export default function IcrastCheckinPage() {
     setCheckinResult(null);
     setManualPhone('');
     setErrorMessage('');
-    // Remove query params from browser URL without reloading
+    setCameraError(null);
     window.history.replaceState({}, '', window.location.pathname);
   };
 
@@ -186,59 +333,11 @@ export default function IcrastCheckinPage() {
       <section
         className="container section icrast-checkin-portal"
         style={{
-          paddingTop: 'clamp(5.5rem, 9vh, 7rem)',
-          paddingBottom: 'clamp(4rem, 7vh, 6rem)',
+          paddingTop: 'clamp(2.5rem, 5vh, 4rem)',
+          paddingBottom: 'clamp(3rem, 6vh, 5rem)',
         }}
       >
-        <div style={{ maxWidth: '800px', marginInline: 'auto' }}>
-          {/* Top Title Banner */}
-          <Reveal>
-            <div className="text-center" style={{ marginBottom: '2.5rem' }}>
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  padding: '0.4rem 1rem',
-                  borderRadius: '9999px',
-                  backgroundColor: 'rgba(34, 197, 94, 0.12)',
-                  border: '1px solid rgba(34, 197, 94, 0.35)',
-                  color: '#86efac',
-                  fontSize: '0.85rem',
-                  fontWeight: 600,
-                  marginBottom: '1rem',
-                  letterSpacing: '0.04em',
-                  textTransform: 'uppercase',
-                }}
-              >
-                <UserCheck size={14} />
-                <span>Aryabhata Hall · Registration Counter Desk</span>
-              </div>
-              <h1
-                style={{
-                  fontSize: 'clamp(1.9rem, 3.8vw, 2.6rem)',
-                  fontWeight: 800,
-                  color: '#ffffff',
-                  marginBottom: '0.75rem',
-                  letterSpacing: '-0.02em',
-                }}
-              >
-                Volunteer Check-in Counter
-              </h1>
-              <p
-                style={{
-                  color: 'rgba(255, 255, 255, 0.72)',
-                  fontSize: '1rem',
-                  maxWidth: '580px',
-                  marginInline: 'auto',
-                }}
-              >
-                Scan delegate QR passes or search by mobile number to mark attendance
-                and record entry in real time.
-              </p>
-            </div>
-          </Reveal>
-
+        <div style={{ maxWidth: '720px', marginInline: 'auto' }}>
           {/* Volunteer PIN Gate */}
           {!pinVerified ? (
             <Reveal delay={100}>
@@ -362,8 +461,8 @@ export default function IcrastCheckinPage() {
                     backgroundColor: 'rgba(11, 27, 51, 0.8)',
                     border: '1px solid rgba(255, 255, 255, 0.1)',
                     borderRadius: '14px',
-                    padding: '1rem 1.5rem',
-                    marginBottom: '1.75rem',
+                    padding: '0.85rem 1.25rem',
+                    marginBottom: '1.5rem',
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -376,8 +475,8 @@ export default function IcrastCheckinPage() {
                         boxShadow: '0 0 10px #22c55e',
                       }}
                     />
-                    <span style={{ fontSize: '0.9rem', color: '#ffffff', fontWeight: 600 }}>
-                      Counter Desk Active (PIN: 2026)
+                    <span style={{ fontSize: '0.88rem', color: '#ffffff', fontWeight: 600 }}>
+                      Counter Active (PIN: 2026)
                     </span>
                   </div>
 
@@ -433,47 +532,144 @@ export default function IcrastCheckinPage() {
                   </div>
                 </div>
 
-                {/* Scan / Manual Search Form */}
+                {/* Scan / Manual Search Card */}
                 <div
                   style={{
                     backgroundColor: 'rgba(15, 23, 42, 0.85)',
                     border: '1px solid rgba(255, 255, 255, 0.12)',
                     borderRadius: '16px',
-                    padding: '1.75rem',
-                    marginBottom: '2rem',
+                    padding: '1.5rem',
+                    marginBottom: '1.5rem',
                     boxShadow: '0 12px 30px rgba(0, 0, 0, 0.35)',
                   }}
                 >
-                  <form onSubmit={handleManualSubmit}>
-                    <label
-                      htmlFor="manual-phone-input"
+                  {/* Top Bar with Camera Button */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginBottom: '1rem',
+                      flexWrap: 'wrap',
+                      gap: '0.75rem',
+                    }}
+                  >
+                    <span
                       style={{
-                        display: 'block',
                         fontSize: '0.95rem',
                         fontWeight: 600,
                         color: '#ffffff',
-                        marginBottom: '0.5rem',
                       }}
                     >
-                      Mobile / WhatsApp Number from QR Code or Delegate
-                    </label>
+                      Delegate Verification
+                    </span>
+
+                    <button
+                      type="button"
+                      onClick={handleToggleCamera}
+                      style={{
+                        backgroundColor: isCameraActive ? 'rgba(239, 68, 68, 0.18)' : 'rgba(34, 197, 94, 0.15)',
+                        border: isCameraActive ? '1px solid rgba(239, 68, 68, 0.45)' : '1px solid rgba(34, 197, 94, 0.45)',
+                        color: isCameraActive ? '#fca5a5' : '#86efac',
+                        borderRadius: '8px',
+                        padding: '0.45rem 0.95rem',
+                        fontSize: '0.85rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.45rem',
+                        transition: 'all 0.2s ease',
+                      }}
+                    >
+                      {isCameraActive ? (
+                        <>
+                          <CameraOff size={15} />
+                          <span>Close Camera</span>
+                        </>
+                      ) : (
+                        <>
+                          <Camera size={15} />
+                          <span>Scan with Camera</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Camera Scanner Viewfinder */}
+                  {isCameraActive && (
+                    <div
+                      style={{
+                        marginBottom: '1.5rem',
+                        padding: '1rem',
+                        backgroundColor: 'rgba(0, 0, 0, 0.45)',
+                        border: '1px solid rgba(34, 197, 94, 0.35)',
+                        borderRadius: '14px',
+                        textAlign: 'center',
+                      }}
+                    >
+                      <div
+                        id="icrast-reader"
+                        style={{
+                          width: '100%',
+                          maxWidth: '340px',
+                          margin: '0 auto',
+                          borderRadius: '12px',
+                          overflow: 'hidden',
+                          border: '2px solid rgba(34, 197, 94, 0.5)',
+                          backgroundColor: '#000000',
+                          minHeight: '240px',
+                        }}
+                      />
+
+                      {cameraError ? (
+                        <div
+                          style={{
+                            marginTop: '0.85rem',
+                            padding: '0.65rem 0.85rem',
+                            borderRadius: '8px',
+                            backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                            border: '1px solid rgba(239, 68, 68, 0.4)',
+                            color: '#fca5a5',
+                            fontSize: '0.82rem',
+                          }}
+                        >
+                          {cameraError}
+                        </div>
+                      ) : (
+                        <p
+                          style={{
+                            marginTop: '0.75rem',
+                            fontSize: '0.82rem',
+                            color: 'rgba(255, 255, 255, 0.7)',
+                            marginBottom: 0,
+                          }}
+                        >
+                          Align delegate QR pass within camera frame to scan automatically.
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Manual Phone / Search Input */}
+                  <form onSubmit={handleManualSubmit}>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
                       <input
                         id="manual-phone-input"
                         type="tel"
                         value={manualPhone}
                         onChange={(e) => setManualPhone(e.target.value)}
-                        placeholder="Scan or type 10-digit phone number"
+                        placeholder="Or type 10-digit phone number"
                         disabled={isProcessing}
                         autoFocus
                         style={{
-                          flex: '1 1 280px',
+                          flex: '1 1 260px',
                           padding: '0.85rem 1rem',
                           backgroundColor: 'rgba(11, 27, 51, 0.7)',
                           border: '1px solid rgba(255, 255, 255, 0.25)',
                           borderRadius: '10px',
                           color: '#ffffff',
-                          fontSize: '1.05rem',
+                          fontSize: '1rem',
                           outline: 'none',
                         }}
                       />
@@ -482,11 +678,11 @@ export default function IcrastCheckinPage() {
                         disabled={isProcessing}
                         className="icrast-btn icrast-btn--primary"
                         style={{
-                          padding: '0.85rem 1.75rem',
+                          padding: '0.85rem 1.6rem',
                           display: 'inline-flex',
                           alignItems: 'center',
                           gap: '0.5rem',
-                          fontSize: '0.95rem',
+                          fontSize: '0.92rem',
                         }}
                       >
                         {isProcessing ? (
