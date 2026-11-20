@@ -74,6 +74,76 @@ function splitCampusLines(name: string, maxLineChars = 28): string[] {
 
 const DELEGATE_STORAGE_KEY = 'icrast_delegate_mobile_session';
 
+interface ScheduleSessionItem {
+  time: string;
+  title: string;
+  subtitle?: string;
+  isBreak?: boolean;
+  highlightTag?: string;
+}
+
+const CONFERENCE_SCHEDULE: ScheduleSessionItem[] = [
+  {
+    time: '09:30 – 10:00 AM',
+    title: 'Registration & Delegate Check-in',
+    subtitle: 'Counter Desk Verification & Kit Dispatch',
+  },
+  {
+    time: '10:00 – 10:30 AM',
+    title: 'Inaugural Session',
+    subtitle: 'Dr. P. Raveendran · Vice Chancellor, University of Calicut',
+    highlightTag: 'Inauguration',
+  },
+  {
+    time: '10:30 – 11:15 AM',
+    title: 'Invited Talk',
+    subtitle: 'Dr. P. Muhammed Shafi',
+  },
+  {
+    time: '11:15 – 11:30 AM',
+    title: 'Morning Tea Break',
+    isBreak: true,
+  },
+  {
+    time: '11:30 AM – 01:30 PM',
+    title: 'Research Paper Presentations',
+    subtitle: '8 Technical Presentations (Aryabhata Hall)',
+    highlightTag: '8 Papers',
+  },
+  {
+    time: '01:30 – 02:00 PM',
+    title: 'Lunch Break',
+    isBreak: true,
+  },
+  {
+    time: '02:00 – 02:30 PM',
+    title: 'Invited Talk (Online Session)',
+    subtitle: 'Dr. Sara Bologna · CEITEC MU, Brno, Czech Republic',
+    highlightTag: 'Online Stream',
+  },
+  {
+    time: '02:30 – 03:00 PM',
+    title: 'Chair Talk I',
+    subtitle: 'Dr. Deepti M · Dept. of Biotechnology, University of Calicut',
+  },
+  {
+    time: '03:00 – 03:30 PM',
+    title: 'Chair Talk II',
+    subtitle: 'Dr. Ali Muhammad K. S · Molecular Radionuclide Pharmacy',
+  },
+  {
+    time: '03:30 – 04:00 PM',
+    title: 'Valedictory Session',
+    subtitle: 'Best Paper Awards & Certificate Distribution',
+    highlightTag: 'Valedictory',
+  },
+  {
+    time: '04:00 – 04:30 PM',
+    title: 'Evening Tea & Academic Networking',
+    isBreak: true,
+  },
+];
+
 export default function IcrastBadgePage() {
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
@@ -1312,82 +1382,209 @@ export default function IcrastBadgePage() {
               </div>
             )}
 
-            {/* TAB 2: SCHEDULE (Clean Minimal Card State) */}
+            {/* TAB 2: SCHEDULE (Clean, Premium, Well-Arranged Timetable) */}
             {activeTab === 'schedule' && (
               <div
                 style={{
-                  padding: '3.5rem 1.5rem 2.5rem',
-                  textAlign: 'center',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  maxWidth: '520px',
-                  width: '100%',
-                  margin: '0 auto',
                   backgroundColor: '#ffffff',
                   borderRadius: '24px',
                   border: '1px solid #EAEFF5',
-                  boxShadow: '0 16px 40px rgba(18, 59, 112, 0.06)',
+                  boxShadow: '0 16px 45px rgba(18, 59, 112, 0.06), 0 2px 8px rgba(0, 0, 0, 0.02)',
+                  overflow: 'hidden',
+                  width: '100%',
+                  maxWidth: '680px',
+                  margin: '0 auto',
                 }}
               >
+                {/* Header Strip */}
                 <div
                   style={{
-                    width: '68px',
-                    height: '68px',
-                    borderRadius: '50%',
-                    backgroundColor: '#E8F1FC',
-                    color: '#185ADB',
+                    backgroundColor: '#F8FAFC',
+                    borderBottom: '1px solid #EAEFF5',
+                    padding: '1.25rem 1.5rem',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: '1.25rem',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '0.65rem',
                   }}
                 >
-                  <Calendar size={32} strokeWidth={1.8} />
+                  <div>
+                    <h2
+                      style={{
+                        fontSize: '1.15rem',
+                        fontWeight: 850,
+                        color: '#081e3e',
+                        margin: 0,
+                        lineHeight: 1.2,
+                        letterSpacing: '-0.01em',
+                      }}
+                    >
+                      Conference Schedule
+                    </h2>
+                    <div
+                      style={{
+                        fontSize: '0.8rem',
+                        color: '#5A6E85',
+                        fontWeight: 600,
+                        marginTop: '3px',
+                      }}
+                    >
+                      Saturday, 21 November 2026 · Aryabhata Hall
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                      padding: '0.28rem 0.65rem',
+                      borderRadius: '9999px',
+                      backgroundColor: '#EDF3FA',
+                      border: '1px solid #DBEAFE',
+                      color: '#185ADB',
+                      fontSize: '0.74rem',
+                      fontWeight: 700,
+                    }}
+                  >
+                    <span>Single-Day Track</span>
+                  </div>
                 </div>
 
-                <h3
-                  style={{
-                    fontSize: '1.35rem',
-                    fontWeight: 800,
-                    color: '#123B70',
-                    marginBottom: '0.45rem',
-                    letterSpacing: '-0.01em',
-                  }}
-                >
-                  Schedule Releasing Soon
-                </h3>
+                {/* Schedule Item Rows */}
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  {CONFERENCE_SCHEDULE.map((item, idx) => {
+                    const isLast = idx === CONFERENCE_SCHEDULE.length - 1;
 
-                <p
-                  style={{
-                    fontSize: '0.9rem',
-                    color: '#5A6E85',
-                    lineHeight: 1.6,
-                    margin: 0,
-                    maxWidth: '420px',
-                  }}
-                >
-                  Conference session timetable, oral presentation tracks, and hall allocations will be published here 24 hours prior to Day 1.
-                </p>
+                    if (item.isBreak) {
+                      return (
+                        <div
+                          key={idx}
+                          style={{
+                            padding: '0.75rem 1.5rem',
+                            backgroundColor: '#FAFBFD',
+                            borderBottom: isLast ? 'none' : '1px solid #F1F5F9',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '1rem',
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: '145px',
+                              flexShrink: 0,
+                              fontFamily: '"JetBrains Mono", monospace',
+                              fontSize: '0.78rem',
+                              fontWeight: 600,
+                              color: '#7C8BA0',
+                            }}
+                          >
+                            {item.time}
+                          </div>
+                          <div
+                            style={{
+                              fontSize: '0.84rem',
+                              fontWeight: 600,
+                              fontStyle: 'italic',
+                              color: '#64748B',
+                            }}
+                          >
+                            {item.title}
+                          </div>
+                        </div>
+                      );
+                    }
 
+                    return (
+                      <div
+                        key={idx}
+                        style={{
+                          padding: '1.05rem 1.5rem',
+                          backgroundColor: '#ffffff',
+                          borderBottom: isLast ? 'none' : '1px solid #F1F5F9',
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          gap: '1rem',
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: '145px',
+                            flexShrink: 0,
+                            fontFamily: '"JetBrains Mono", monospace',
+                            fontSize: '0.8rem',
+                            fontWeight: 700,
+                            color: '#185ADB',
+                            lineHeight: 1.35,
+                          }}
+                        >
+                          {item.time}
+                        </div>
+
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div
+                            style={{
+                              fontSize: '0.94rem',
+                              fontWeight: 850,
+                              color: '#081e3e',
+                              lineHeight: 1.3,
+                              display: 'flex',
+                              alignItems: 'center',
+                              flexWrap: 'wrap',
+                              gap: '0.45rem',
+                            }}
+                          >
+                            <span>{item.title}</span>
+                            {item.highlightTag && (
+                              <span
+                                style={{
+                                  fontSize: '0.68rem',
+                                  fontWeight: 700,
+                                  padding: '0.12rem 0.5rem',
+                                  borderRadius: '6px',
+                                  backgroundColor: '#EDF3FA',
+                                  color: '#185ADB',
+                                  letterSpacing: '0.02em',
+                                }}
+                              >
+                                {item.highlightTag}
+                              </span>
+                            )}
+                          </div>
+
+                          {item.subtitle && (
+                            <div
+                              style={{
+                                fontSize: '0.82rem',
+                                color: '#5A6E85',
+                                fontWeight: 500,
+                                marginTop: '0.22rem',
+                                lineHeight: 1.4,
+                              }}
+                            >
+                              {item.subtitle}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Footer Note */}
                 <div
                   style={{
-                    marginTop: '1.5rem',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    padding: '0.45rem 1rem',
-                    borderRadius: '9999px',
+                    padding: '0.85rem 1.5rem',
                     backgroundColor: '#F8FAFC',
-                    border: '1px solid #E2E8F0',
+                    borderTop: '1px solid #EAEFF5',
                     fontSize: '0.78rem',
-                    color: '#185ADB',
-                    fontWeight: 700,
+                    color: '#64748B',
+                    textAlign: 'center',
+                    fontWeight: 500,
                   }}
                 >
-                  <Clock size={14} />
-                  <span>21–22 November 2026 · Calicut University</span>
+                  Please arrive 15 minutes before your scheduled presentation or session slot.
                 </div>
               </div>
             )}
