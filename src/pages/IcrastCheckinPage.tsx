@@ -457,7 +457,7 @@ export default function IcrastCheckinPage() {
       >
         {/* Brand: ICRAST Logo & Title */}
         <Link
-          to="/icrast/badge"
+          to="/icrast/delegate"
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -589,7 +589,7 @@ export default function IcrastCheckinPage() {
                 </div>
                 <hr style={{ border: 'none', borderTop: '1px solid #F1F5F9', margin: '0.65rem 0' }} />
                 <Link
-                  to="/icrast/badge"
+                  to="/icrast/delegate"
                   style={{
                     width: '100%',
                     display: 'flex',
@@ -637,7 +637,7 @@ export default function IcrastCheckinPage() {
           </div>
         ) : (
           <Link
-            to="/icrast/badge"
+            to="/icrast/delegate"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -808,7 +808,7 @@ export default function IcrastCheckinPage() {
 
             <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
               <Link
-                to="/icrast/badge"
+                to="/icrast/delegate"
                 style={{
                   fontSize: '0.82rem',
                   color: '#5A6E85',

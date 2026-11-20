@@ -379,6 +379,64 @@ export default function IcrastBadgePage() {
         position: 'relative',
       }}
     >
+      {/* Desktop Responsive & Adaptive Layout CSS */}
+      <style>{`
+        @media (min-width: 860px) {
+          .icrast-desktop-nav {
+            display: flex !important;
+          }
+          .icrast-bottom-nav {
+            display: none !important;
+          }
+          .icrast-main-viewport {
+            padding-bottom: 2.5rem !important;
+          }
+          .icrast-portal-container {
+            max-width: 1080px !important;
+          }
+          .icrast-desktop-split {
+            display: grid !important;
+            grid-template-columns: 390px 1fr !important;
+            gap: 2.5rem !important;
+            align-items: start !important;
+            width: 100% !important;
+          }
+          .icrast-desktop-ticket-col {
+            position: sticky;
+            top: 1rem;
+          }
+          .icrast-mobile-download-btn {
+            display: none !important;
+          }
+          .icrast-desktop-action-hub {
+            display: flex !important;
+          }
+        }
+        @media (max-width: 859px) {
+          .icrast-desktop-nav {
+            display: none !important;
+          }
+          .icrast-bottom-nav {
+            display: flex !important;
+          }
+          .icrast-portal-container {
+            max-width: 480px !important;
+          }
+          .icrast-desktop-action-hub {
+            display: none !important;
+          }
+          .icrast-mobile-download-btn {
+            display: block !important;
+          }
+          .icrast-desktop-split {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            width: 100% !important;
+          }
+        }
+      `}</style>
+
       {/* Top Application Header Bar - Clean White Executive Bar */}
       <header
         style={{
@@ -387,45 +445,153 @@ export default function IcrastBadgePage() {
           borderBottom: '1px solid #EAEFF5',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '0 1.25rem',
+          justifyContent: 'center',
           flexShrink: 0,
           zIndex: 40,
+          position: 'sticky',
+          top: 0,
         }}
       >
-        {/* Left: ICRAST Cube Logo & Title */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-          <img
-            src="/images/icrast-logo-mark.png"
-            alt="ICRAST Logo"
-            style={{ width: '34px', height: '34px', objectFit: 'contain' }}
-          />
-          <div>
-            <div
-              style={{
-                fontSize: '1.02rem',
-                fontWeight: 800,
-                color: '#123B70',
-                lineHeight: 1.15,
-                letterSpacing: '-0.02em',
-              }}
-            >
-              ICRAST-26
+        <div
+          style={{
+            maxWidth: '1180px',
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '0 1.25rem',
+          }}
+        >
+          {/* Left: ICRAST Cube Logo & Title */}
+          <Link
+            to="/icrast/delegate"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', textDecoration: 'none' }}
+          >
+            <img
+              src="/images/icrast-logo-mark.png"
+              alt="ICRAST Logo"
+              style={{ width: '34px', height: '34px', objectFit: 'contain' }}
+            />
+            <div>
+              <div
+                style={{
+                  fontSize: '1.02rem',
+                  fontWeight: 800,
+                  color: '#123B70',
+                  lineHeight: 1.15,
+                  letterSpacing: '-0.02em',
+                }}
+              >
+                ICRAST-26
+              </div>
+              <div
+                style={{
+                  fontSize: '0.72rem',
+                  color: '#5A6E85',
+                  fontWeight: 600,
+                  letterSpacing: '0.01em',
+                }}
+              >
+                Delegate Portal
+              </div>
             </div>
-            <div
-              style={{
-                fontSize: '0.72rem',
-                color: '#5A6E85',
-                fontWeight: 600,
-                letterSpacing: '0.01em',
-              }}
-            >
-              Conference Portal
-            </div>
-          </div>
-        </div>
+          </Link>
 
-        {/* Right Action: Delegate dropdown + Notification/Logout button */}
+          {/* Center: Desktop Navigation Tabs (Visible on screens >= 860px) */}
+          {delegate && (
+            <nav className="icrast-desktop-nav" style={{ display: 'none', alignItems: 'center', gap: '0.45rem' }}>
+              <button
+                type="button"
+                onClick={() => setActiveTab('pass')}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  padding: '0.45rem 0.95rem',
+                  borderRadius: '12px',
+                  border: 'none',
+                  backgroundColor: activeTab === 'pass' ? '#EDF3FA' : 'transparent',
+                  color: activeTab === 'pass' ? '#185ADB' : '#5A6E85',
+                  fontSize: '0.82rem',
+                  fontWeight: activeTab === 'pass' ? 800 : 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <Ticket size={16} strokeWidth={activeTab === 'pass' ? 2.5 : 1.8} />
+                <span>Badge Pass</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab('schedule')}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  padding: '0.45rem 0.95rem',
+                  borderRadius: '12px',
+                  border: 'none',
+                  backgroundColor: activeTab === 'schedule' ? '#EDF3FA' : 'transparent',
+                  color: activeTab === 'schedule' ? '#185ADB' : '#5A6E85',
+                  fontSize: '0.82rem',
+                  fontWeight: activeTab === 'schedule' ? 800 : 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <Calendar size={16} strokeWidth={activeTab === 'schedule' ? 2.5 : 1.8} />
+                <span>Schedule</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab('certificate')}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  padding: '0.45rem 0.95rem',
+                  borderRadius: '12px',
+                  border: 'none',
+                  backgroundColor: activeTab === 'certificate' ? '#EDF3FA' : 'transparent',
+                  color: activeTab === 'certificate' ? '#185ADB' : '#5A6E85',
+                  fontSize: '0.82rem',
+                  fontWeight: activeTab === 'certificate' ? 800 : 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <FileText size={16} strokeWidth={activeTab === 'certificate' ? 2.5 : 1.8} />
+                <span>Downloads</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab('profile')}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  padding: '0.45rem 0.95rem',
+                  borderRadius: '12px',
+                  border: 'none',
+                  backgroundColor: activeTab === 'profile' ? '#EDF3FA' : 'transparent',
+                  color: activeTab === 'profile' ? '#185ADB' : '#5A6E85',
+                  fontSize: '0.82rem',
+                  fontWeight: activeTab === 'profile' ? 800 : 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <User size={16} strokeWidth={activeTab === 'profile' ? 2.5 : 1.8} />
+                <span>Profile</span>
+              </button>
+            </nav>
+          )}
+
+          {/* Right Action: Delegate dropdown + Notification/Logout button */}
         {delegate ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', position: 'relative' }}>
             <button
@@ -561,19 +727,22 @@ export default function IcrastBadgePage() {
             Register Now
           </Link>
         )}
+        </div>
       </header>
 
       {/* Main Scrollable View Area */}
       <main
+        className="icrast-main-viewport"
         style={{
           flex: 1,
           overflowY: 'auto',
-          padding: '1rem',
+          padding: '1.25rem 1rem',
           paddingBottom: delegate ? '88px' : '1.5rem',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: delegate ? 'flex-start' : 'center',
+          width: '100%',
         }}
       >
         {!delegate ? (
@@ -742,230 +911,471 @@ export default function IcrastBadgePage() {
             )}
           </div>
         ) : (
-          /* Authenticated Delegate Mobile Portal View */
-          <div style={{ width: '100%', maxWidth: '480px', margin: '0 auto' }}>
-            {/* TAB 1: PASS / TICKET (Hero Digital Badge) */}
+          /* Authenticated Delegate Portal View */
+          <div className="icrast-portal-container" style={{ width: '100%', margin: '0 auto' }}>
+            {/* TAB 1: PASS / TICKET (Hero Digital Badge with Desktop 2-Column Split) */}
             {activeTab === 'pass' && (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-                {/* Clean Apple Wallet-style Ticket Card */}
-                <div
-                  ref={badgeCardRef}
-                  className="icrast-hero-ticket-card"
-                  style={{
-                    position: 'relative',
-                    width: '100%',
-                    maxWidth: '380px',
-                    aspectRatio: '682 / 1024',
-                    margin: '0 auto 1.15rem',
-                    borderRadius: '26px',
-                    overflow: 'hidden',
-                    boxShadow: '0 16px 45px rgba(18, 59, 112, 0.12), 0 2px 10px rgba(0, 0, 0, 0.04)',
-                    border: '1px solid rgba(18, 59, 112, 0.08)',
-                    backgroundImage: "url('/images/icrast-badge-template.png')",
-                    backgroundSize: '100% 100%',
-                    backgroundPosition: 'center',
-                    backgroundRepeat: 'no-repeat',
-                    backgroundColor: '#ffffff',
-                    userSelect: 'none',
-                  }}
-                >
-                  {/* 1. Dynamic Candidate Full Name - Prominent & Large with extra gap after DELEGATE */}
+              <div className="icrast-desktop-split">
+                {/* Left Column: Official Portrait Ticket Card */}
+                <div className="icrast-desktop-ticket-col" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
                   <div
+                    ref={badgeCardRef}
+                    className="icrast-hero-ticket-card"
                     style={{
-                      position: 'absolute',
-                      top: '54.5%',
-                      left: '4%',
-                      right: '4%',
-                      textAlign: 'center',
-                      transform: 'translateY(-50%)',
-                      pointerEvents: 'none',
+                      position: 'relative',
+                      width: '100%',
+                      maxWidth: '380px',
+                      aspectRatio: '682 / 1024',
+                      margin: '0 auto 1.15rem',
+                      borderRadius: '26px',
+                      overflow: 'hidden',
+                      boxShadow: '0 16px 45px rgba(18, 59, 112, 0.12), 0 2px 10px rgba(0, 0, 0, 0.04)',
+                      border: '1px solid rgba(18, 59, 112, 0.08)',
+                      backgroundImage: "url('/images/icrast-badge-template.png')",
+                      backgroundSize: '100% 100%',
+                      backgroundPosition: 'center',
+                      backgroundRepeat: 'no-repeat',
+                      backgroundColor: '#ffffff',
+                      userSelect: 'none',
                     }}
                   >
+                    {/* 1. Dynamic Candidate Full Name - Prominent & Large with extra gap after DELEGATE */}
                     <div
                       style={{
-                        fontFamily: '"Plus Jakarta Sans", sans-serif',
-                        fontWeight: 850,
-                        fontSize: 'clamp(1.35rem, 5.6vw, 1.85rem)',
-                        color: '#081e3e',
-                        letterSpacing: '-0.02em',
-                        lineHeight: 1.15,
-                        textOverflow: 'ellipsis',
-                        overflow: 'hidden',
-                        whiteSpace: delegate.fullName && delegate.fullName.length > 24 ? 'normal' : 'nowrap',
+                        position: 'absolute',
+                        top: '54.5%',
+                        left: '4%',
+                        right: '4%',
+                        textAlign: 'center',
+                        transform: 'translateY(-50%)',
+                        pointerEvents: 'none',
                       }}
                     >
-                      {delegate.fullName}
+                      <div
+                        style={{
+                          fontFamily: '"Plus Jakarta Sans", sans-serif',
+                          fontWeight: 850,
+                          fontSize: 'clamp(1.35rem, 5.6vw, 1.85rem)',
+                          color: '#081e3e',
+                          letterSpacing: '-0.02em',
+                          lineHeight: 1.15,
+                          textOverflow: 'ellipsis',
+                          overflow: 'hidden',
+                          whiteSpace: delegate.fullName && delegate.fullName.length > 24 ? 'normal' : 'nowrap',
+                        }}
+                      >
+                        {delegate.fullName}
+                      </div>
+                    </div>
+
+                    {/* 2. Dynamic Campus / Institution with Cap Icon & Divider - Centered relative to Name */}
+                    {(() => {
+                      const campusLines = splitCampusLines(delegate.institution || 'University of Calicut');
+                      const isTwoLines = campusLines.length > 1;
+                      return (
+                        <div
+                          style={{
+                            position: 'absolute',
+                            top: '60.8%',
+                            left: 0,
+                            right: 0,
+                            width: '100%',
+                            margin: '0 auto',
+                            transform: 'translateY(-50%)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '0.45rem',
+                            pointerEvents: 'none',
+                            padding: '0 1rem',
+                          }}
+                        >
+                          <img
+                            src="/images/icrast-badge-cap.png"
+                            alt="Campus"
+                            style={{
+                              width: 'clamp(20px, 4.4vw, 24px)',
+                              height: 'auto',
+                              objectFit: 'contain',
+                              flexShrink: 0,
+                            }}
+                          />
+                          <div
+                            style={{
+                              width: '1.5px',
+                              height: isTwoLines ? 'clamp(28px, 5.8vw, 34px)' : 'clamp(18px, 3.8vw, 22px)',
+                              backgroundColor: '#081e3e',
+                              flexShrink: 0,
+                            }}
+                          />
+                          <div
+                            style={{
+                              fontFamily: '"Plus Jakarta Sans", sans-serif',
+                              fontWeight: 600,
+                              fontSize: 'clamp(0.68rem, 2.4vw, 0.82rem)',
+                              color: '#081e3e',
+                              lineHeight: 1.25,
+                              textAlign: 'left',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              maxWidth: '240px',
+                            }}
+                          >
+                            {campusLines.map((line, idx) => (
+                              <span key={idx} style={{ whiteSpace: 'nowrap' }}>
+                                {line}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })()}
+
+                    {/* 3. Dynamic Vector SVG QR Code with full border clearance inside Cyan Rounded Frame */}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '74.6%',
+                        left: '50.0%',
+                        transform: 'translate(-50%, -50%)',
+                        width: '23.8%',
+                        aspectRatio: '1 / 1',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        pointerEvents: 'none',
+                      }}
+                    >
+                      {qrSvg ? (
+                        <div
+                          dangerouslySetInnerHTML={{ __html: qrSvg }}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            display: 'block',
+                          }}
+                        />
+                      ) : qrDataUrl ? (
+                        <img
+                          src={qrDataUrl}
+                          alt={`QR Pass for ${delegate.fullName}`}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            display: 'block',
+                            imageRendering: 'pixelated',
+                          }}
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          <RefreshCw size={24} className="animate-spin text-blue-900" />
+                        </div>
+                      )}
                     </div>
                   </div>
 
-                  {/* 2. Dynamic Campus / Institution with Cap Icon & Divider - Centered relative to Name */}
-                  {(() => {
-                    const campusLines = splitCampusLines(delegate.institution || 'University of Calicut');
-                    const isTwoLines = campusLines.length > 1;
-                    return (
-                      <div
-                        style={{
-                          position: 'absolute',
-                          top: '60.8%',
-                          left: 0,
-                          right: 0,
-                          width: '100%',
-                          margin: '0 auto',
-                          transform: 'translateY(-50%)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '0.45rem',
-                          pointerEvents: 'none',
-                          padding: '0 1rem',
-                        }}
-                      >
-                        <img
-                          src="/images/icrast-badge-cap.png"
-                          alt="Campus"
-                          style={{
-                            width: 'clamp(20px, 4.4vw, 24px)',
-                            height: 'auto',
-                            objectFit: 'contain',
-                            flexShrink: 0,
-                          }}
-                        />
-                        <div
-                          style={{
-                            width: '1.5px',
-                            height: isTwoLines ? 'clamp(28px, 5.8vw, 34px)' : 'clamp(18px, 3.8vw, 22px)',
-                            backgroundColor: '#081e3e',
-                            flexShrink: 0,
-                          }}
-                        />
-                        <div
-                          style={{
-                            fontFamily: '"Plus Jakarta Sans", sans-serif',
-                            fontWeight: 600,
-                            fontSize: 'clamp(0.68rem, 2.4vw, 0.82rem)',
-                            color: '#081e3e',
-                            lineHeight: 1.25,
-                            textAlign: 'left',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            maxWidth: '240px',
-                          }}
-                        >
-                          {campusLines.map((line, idx) => (
-                            <span key={idx} style={{ whiteSpace: 'nowrap' }}>
-                              {line}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })()}
-
-                  {/* 3. Dynamic Vector SVG QR Code with full border clearance inside Cyan Rounded Frame */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '74.6%',
-                      left: '50.0%',
-                      transform: 'translate(-50%, -50%)',
-                      width: '23.8%',
-                      aspectRatio: '1 / 1',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      pointerEvents: 'none',
-                    }}
-                  >
-                    {qrSvg ? (
-                      <div
-                        dangerouslySetInnerHTML={{ __html: qrSvg }}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          display: 'block',
-                        }}
-                      />
-                    ) : qrDataUrl ? (
-                      <img
-                        src={qrDataUrl}
-                        alt={`QR Pass for ${delegate.fullName}`}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          display: 'block',
-                          imageRendering: 'pixelated',
-                        }}
-                      />
-                    ) : (
-                      <div
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                      >
-                        <RefreshCw size={24} className="animate-spin text-blue-900" />
-                      </div>
-                    )}
+                  {/* Primary Solid Navy/Blue Download Button (Visible on Mobile) */}
+                  <div className="icrast-mobile-download-btn" style={{ width: '100%', maxWidth: '380px' }}>
+                    <button
+                      type="button"
+                      onClick={handleDownloadBadgeImage}
+                      disabled={isDownloading}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.55rem',
+                        padding: '0.92rem 1.6rem',
+                        fontSize: '0.94rem',
+                        fontWeight: 700,
+                        borderRadius: '14px',
+                        width: '100%',
+                        backgroundColor: '#185ADB',
+                        color: '#ffffff',
+                        border: 'none',
+                        cursor: isDownloading ? 'wait' : 'pointer',
+                        boxShadow: '0 8px 22px rgba(24, 90, 219, 0.22)',
+                        transition: 'all 0.15s ease',
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#154ec4')}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#185ADB')}
+                    >
+                      {isDownloading ? (
+                        <>
+                          <RefreshCw size={18} className="animate-spin" />
+                          <span>Generating High-Res Badge...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Download size={18} />
+                          <span>Download Digital Badge (PNG)</span>
+                        </>
+                      )}
+                    </button>
                   </div>
                 </div>
 
-                {/* Primary Solid Navy/Blue Download Button */}
-                <div style={{ width: '100%', maxWidth: '380px' }}>
-                  <button
-                    type="button"
-                    onClick={handleDownloadBadgeImage}
-                    disabled={isDownloading}
+                {/* Right Column: Executive Delegate Action & Information Hub (Desktop Only) */}
+                <div
+                  className="icrast-desktop-action-hub"
+                  style={{
+                    display: 'none',
+                    flexDirection: 'column',
+                    gap: '1.25rem',
+                    width: '100%',
+                  }}
+                >
+                  {/* Card 1: Attendee Identity & Verification Banner */}
+                  <div
                     style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '0.55rem',
-                      padding: '0.92rem 1.6rem',
-                      fontSize: '0.94rem',
-                      fontWeight: 700,
-                      borderRadius: '14px',
-                      width: '100%',
-                      backgroundColor: '#185ADB',
-                      color: '#ffffff',
-                      border: 'none',
-                      cursor: isDownloading ? 'wait' : 'pointer',
-                      boxShadow: '0 8px 22px rgba(24, 90, 219, 0.22)',
-                      transition: 'all 0.15s ease',
+                      backgroundColor: '#ffffff',
+                      border: '1px solid #EAEFF5',
+                      borderRadius: '24px',
+                      padding: '1.75rem',
+                      boxShadow: '0 16px 40px rgba(18, 59, 112, 0.06)',
                     }}
-                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#154ec4')}
-                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#185ADB')}
                   >
-                    {isDownloading ? (
-                      <>
-                        <RefreshCw size={18} className="animate-spin" />
-                        <span>Generating High-Res Badge...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Download size={18} />
-                        <span>Download Digital Badge (PNG)</span>
-                      </>
-                    )}
-                  </button>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+                      <div>
+                        <div style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.06em', color: '#185ADB', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+                          OFFICIAL CONFERENCE DELEGATE
+                        </div>
+                        <h2 style={{ fontSize: '1.85rem', fontWeight: 850, color: '#081e3e', margin: 0, lineHeight: 1.15, letterSpacing: '-0.02em' }}>
+                          {delegate.fullName}
+                        </h2>
+                      </div>
+
+                      {/* Verified Badge */}
+                      <div
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.45rem',
+                          padding: '0.4rem 0.85rem',
+                          borderRadius: '9999px',
+                          backgroundColor: '#ECFDF5',
+                          border: '1px solid #A7F3D0',
+                          color: '#059669',
+                          fontSize: '0.8rem',
+                          fontWeight: 700,
+                        }}
+                      >
+                        <BadgeCheck size={16} />
+                        <span>Registration Confirmed</span>
+                      </div>
+                    </div>
+
+                    {/* Delegate ID with 1-Click Copy */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginTop: '1rem' }}>
+                      <div
+                        onClick={handleCopyId}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.5rem',
+                          padding: '0.4rem 0.85rem',
+                          borderRadius: '10px',
+                          backgroundColor: '#F8FAFC',
+                          border: '1px solid #E2E8F0',
+                          color: '#185ADB',
+                          fontFamily: '"JetBrains Mono", monospace',
+                          fontSize: '0.84rem',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease',
+                        }}
+                        title="Click to copy Delegate ID"
+                      >
+                        <span>ID: {delegate.delegateId || 'ICRAST26-DELEGATE'}</span>
+                        {copiedId ? <Check size={14} color="#10B981" /> : <Copy size={14} opacity={0.6} />}
+                      </div>
+                      <span style={{ fontSize: '0.78rem', color: '#64748B' }}>
+                        {copiedId ? 'Copied to clipboard!' : 'Click to copy ID'}
+                      </span>
+                    </div>
+
+                    <hr style={{ border: 'none', borderTop: '1px solid #F1F5F9', margin: '1.4rem 0' }} />
+
+                    {/* Primary High-Res Download Action */}
+                    <div>
+                      <button
+                        type="button"
+                        onClick={handleDownloadBadgeImage}
+                        disabled={isDownloading}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '0.65rem',
+                          padding: '1rem 1.75rem',
+                          fontSize: '1rem',
+                          fontWeight: 700,
+                          borderRadius: '14px',
+                          width: '100%',
+                          backgroundColor: '#185ADB',
+                          color: '#ffffff',
+                          border: 'none',
+                          cursor: isDownloading ? 'wait' : 'pointer',
+                          boxShadow: '0 8px 24px rgba(24, 90, 219, 0.25)',
+                          transition: 'all 0.15s ease',
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#154ec4')}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#185ADB')}
+                      >
+                        {isDownloading ? (
+                          <>
+                            <RefreshCw size={20} className="animate-spin" />
+                            <span>Generating Print-Quality Badge (1364x2048)...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Download size={20} />
+                            <span>Download Digital Badge (High-Resolution PNG)</span>
+                          </>
+                        )}
+                      </button>
+                      <p style={{ fontSize: '0.78rem', color: '#64748B', marginTop: '0.6rem', textAlign: 'center', marginInline: 'auto' }}>
+                        Retina-quality printable badge pass with encrypted QR for on-campus verification at Aryabhata Hall.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Card 2: Delegate Academic Details & Mode (2x2 Grid) */}
+                  <div
+                    style={{
+                      backgroundColor: '#ffffff',
+                      border: '1px solid #EAEFF5',
+                      borderRadius: '24px',
+                      padding: '1.5rem',
+                      boxShadow: '0 16px 40px rgba(18, 59, 112, 0.06)',
+                    }}
+                  >
+                    <div style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.04em', color: '#64748B', textTransform: 'uppercase', marginBottom: '1rem' }}>
+                      REGISTRATION &amp; AFFILIATION DETAILS
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
+                      {/* Grid Item 1: Institution */}
+                      <div style={{ padding: '0.85rem', backgroundColor: '#F8FAFC', borderRadius: '14px', border: '1px solid #EAEFF5' }}>
+                        <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                          <Building size={14} color="#185ADB" />
+                          <span>INSTITUTION</span>
+                        </div>
+                        <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#123B70', marginTop: '0.25rem' }}>
+                          {delegate.institution || 'University of Calicut'}
+                        </div>
+                      </div>
+
+                      {/* Grid Item 2: Department */}
+                      <div style={{ padding: '0.85rem', backgroundColor: '#F8FAFC', borderRadius: '14px', border: '1px solid #EAEFF5' }}>
+                        <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                          <GraduationCap size={14} color="#185ADB" />
+                          <span>DEPARTMENT</span>
+                        </div>
+                        <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#123B70', marginTop: '0.25rem' }}>
+                          {delegate.department || 'Science & Technology'}
+                        </div>
+                      </div>
+
+                      {/* Grid Item 3: Mode */}
+                      <div style={{ padding: '0.85rem', backgroundColor: '#F8FAFC', borderRadius: '14px', border: '1px solid #EAEFF5' }}>
+                        <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                          <Ticket size={14} color="#185ADB" />
+                          <span>PARTICIPATION MODE</span>
+                        </div>
+                        <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#123B70', marginTop: '0.25rem' }}>
+                          {delegate.participationMode || 'On-Campus Delegate'}
+                        </div>
+                      </div>
+
+                      {/* Grid Item 4: Registered Mobile */}
+                      <div style={{ padding: '0.85rem', backgroundColor: '#F8FAFC', borderRadius: '14px', border: '1px solid #EAEFF5' }}>
+                        <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                          <Phone size={14} color="#185ADB" />
+                          <span>REGISTERED MOBILE</span>
+                        </div>
+                        <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#123B70', marginTop: '0.25rem' }}>
+                          +91 {delegate.phone}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card 3: Conference Venue & Reporting Instructions */}
+                  <div
+                    style={{
+                      backgroundColor: '#ffffff',
+                      border: '1px solid #EAEFF5',
+                      borderRadius: '24px',
+                      padding: '1.5rem',
+                      boxShadow: '0 16px 40px rgba(18, 59, 112, 0.06)',
+                    }}
+                  >
+                    <div style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.04em', color: '#64748B', textTransform: 'uppercase', marginBottom: '1rem' }}>
+                      CONFERENCE DATES &amp; VENUE INFORMATION
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
+                        <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: '#EDF3FA', color: '#185ADB', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <Calendar size={18} />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>DATES</div>
+                          <div style={{ fontSize: '0.86rem', fontWeight: 700, color: '#123B70' }}>21–22 Nov 2026</div>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
+                        <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: '#EDF3FA', color: '#185ADB', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <MapPin size={18} />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>VENUE</div>
+                          <div style={{ fontSize: '0.86rem', fontWeight: 700, color: '#123B70' }}>Aryabhata Hall, Calicut Univ.</div>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
+                        <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: '#EDF3FA', color: '#185ADB', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <Wifi size={18} />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>CAMPUS WI-FI</div>
+                          <div style={{ fontSize: '0.86rem', fontWeight: 700, color: '#123B70' }}>CU-Guest / Eduroam</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* TAB 2: SCHEDULE (Clean Minimal Empty State) */}
+            {/* TAB 2: SCHEDULE (Clean Minimal Card State) */}
             {activeTab === 'schedule' && (
               <div
                 style={{
-                  padding: '4.5rem 1.5rem 2rem',
+                  padding: '3.5rem 1.5rem 2.5rem',
                   textAlign: 'center',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  maxWidth: '380px',
+                  maxWidth: '520px',
+                  width: '100%',
                   margin: '0 auto',
+                  backgroundColor: '#ffffff',
+                  borderRadius: '24px',
+                  border: '1px solid #EAEFF5',
+                  boxShadow: '0 16px 40px rgba(18, 59, 112, 0.06)',
                 }}
               >
                 <div
@@ -986,7 +1396,7 @@ export default function IcrastBadgePage() {
 
                 <h3
                   style={{
-                    fontSize: '1.25rem',
+                    fontSize: '1.35rem',
                     fontWeight: 800,
                     color: '#123B70',
                     marginBottom: '0.45rem',
@@ -998,29 +1408,54 @@ export default function IcrastBadgePage() {
 
                 <p
                   style={{
-                    fontSize: '0.88rem',
+                    fontSize: '0.9rem',
                     color: '#5A6E85',
-                    lineHeight: 1.55,
+                    lineHeight: 1.6,
                     margin: 0,
+                    maxWidth: '420px',
                   }}
                 >
                   Conference session timetable, oral presentation tracks, and hall allocations will be published here 24 hours prior to Day 1.
                 </p>
+
+                <div
+                  style={{
+                    marginTop: '1.5rem',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    padding: '0.45rem 1rem',
+                    borderRadius: '9999px',
+                    backgroundColor: '#F8FAFC',
+                    border: '1px solid #E2E8F0',
+                    fontSize: '0.78rem',
+                    color: '#185ADB',
+                    fontWeight: 700,
+                  }}
+                >
+                  <Clock size={14} />
+                  <span>21–22 November 2026 · Calicut University</span>
+                </div>
               </div>
             )}
 
-            {/* TAB 3: CERTIFICATES / DOWNLOADS (Clean Minimal Empty State) */}
+            {/* TAB 3: CERTIFICATES / DOWNLOADS (Clean Minimal Card State) */}
             {activeTab === 'certificate' && (
               <div
                 style={{
-                  padding: '4.5rem 1.5rem 2rem',
+                  padding: '3.5rem 1.5rem 2.5rem',
                   textAlign: 'center',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  maxWidth: '380px',
+                  maxWidth: '520px',
+                  width: '100%',
                   margin: '0 auto',
+                  backgroundColor: '#ffffff',
+                  borderRadius: '24px',
+                  border: '1px solid #EAEFF5',
+                  boxShadow: '0 16px 40px rgba(18, 59, 112, 0.06)',
                 }}
               >
                 <div
@@ -1041,7 +1476,7 @@ export default function IcrastBadgePage() {
 
                 <h3
                   style={{
-                    fontSize: '1.25rem',
+                    fontSize: '1.35rem',
                     fontWeight: 800,
                     color: '#123B70',
                     marginBottom: '0.45rem',
@@ -1053,20 +1488,40 @@ export default function IcrastBadgePage() {
 
                 <p
                   style={{
-                    fontSize: '0.88rem',
+                    fontSize: '0.9rem',
                     color: '#5A6E85',
-                    lineHeight: 1.55,
+                    lineHeight: 1.6,
                     margin: 0,
+                    maxWidth: '420px',
                   }}
                 >
-                  Authorized e-certificates of participation and presentation will be available for download here post-conference.
+                  Authorized digital e-certificates of participation and presentation will be available for download here post-conference.
                 </p>
+
+                <div
+                  style={{
+                    marginTop: '1.5rem',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    padding: '0.45rem 1rem',
+                    borderRadius: '9999px',
+                    backgroundColor: '#F8FAFC',
+                    border: '1px solid #E2E8F0',
+                    fontSize: '0.78rem',
+                    color: '#185ADB',
+                    fontWeight: 700,
+                  }}
+                >
+                  <ShieldCheck size={14} />
+                  <span>Issued post-event with unique verification ID</span>
+                </div>
               </div>
             )}
 
-            {/* TAB 4: REAL MOBILE APP PROFILE */}
+            {/* TAB 4: PROFILE */}
             {activeTab === 'profile' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', maxWidth: '640px', width: '100%', margin: '0 auto' }}>
                 {/* 1. Profile Hero Card */}
                 <div
                   style={{
@@ -1393,7 +1848,7 @@ export default function IcrastBadgePage() {
       {/* Clean White Bottom Navigation Bar - Exactly as in Mockup */}
       {delegate && (
         <nav
-          className="icrast-mobile-bottom-nav"
+          className="icrast-bottom-nav"
           style={{
             position: 'fixed',
             bottom: 0,
