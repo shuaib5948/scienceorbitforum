@@ -28,11 +28,13 @@ import {
   FileText,
   Wifi,
   ChevronRight,
+  ChevronDown,
   Copy,
   Check,
   ShieldCheck,
   BadgeCheck,
   Compass,
+  Bell,
 } from 'lucide-react';
 
 function normalizePhone(p: unknown): string {
@@ -62,6 +64,7 @@ export default function IcrastBadgePage() {
   const [qrDataUrl, setQrDataUrl] = useState<string>('');
   const [isDownloading, setIsDownloading] = useState(false);
   const [copiedId, setCopiedId] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
 
   const badgeCardRef = useRef<HTMLDivElement>(null);
 
@@ -351,126 +354,190 @@ export default function IcrastBadgePage() {
         width: '100vw',
         display: 'flex',
         flexDirection: 'column',
-        background: 'radial-gradient(circle at 50% 0%, rgba(30, 58, 138, 0.22) 0%, rgba(3, 7, 18, 0.96) 65%, #030712 100%)',
-        color: '#ffffff',
+        backgroundColor: '#F4F7FB',
+        color: '#172033',
         fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
         overflow: 'hidden',
         position: 'relative',
       }}
     >
-      {/* Top Application Header Bar */}
+      {/* Top Application Header Bar - Clean White Executive Bar */}
       <header
         style={{
-          height: '62px',
-          backgroundColor: 'rgba(7, 18, 36, 0.85)',
-          backdropFilter: 'blur(16px)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+          height: '64px',
+          backgroundColor: '#ffffff',
+          borderBottom: '1px solid #EAEFF5',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '0 1.1rem',
+          padding: '0 1.25rem',
           flexShrink: 0,
           zIndex: 40,
         }}
       >
-        {/* Brand: ICRAST Logo & Title */}
+        {/* Left: ICRAST Cube Logo & Title */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
           <img
             src="/images/icrast-logo-mark.png"
             alt="ICRAST Logo"
-            style={{
-              width: '32px',
-              height: '32px',
-              objectFit: 'contain',
-              filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.5))',
-            }}
+            style={{ width: '34px', height: '34px', objectFit: 'contain' }}
           />
           <div>
             <div
               style={{
-                fontSize: '0.98rem',
+                fontSize: '1.02rem',
                 fontWeight: 800,
-                color: '#ffffff',
-                lineHeight: 1.1,
-                letterSpacing: '-0.01em',
+                color: '#123B70',
+                lineHeight: 1.15,
+                letterSpacing: '-0.02em',
               }}
             >
               ICRAST-26
             </div>
             <div
               style={{
-                fontSize: '0.68rem',
-                color: '#00e5ff',
-                fontWeight: 700,
-                letterSpacing: '0.04em',
-                textTransform: 'uppercase',
+                fontSize: '0.72rem',
+                color: '#5A6E85',
+                fontWeight: 600,
+                letterSpacing: '0.01em',
               }}
             >
-              Delegate Portal
+              Conference Portal
             </div>
           </div>
         </div>
 
-        {/* Right Action: Delegate ID or Logout */}
+        {/* Right Action: Delegate dropdown + Notification/Logout button */}
         {delegate ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <div
-              onClick={handleCopyId}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', position: 'relative' }}>
+            <button
+              type="button"
+              onClick={() => setShowMenu(!showMenu)}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.35rem',
-                padding: '0.22rem 0.65rem',
+                padding: '0.38rem 0.8rem',
                 borderRadius: '9999px',
-                backgroundColor: 'rgba(0, 229, 255, 0.1)',
-                border: '1px solid rgba(0, 229, 255, 0.35)',
-                color: '#00e5ff',
-                fontFamily: '"JetBrains Mono", monospace',
-                fontSize: '0.74rem',
+                backgroundColor: '#EDF3FA',
+                border: 'none',
+                color: '#123B70',
+                fontSize: '0.78rem',
                 fontWeight: 700,
                 cursor: 'pointer',
+                transition: 'all 0.15s ease',
               }}
-              title="Tap to copy Delegate ID"
             >
-              <span>{delegate.delegateId || 'DELEGATE'}</span>
-              {copiedId ? <Check size={12} color="#4ade80" /> : <Copy size={12} opacity={0.7} />}
-            </div>
+              <span>Delegate</span>
+              <ChevronDown
+                size={14}
+                style={{
+                  transform: showMenu ? 'rotate(180deg)' : 'none',
+                  transition: 'transform 0.2s ease',
+                }}
+              />
+            </button>
 
             <button
               type="button"
-              onClick={handleLogout}
-              title="Switch Account / Logout"
+              onClick={() => setShowMenu(!showMenu)}
+              title="Notifications & Menu"
               style={{
-                background: 'rgba(255, 255, 255, 0.06)',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
-                borderRadius: '10px',
                 width: '34px',
                 height: '34px',
-                color: 'rgba(255, 255, 255, 0.75)',
+                borderRadius: '50%',
+                backgroundColor: '#EDF3FA',
+                border: 'none',
+                color: '#123B70',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
                 transition: 'all 0.15s ease',
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.2)')}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.06)')}
             >
-              <LogOut size={15} />
+              <Bell size={15} />
             </button>
+
+            {/* Dropdown Menu when clicked */}
+            {showMenu && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '46px',
+                  right: 0,
+                  width: '220px',
+                  backgroundColor: '#ffffff',
+                  borderRadius: '16px',
+                  boxShadow: '0 16px 36px rgba(18, 59, 112, 0.14), 0 2px 8px rgba(0,0,0,0.06)',
+                  border: '1px solid #E2E8F0',
+                  padding: '0.85rem',
+                  zIndex: 100,
+                }}
+              >
+                <div style={{ fontSize: '0.68rem', color: '#5A6E85', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                  SIGNED IN ATTENDEE
+                </div>
+                <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#123B70', marginTop: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {delegate.fullName}
+                </div>
+                <div
+                  onClick={handleCopyId}
+                  style={{
+                    fontSize: '0.74rem',
+                    fontFamily: '"JetBrains Mono", monospace',
+                    color: '#185ADB',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    marginTop: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                  }}
+                  title="Tap to copy"
+                >
+                  <span>{delegate.delegateId || 'ICRAST26'}</span>
+                  {copiedId ? <Check size={12} color="#10B981" /> : <Copy size={12} opacity={0.6} />}
+                </div>
+                <hr style={{ border: 'none', borderTop: '1px solid #F1F5F9', margin: '0.65rem 0' }} />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowMenu(false);
+                    handleLogout();
+                  }}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    padding: '0.5rem 0.65rem',
+                    borderRadius: '8px',
+                    backgroundColor: '#FEF2F2',
+                    border: 'none',
+                    color: '#DC2626',
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  <LogOut size={14} />
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <Link
             to="/icrast/register"
             style={{
-              fontSize: '0.78rem',
+              fontSize: '0.8rem',
               fontWeight: 700,
-              color: '#00e5ff',
+              color: '#185ADB',
               textDecoration: 'none',
-              padding: '0.35rem 0.8rem',
-              borderRadius: '8px',
-              border: '1px solid rgba(0, 229, 255, 0.35)',
-              backgroundColor: 'rgba(0, 229, 255, 0.1)',
+              padding: '0.38rem 0.85rem',
+              borderRadius: '9999px',
+              backgroundColor: '#E8F1FC',
             }}
           >
             Register Now
@@ -495,25 +562,23 @@ export default function IcrastBadgePage() {
           /* Phone Authorization Screen (When Logged Out) */
           <div
             style={{
-              backgroundColor: 'rgba(11, 23, 44, 0.8)',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
+              backgroundColor: '#ffffff',
+              border: '1px solid #EAEFF5',
               borderRadius: '24px',
               padding: '2.5rem 2rem',
               maxWidth: '420px',
               width: '100%',
               textAlign: 'center',
-              boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6), 0 0 35px rgba(212, 175, 55, 0.12)',
+              boxShadow: '0 16px 40px rgba(18, 59, 112, 0.08), 0 2px 8px rgba(0, 0, 0, 0.03)',
               margin: 'auto',
             }}
           >
             <div
               style={{
-                width: '68px',
-                height: '68px',
-                borderRadius: '50%',
-                backgroundColor: 'rgba(212, 175, 55, 0.12)',
-                border: '1px solid rgba(212, 175, 55, 0.35)',
+                width: '64px',
+                height: '64px',
+                borderRadius: '20px',
+                backgroundColor: '#EDF3FA',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -523,16 +588,16 @@ export default function IcrastBadgePage() {
               <img
                 src="/images/icrast-logo-mark.png"
                 alt="ICRAST Logo"
-                style={{ width: '42px', height: '42px', objectFit: 'contain' }}
+                style={{ width: '40px', height: '40px', objectFit: 'contain' }}
               />
             </div>
 
             <h1
               style={{
-                fontSize: '1.45rem',
+                fontSize: '1.4rem',
                 fontWeight: 800,
-                color: '#ffffff',
-                marginBottom: '0.4rem',
+                color: '#123B70',
+                marginBottom: '0.35rem',
                 letterSpacing: '-0.02em',
               }}
             >
@@ -541,7 +606,7 @@ export default function IcrastBadgePage() {
             <p
               style={{
                 fontSize: '0.85rem',
-                color: 'rgba(255, 255, 255, 0.68)',
+                color: '#5A6E85',
                 marginBottom: '1.75rem',
                 lineHeight: 1.45,
               }}
@@ -563,7 +628,7 @@ export default function IcrastBadgePage() {
                     left: '14px',
                     top: '50%',
                     transform: 'translateY(-50%)',
-                    color: 'rgba(255, 255, 255, 0.45)',
+                    color: '#94A3B8',
                   }}
                 />
                 <input
@@ -576,11 +641,11 @@ export default function IcrastBadgePage() {
                   style={{
                     width: '100%',
                     padding: '0.9rem 1rem 0.9rem 2.75rem',
-                    fontSize: '1.05rem',
-                    backgroundColor: 'rgba(6, 16, 32, 0.85)',
-                    border: '1px solid rgba(255, 255, 255, 0.22)',
+                    fontSize: '1.02rem',
+                    backgroundColor: '#F8FAFC',
+                    border: '1px solid #CBD5E1',
                     borderRadius: '12px',
-                    color: '#ffffff',
+                    color: '#172033',
                     outline: 'none',
                     letterSpacing: '0.04em',
                     fontFamily: '"JetBrains Mono", monospace',
@@ -591,17 +656,22 @@ export default function IcrastBadgePage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="icrast-btn icrast-btn--primary"
                 style={{
                   width: '100%',
-                  padding: '0.9rem',
-                  fontSize: '0.98rem',
+                  padding: '0.92rem',
+                  fontSize: '0.96rem',
                   fontWeight: 700,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '0.5rem',
                   borderRadius: '12px',
+                  backgroundColor: '#185ADB',
+                  color: '#ffffff',
+                  border: 'none',
+                  cursor: isLoading ? 'wait' : 'pointer',
+                  boxShadow: '0 8px 20px rgba(24, 90, 219, 0.22)',
+                  transition: 'all 0.15s ease',
                 }}
               >
                 {isLoading ? (
@@ -622,9 +692,9 @@ export default function IcrastBadgePage() {
                   to="/icrast/register"
                   style={{
                     fontSize: '0.82rem',
-                    color: 'rgba(255, 255, 255, 0.65)',
+                    color: '#5A6E85',
                     textDecoration: 'none',
-                    fontWeight: 500,
+                    fontWeight: 600,
                   }}
                 >
                   New attendee? Register here &rarr;
@@ -638,9 +708,9 @@ export default function IcrastBadgePage() {
                   marginTop: '1.25rem',
                   padding: '0.75rem 0.9rem',
                   borderRadius: '10px',
-                  backgroundColor: 'rgba(239, 68, 68, 0.18)',
-                  border: '1px solid rgba(239, 68, 68, 0.4)',
-                  color: '#fca5a5',
+                  backgroundColor: '#FEF2F2',
+                  border: '1px solid #FCA5A5',
+                  color: '#DC2626',
                   fontSize: '0.85rem',
                   display: 'flex',
                   alignItems: 'center',
@@ -655,28 +725,29 @@ export default function IcrastBadgePage() {
           </div>
         ) : (
           /* Authenticated Delegate Mobile Portal View */
-          <div style={{ width: '100%', maxWidth: '580px', margin: '0 auto' }}>
-            {/* TAB 1: PASS / TICKET (Official Conference Portrait Badge) */}
+          <div style={{ width: '100%', maxWidth: '480px', margin: '0 auto' }}>
+            {/* TAB 1: PASS / TICKET (Hero Digital Badge) */}
             {activeTab === 'pass' && (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-                {/* Official Portrait Badge Card */}
+                {/* Clean Apple Wallet-style Ticket Card */}
                 <div
                   ref={badgeCardRef}
-                  className="icrast-badge-portrait-wrap"
+                  className="icrast-hero-ticket-card"
                   style={{
                     position: 'relative',
                     width: '100%',
                     maxWidth: '380px',
                     aspectRatio: '682 / 1024',
-                    margin: '0 auto 1.25rem',
-                    borderRadius: '24px',
+                    margin: '0 auto 1.15rem',
+                    borderRadius: '26px',
                     overflow: 'hidden',
-                    boxShadow: '0 25px 60px rgba(0, 0, 0, 0.7), 0 0 45px rgba(0, 168, 255, 0.25)',
-                    border: '1px solid rgba(0, 168, 255, 0.35)',
+                    boxShadow: '0 16px 45px rgba(18, 59, 112, 0.12), 0 2px 10px rgba(0, 0, 0, 0.04)',
+                    border: '1px solid rgba(18, 59, 112, 0.08)',
                     backgroundImage: "url('/images/icrast-badge-template.png')",
                     backgroundSize: '100% 100%',
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat',
+                    backgroundColor: '#ffffff',
                     userSelect: 'none',
                   }}
                 >
@@ -810,7 +881,7 @@ export default function IcrastBadgePage() {
                   </div>
                 </div>
 
-                {/* Primary Download Button & Status */}
+                {/* Primary Solid Navy/Blue Download Button */}
                 <div style={{ width: '100%', maxWidth: '380px', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                   <button
                     type="button"
@@ -820,19 +891,21 @@ export default function IcrastBadgePage() {
                       display: 'inline-flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      gap: '0.6rem',
-                      padding: '0.9rem 1.6rem',
-                      fontSize: '0.95rem',
+                      gap: '0.55rem',
+                      padding: '0.92rem 1.6rem',
+                      fontSize: '0.94rem',
                       fontWeight: 700,
                       borderRadius: '14px',
                       width: '100%',
-                      background: 'linear-gradient(135deg, #0062ff 0%, #00a8ff 100%)',
+                      backgroundColor: '#185ADB',
                       color: '#ffffff',
                       border: 'none',
                       cursor: isDownloading ? 'wait' : 'pointer',
-                      boxShadow: '0 10px 28px rgba(0, 168, 255, 0.35)',
-                      transition: 'all 0.18s ease',
+                      boxShadow: '0 8px 22px rgba(24, 90, 219, 0.22)',
+                      transition: 'all 0.15s ease',
                     }}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#154ec4')}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#185ADB')}
                   >
                     {isDownloading ? (
                       <>
@@ -842,87 +915,67 @@ export default function IcrastBadgePage() {
                     ) : (
                       <>
                         <Download size={18} />
-                        <span>Download Official Badge (PNG)</span>
+                        <span>Download Digital Badge (PNG)</span>
                       </>
                     )}
                   </button>
 
-                  {/* Verification Status Pill */}
+                  {/* Verification Status Pill - Exactly as in the mockup */}
                   <div
                     style={{
-                      padding: '0.85rem 1.1rem',
+                      padding: '0.82rem 1.1rem',
                       borderRadius: '16px',
-                      backgroundColor: isCheckedIn ? 'rgba(34, 197, 94, 0.12)' : 'rgba(0, 168, 255, 0.1)',
-                      border: isCheckedIn ? '1px solid rgba(34, 197, 94, 0.35)' : '1px solid rgba(0, 168, 255, 0.28)',
+                      backgroundColor: '#EBF8F2',
+                      border: '1px solid #D1F2DF',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '0.75rem',
                     }}
                   >
-                    {isCheckedIn ? (
-                      <ShieldCheck size={22} style={{ color: '#4ade80', flexShrink: 0 }} />
-                    ) : (
-                      <QrCode size={22} style={{ color: '#00e5ff', flexShrink: 0 }} />
-                    )}
+                    <div
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '50%',
+                        backgroundColor: '#10B981',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: '#ffffff',
+                        flexShrink: 0,
+                      }}
+                    >
+                      <Check size={16} strokeWidth={3} />
+                    </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div
                         style={{
-                          fontSize: '0.84rem',
+                          fontSize: '0.88rem',
                           fontWeight: 800,
-                          color: isCheckedIn ? '#4ade80' : '#00e5ff',
-                          letterSpacing: '0.02em',
+                          color: '#0D5D3B',
+                          letterSpacing: '-0.01em',
+                          lineHeight: 1.25,
                         }}
                       >
-                        {isCheckedIn ? 'CHECKED IN · ATTENDANCE VERIFIED' : 'OFFICIAL DELEGATE PASS ACTIVE'}
+                        {isCheckedIn ? 'Attendance Verified' : 'Registration Confirmed'}
                       </div>
                       <div
+                        onClick={handleCopyId}
                         style={{
-                          fontSize: '0.72rem',
-                          color: 'rgba(255, 255, 255, 0.72)',
-                          marginTop: '2px',
-                          lineHeight: 1.35,
+                          fontSize: '0.74rem',
+                          color: '#4A6B5D',
+                          marginTop: '1px',
+                          fontFamily: '"JetBrains Mono", monospace',
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px',
                         }}
+                        title="Tap to copy"
                       >
-                        {isCheckedIn
-                          ? `Entry verified at ${delegate.checkinTimestamp || 'Calicut University desk'}`
-                          : 'Show this digital pass or downloaded badge at the counter desk on conference day.'}
+                        <span>Delegate ID: {delegate.delegateId || 'ICRAST26-D-0487'}</span>
+                        {copiedId ? <Check size={11} color="#10B981" /> : <Copy size={11} opacity={0.5} />}
                       </div>
-                    </div>
-                  </div>
-
-                  {/* Quick Metadata Capsule */}
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: '0.65rem 0.95rem',
-                      borderRadius: '12px',
-                      backgroundColor: 'rgba(255, 255, 255, 0.04)',
-                      border: '1px solid rgba(255, 255, 255, 0.08)',
-                      fontSize: '0.75rem',
-                      color: 'rgba(255, 255, 255, 0.7)',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                      <MapPin size={13} style={{ color: '#00e5ff' }} />
-                      <span>Calicut University · 21–22 Nov</span>
-                    </div>
-                    <div
-                      onClick={handleCopyId}
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '0.35rem',
-                        color: '#00e5ff',
-                        fontFamily: '"JetBrains Mono", monospace',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                      }}
-                      title="Tap to copy"
-                    >
-                      <span>{delegate.delegateId || 'ICRAST26'}</span>
-                      {copiedId ? <Check size={12} color="#4ade80" /> : <Copy size={12} opacity={0.7} />}
                     </div>
                   </div>
                 </div>
@@ -933,13 +986,12 @@ export default function IcrastBadgePage() {
             {activeTab === 'schedule' && (
               <div
                 style={{
-                  backgroundColor: 'rgba(15, 23, 42, 0.8)',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #EAEFF5',
                   borderRadius: '24px',
                   padding: '2.2rem 1.5rem',
                   textAlign: 'center',
-                  boxShadow: '0 20px 45px rgba(0, 0, 0, 0.5)',
+                  boxShadow: '0 16px 40px rgba(18, 59, 112, 0.08)',
                 }}
               >
                 <div
@@ -947,9 +999,8 @@ export default function IcrastBadgePage() {
                     width: '64px',
                     height: '64px',
                     borderRadius: '20px',
-                    backgroundColor: 'rgba(59, 130, 246, 0.12)',
-                    border: '1px solid rgba(59, 130, 246, 0.3)',
-                    color: '#93c5fd',
+                    backgroundColor: '#EDF3FA',
+                    color: '#185ADB',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -962,11 +1013,10 @@ export default function IcrastBadgePage() {
                 <div
                   style={{
                     display: 'inline-block',
-                    padding: '0.25rem 0.8rem',
+                    padding: '0.3rem 0.85rem',
                     borderRadius: '9999px',
-                    backgroundColor: 'rgba(212, 175, 55, 0.12)',
-                    border: '1px solid rgba(212, 175, 55, 0.35)',
-                    color: '#d4af37',
+                    backgroundColor: '#EDF3FA',
+                    color: '#123B70',
                     fontSize: '0.74rem',
                     fontWeight: 700,
                     marginBottom: '0.85rem',
@@ -977,13 +1027,13 @@ export default function IcrastBadgePage() {
                   TIMETABLE RELEASING 20 NOV 2026
                 </div>
 
-                <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.5rem', letterSpacing: '-0.01em' }}>
+                <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#123B70', marginBottom: '0.5rem', letterSpacing: '-0.01em' }}>
                   Conference Schedule &amp; Oral Tracks
                 </h3>
                 <p
                   style={{
                     fontSize: '0.88rem',
-                    color: 'rgba(255, 255, 255, 0.7)',
+                    color: '#5A6E85',
                     maxWidth: '440px',
                     margin: '0 auto 1.75rem',
                     lineHeight: 1.55,
@@ -994,8 +1044,8 @@ export default function IcrastBadgePage() {
 
                 <div
                   style={{
-                    backgroundColor: 'rgba(6, 16, 32, 0.75)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    backgroundColor: '#F8FAFC',
+                    border: '1px solid #E2E8F0',
                     borderRadius: '16px',
                     padding: '1.25rem',
                     textAlign: 'left',
@@ -1005,28 +1055,27 @@ export default function IcrastBadgePage() {
                     gap: '0.65rem',
                   }}
                 >
-                  <div style={{ color: '#00e5ff', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <div style={{ color: '#185ADB', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                     <MapPin size={15} />
                     <span>Official Venue:</span>
                   </div>
-                  <div style={{ color: 'rgba(255, 255, 255, 0.85)', lineHeight: 1.45 }}>
+                  <div style={{ color: '#334155', lineHeight: 1.45 }}>
                     Aryabhata Hall, Department of Physics &amp; Campus Auditorium, University of Calicut, Thenhipalam, Kerala 673635.
                   </div>
                 </div>
               </div>
             )}
 
-            {/* TAB 3: CERTIFICATE (Verified E-Certificate Desk) */}
+            {/* TAB 3: CERTIFICATES / DOWNLOADS (Verified E-Certificate Desk) */}
             {activeTab === 'certificate' && (
               <div
                 style={{
-                  backgroundColor: 'rgba(15, 23, 42, 0.8)',
-                  backdropFilter: 'blur(20px)',
-                  border: isCheckedIn ? '1px solid rgba(34, 197, 94, 0.35)' : '1px solid rgba(255, 255, 255, 0.1)',
+                  backgroundColor: '#ffffff',
+                  border: isCheckedIn ? '1px solid #D1F2DF' : '1px solid #EAEFF5',
                   borderRadius: '24px',
                   padding: '2.2rem 1.5rem',
                   textAlign: 'center',
-                  boxShadow: '0 20px 45px rgba(0, 0, 0, 0.5)',
+                  boxShadow: '0 16px 40px rgba(18, 59, 112, 0.08)',
                 }}
               >
                 <div
@@ -1034,9 +1083,8 @@ export default function IcrastBadgePage() {
                     width: '64px',
                     height: '64px',
                     borderRadius: '20px',
-                    backgroundColor: isCheckedIn ? 'rgba(34, 197, 94, 0.12)' : 'rgba(212, 175, 55, 0.12)',
-                    border: isCheckedIn ? '1px solid rgba(34, 197, 94, 0.35)' : '1px solid rgba(212, 175, 55, 0.35)',
-                    color: isCheckedIn ? '#4ade80' : '#d4af37',
+                    backgroundColor: isCheckedIn ? '#EBF8F2' : '#F1F5F9',
+                    color: isCheckedIn ? '#10B981' : '#64748B',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -1049,11 +1097,10 @@ export default function IcrastBadgePage() {
                 <div
                   style={{
                     display: 'inline-block',
-                    padding: '0.25rem 0.8rem',
+                    padding: '0.3rem 0.85rem',
                     borderRadius: '9999px',
-                    backgroundColor: isCheckedIn ? 'rgba(34, 197, 94, 0.12)' : 'rgba(212, 175, 55, 0.12)',
-                    border: isCheckedIn ? '1px solid rgba(34, 197, 94, 0.35)' : '1px solid rgba(212, 175, 55, 0.35)',
-                    color: isCheckedIn ? '#86efac' : '#d4af37',
+                    backgroundColor: isCheckedIn ? '#EBF8F2' : '#F1F5F9',
+                    color: isCheckedIn ? '#0D5D3B' : '#64748B',
                     fontSize: '0.74rem',
                     fontWeight: 700,
                     marginBottom: '0.85rem',
@@ -1064,13 +1111,13 @@ export default function IcrastBadgePage() {
                   {isCheckedIn ? 'ATTENDANCE VERIFIED ✓' : 'LOCKED UNTIL CHECK-IN'}
                 </div>
 
-                <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.5rem', letterSpacing: '-0.01em' }}>
+                <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#123B70', marginBottom: '0.5rem', letterSpacing: '-0.01em' }}>
                   Official E-Certificate Desk
                 </h3>
                 <p
                   style={{
                     fontSize: '0.88rem',
-                    color: 'rgba(255, 255, 255, 0.7)',
+                    color: '#5A6E85',
                     maxWidth: '440px',
                     margin: '0 auto 1.75rem',
                     lineHeight: 1.55,
@@ -1083,25 +1130,25 @@ export default function IcrastBadgePage() {
 
                 <div
                   style={{
-                    backgroundColor: 'rgba(6, 16, 32, 0.75)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    backgroundColor: '#F8FAFC',
+                    border: '1px solid #E2E8F0',
                     borderRadius: '16px',
                     padding: '1.1rem',
                     textAlign: 'left',
                     fontSize: '0.82rem',
-                    color: 'rgba(255, 255, 255, 0.8)',
+                    color: '#334155',
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '0.45rem',
                   }}
                 >
-                  <div style={{ fontWeight: 700, color: '#ffffff' }}>
+                  <div style={{ fontWeight: 700, color: '#123B70' }}>
                     Candidate: {delegate.fullName}
                   </div>
-                  <div style={{ fontFamily: '"JetBrains Mono", monospace', color: '#00e5ff' }}>
+                  <div style={{ fontFamily: '"JetBrains Mono", monospace', color: '#185ADB' }}>
                     ID: {delegate.delegateId || 'ICRAST26-DELEGATE'}
                   </div>
-                  <div style={{ color: isCheckedIn ? '#86efac' : '#facc15' }}>
+                  <div style={{ color: isCheckedIn ? '#166534' : '#D97706', fontWeight: 600 }}>
                     Status: {isCheckedIn ? 'Checked in at registration counter ✓' : 'Pending in-person check-in'}
                   </div>
                 </div>
@@ -1114,25 +1161,22 @@ export default function IcrastBadgePage() {
                 {/* 1. Profile Hero Card */}
                 <div
                   style={{
-                    backgroundColor: 'rgba(15, 23, 42, 0.85)',
-                    backdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #EAEFF5',
                     borderRadius: '24px',
                     padding: '1.5rem',
-                    boxShadow: '0 20px 45px rgba(0, 0, 0, 0.5)',
+                    boxShadow: '0 16px 40px rgba(18, 59, 112, 0.08)',
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '1.1rem' }}>
-                    {/* Gradient Avatar */}
+                    {/* Clean Monogram Avatar */}
                     <div
                       style={{
                         width: '64px',
                         height: '64px',
                         borderRadius: '20px',
-                        background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #06b6d4 100%)',
-                        boxShadow: '0 8px 20px rgba(59, 130, 246, 0.35)',
-                        border: '2px solid rgba(255, 255, 255, 0.2)',
-                        color: '#ffffff',
+                        backgroundColor: '#E8F1FC',
+                        color: '#185ADB',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -1148,9 +1192,9 @@ export default function IcrastBadgePage() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                         <h2
                           style={{
-                            fontSize: '1.3rem',
+                            fontSize: '1.25rem',
                             fontWeight: 800,
-                            color: '#ffffff',
+                            color: '#123B70',
                             margin: 0,
                             lineHeight: 1.2,
                             letterSpacing: '-0.02em',
@@ -1161,13 +1205,13 @@ export default function IcrastBadgePage() {
                         >
                           {delegate.fullName}
                         </h2>
-                        <BadgeCheck size={18} style={{ color: '#00e5ff', flexShrink: 0 }} />
+                        <BadgeCheck size={18} style={{ color: '#185ADB', flexShrink: 0 }} />
                       </div>
 
                       <div
                         style={{
                           fontSize: '0.82rem',
-                          color: '#93c5fd',
+                          color: '#5A6E85',
                           marginTop: '3px',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
@@ -1187,9 +1231,9 @@ export default function IcrastBadgePage() {
                           marginTop: '0.5rem',
                           padding: '0.2rem 0.6rem',
                           borderRadius: '6px',
-                          backgroundColor: 'rgba(0, 229, 255, 0.1)',
-                          border: '1px solid rgba(0, 229, 255, 0.3)',
-                          color: '#00e5ff',
+                          backgroundColor: '#F1F5F9',
+                          border: '1px solid #E2E8F0',
+                          color: '#185ADB',
                           fontFamily: '"JetBrains Mono", monospace',
                           fontSize: '0.74rem',
                           fontWeight: 700,
@@ -1198,7 +1242,7 @@ export default function IcrastBadgePage() {
                         title="Tap to copy Delegate ID"
                       >
                         <span>{delegate.delegateId || 'ICRAST26-DELEGATE'}</span>
-                        {copiedId ? <Check size={12} color="#4ade80" /> : <Copy size={12} opacity={0.7} />}
+                        {copiedId ? <Check size={12} color="#10B981" /> : <Copy size={12} opacity={0.6} />}
                       </div>
                     </div>
                   </div>
@@ -1211,26 +1255,27 @@ export default function IcrastBadgePage() {
                       gap: '0.65rem',
                       marginTop: '1.25rem',
                       paddingTop: '1.1rem',
-                      borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                      borderTop: '1px solid #F1F5F9',
                     }}
                   >
                     {/* Chip 1: Registration Status */}
                     <div
                       style={{
-                        backgroundColor: 'rgba(6, 16, 32, 0.75)',
+                        backgroundColor: '#F8FAFC',
                         borderRadius: '12px',
                         padding: '0.65rem',
                         textAlign: 'center',
+                        border: '1px solid #EAEFF5',
                       }}
                     >
-                      <div style={{ fontSize: '0.65rem', color: 'rgba(255, 255, 255, 0.5)', fontWeight: 600 }}>
+                      <div style={{ fontSize: '0.65rem', color: '#64748B', fontWeight: 700 }}>
                         CHECK-IN
                       </div>
                       <div
                         style={{
                           fontSize: '0.78rem',
                           fontWeight: 700,
-                          color: isCheckedIn ? '#4ade80' : '#facc15',
+                          color: isCheckedIn ? '#16A34A' : '#D97706',
                           marginTop: '2px',
                         }}
                       >
@@ -1241,16 +1286,17 @@ export default function IcrastBadgePage() {
                     {/* Chip 2: Mode */}
                     <div
                       style={{
-                        backgroundColor: 'rgba(6, 16, 32, 0.75)',
+                        backgroundColor: '#F8FAFC',
                         borderRadius: '12px',
                         padding: '0.65rem',
                         textAlign: 'center',
+                        border: '1px solid #EAEFF5',
                       }}
                     >
-                      <div style={{ fontSize: '0.65rem', color: 'rgba(255, 255, 255, 0.5)', fontWeight: 600 }}>
+                      <div style={{ fontSize: '0.65rem', color: '#64748B', fontWeight: 700 }}>
                         ENTRY MODE
                       </div>
-                      <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#93c5fd', marginTop: '2px' }}>
+                      <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#185ADB', marginTop: '2px' }}>
                         {delegate.participationMode?.includes('Online') ? 'Online' : 'On-Campus'}
                       </div>
                     </div>
@@ -1258,28 +1304,28 @@ export default function IcrastBadgePage() {
                     {/* Chip 3: Venue Hall */}
                     <div
                       style={{
-                        backgroundColor: 'rgba(6, 16, 32, 0.75)',
+                        backgroundColor: '#F8FAFC',
                         borderRadius: '12px',
                         padding: '0.65rem',
                         textAlign: 'center',
+                        border: '1px solid #EAEFF5',
                       }}
                     >
-                      <div style={{ fontSize: '0.65rem', color: 'rgba(255, 255, 255, 0.5)', fontWeight: 600 }}>
+                      <div style={{ fontSize: '0.65rem', color: '#64748B', fontWeight: 700 }}>
                         VENUE
                       </div>
-                      <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#d4af37', marginTop: '2px' }}>
+                      <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#123B70', marginTop: '2px' }}>
                         Aryabhata
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* 2. Grouped Inset List: Academic Details (iOS / Native style) */}
+                {/* 2. Grouped Inset List: Academic Details */}
                 <div
                   style={{
-                    backgroundColor: 'rgba(15, 23, 42, 0.85)',
-                    backdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #EAEFF5',
                     borderRadius: '20px',
                     overflow: 'hidden',
                   }}
@@ -1289,7 +1335,7 @@ export default function IcrastBadgePage() {
                       padding: '0.75rem 1rem 0.35rem',
                       fontSize: '0.7rem',
                       fontWeight: 700,
-                      color: 'rgba(255, 255, 255, 0.45)',
+                      color: '#64748B',
                       letterSpacing: '0.05em',
                       textTransform: 'uppercase',
                     }}
@@ -1304,7 +1350,7 @@ export default function IcrastBadgePage() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+                      borderBottom: '1px solid #F1F5F9',
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -1313,18 +1359,18 @@ export default function IcrastBadgePage() {
                           width: '32px',
                           height: '32px',
                           borderRadius: '8px',
-                          backgroundColor: 'rgba(59, 130, 246, 0.15)',
+                          backgroundColor: '#EDF3FA',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          color: '#93c5fd',
+                          color: '#185ADB',
                         }}
                       >
                         <Building size={16} />
                       </div>
                       <div>
-                        <div style={{ fontSize: '0.72rem', color: 'rgba(255, 255, 255, 0.5)' }}>Institution</div>
-                        <div style={{ fontSize: '0.86rem', fontWeight: 600, color: '#ffffff' }}>
+                        <div style={{ fontSize: '0.72rem', color: '#64748B' }}>Institution</div>
+                        <div style={{ fontSize: '0.86rem', fontWeight: 600, color: '#123B70' }}>
                           {delegate.institution || 'University of Calicut'}
                         </div>
                       </div>
@@ -1339,7 +1385,7 @@ export default function IcrastBadgePage() {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+                        borderBottom: '1px solid #F1F5F9',
                       }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -1348,18 +1394,18 @@ export default function IcrastBadgePage() {
                             width: '32px',
                             height: '32px',
                             borderRadius: '8px',
-                            backgroundColor: 'rgba(168, 85, 247, 0.15)',
+                            backgroundColor: '#F3E8FF',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            color: '#c084fc',
+                            color: '#9333EA',
                           }}
                         >
                           <GraduationCap size={16} />
                         </div>
                         <div>
-                          <div style={{ fontSize: '0.72rem', color: 'rgba(255, 255, 255, 0.5)' }}>Department</div>
-                          <div style={{ fontSize: '0.86rem', fontWeight: 600, color: '#ffffff' }}>
+                          <div style={{ fontSize: '0.72rem', color: '#64748B' }}>Department</div>
+                          <div style={{ fontSize: '0.86rem', fontWeight: 600, color: '#123B70' }}>
                             {delegate.department}
                           </div>
                         </div>
@@ -1383,18 +1429,18 @@ export default function IcrastBadgePage() {
                             width: '32px',
                             height: '32px',
                             borderRadius: '8px',
-                            backgroundColor: 'rgba(234, 179, 8, 0.15)',
+                            backgroundColor: '#FEF9C3',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            color: '#facc15',
+                            color: '#CA8A04',
                           }}
                         >
                           <Sparkles size={16} />
                         </div>
                         <div>
-                          <div style={{ fontSize: '0.72rem', color: 'rgba(255, 255, 255, 0.5)' }}>Research Track</div>
-                          <div style={{ fontSize: '0.86rem', fontWeight: 600, color: '#ffffff' }}>
+                          <div style={{ fontSize: '0.72rem', color: '#64748B' }}>Research Track</div>
+                          <div style={{ fontSize: '0.86rem', fontWeight: 600, color: '#123B70' }}>
                             {delegate.areaOfInterest}
                           </div>
                         </div>
@@ -1406,9 +1452,8 @@ export default function IcrastBadgePage() {
                 {/* 3. Grouped Inset List: Conference Essentials */}
                 <div
                   style={{
-                    backgroundColor: 'rgba(15, 23, 42, 0.85)',
-                    backdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #EAEFF5',
                     borderRadius: '20px',
                     overflow: 'hidden',
                   }}
@@ -1418,7 +1463,7 @@ export default function IcrastBadgePage() {
                       padding: '0.75rem 1rem 0.35rem',
                       fontSize: '0.7rem',
                       fontWeight: 700,
-                      color: 'rgba(255, 255, 255, 0.45)',
+                      color: '#64748B',
                       letterSpacing: '0.05em',
                       textTransform: 'uppercase',
                     }}
@@ -1433,7 +1478,7 @@ export default function IcrastBadgePage() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+                      borderBottom: '1px solid #F1F5F9',
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -1442,18 +1487,18 @@ export default function IcrastBadgePage() {
                           width: '32px',
                           height: '32px',
                           borderRadius: '8px',
-                          backgroundColor: 'rgba(34, 197, 94, 0.15)',
+                          backgroundColor: '#EBF8F2',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          color: '#4ade80',
+                          color: '#10B981',
                         }}
                       >
                         <Wifi size={16} />
                       </div>
                       <div>
-                        <div style={{ fontSize: '0.72rem', color: 'rgba(255, 255, 255, 0.5)' }}>Campus Guest Wi-Fi</div>
-                        <div style={{ fontSize: '0.86rem', fontWeight: 600, color: '#ffffff' }}>
+                        <div style={{ fontSize: '0.72rem', color: '#64748B' }}>Campus Guest Wi-Fi</div>
+                        <div style={{ fontSize: '0.86rem', fontWeight: 600, color: '#123B70' }}>
                           CU-Guest / Eduroam Available
                         </div>
                       </div>
@@ -1475,18 +1520,18 @@ export default function IcrastBadgePage() {
                           width: '32px',
                           height: '32px',
                           borderRadius: '8px',
-                          backgroundColor: 'rgba(0, 229, 255, 0.15)',
+                          backgroundColor: '#EDF3FA',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          color: '#00e5ff',
+                          color: '#185ADB',
                         }}
                       >
                         <Clock size={16} />
                       </div>
                       <div>
-                        <div style={{ fontSize: '0.72rem', color: 'rgba(255, 255, 255, 0.5)' }}>Conference Dates</div>
-                        <div style={{ fontSize: '0.86rem', fontWeight: 600, color: '#ffffff' }}>
+                        <div style={{ fontSize: '0.72rem', color: '#64748B' }}>Conference Dates</div>
+                        <div style={{ fontSize: '0.86rem', fontWeight: 600, color: '#123B70' }}>
                           21–22 November 2026 · Calicut University
                         </div>
                       </div>
@@ -1502,9 +1547,9 @@ export default function IcrastBadgePage() {
                     width: '100%',
                     padding: '0.9rem',
                     borderRadius: '16px',
-                    backgroundColor: 'rgba(239, 68, 68, 0.12)',
-                    border: '1px solid rgba(239, 68, 68, 0.3)',
-                    color: '#fca5a5',
+                    backgroundColor: '#FEF2F2',
+                    border: '1px solid #FECACA',
+                    color: '#DC2626',
                     fontSize: '0.9rem',
                     fontWeight: 700,
                     display: 'flex',
@@ -1514,8 +1559,8 @@ export default function IcrastBadgePage() {
                     cursor: 'pointer',
                     transition: 'all 0.15s ease',
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.22)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.12)')}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#FEE2E2')}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#FEF2F2')}
                 >
                   <LogOut size={16} />
                   <span>Log Out / Switch Mobile Number</span>
@@ -1526,7 +1571,7 @@ export default function IcrastBadgePage() {
         )}
       </main>
 
-      {/* Fixed Bottom Mobile App Navigation Bar (When Logged In) */}
+      {/* Clean White Bottom Navigation Bar - Exactly as in Mockup */}
       {delegate && (
         <nav
           className="icrast-mobile-bottom-nav"
@@ -1536,9 +1581,8 @@ export default function IcrastBadgePage() {
             left: 0,
             right: 0,
             height: '66px',
-            backgroundColor: 'rgba(5, 14, 30, 0.94)',
-            backdropFilter: 'blur(20px)',
-            borderTop: '1px solid rgba(0, 168, 255, 0.18)',
+            backgroundColor: '#ffffff',
+            borderTop: '1px solid #EAEFF5',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-around',
@@ -1546,9 +1590,10 @@ export default function IcrastBadgePage() {
             maxWidth: '580px',
             marginInline: 'auto',
             paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+            boxShadow: '0 -4px 20px rgba(18, 59, 112, 0.04)',
           }}
         >
-          {/* Tab 1: Pass */}
+          {/* Tab 1: Badge */}
           <button
             type="button"
             onClick={() => setActiveTab('pass')}
@@ -1559,32 +1604,31 @@ export default function IcrastBadgePage() {
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '4px',
               background: 'transparent',
               border: 'none',
               cursor: 'pointer',
-              color: activeTab === 'pass' ? '#00e5ff' : 'rgba(255, 255, 255, 0.45)',
+              color: activeTab === 'pass' ? '#185ADB' : '#7C8BA0',
               transition: 'all 0.15s ease',
-              position: 'relative',
             }}
           >
-            <Ticket size={21} strokeWidth={activeTab === 'pass' ? 2.5 : 1.8} />
-            <span style={{ fontSize: '0.72rem', fontWeight: activeTab === 'pass' ? 800 : 500, letterSpacing: '0.01em' }}>
-              Pass
-            </span>
-            {activeTab === 'pass' && (
-              <span
-                style={{
-                  position: 'absolute',
-                  bottom: '6px',
-                  width: '16px',
-                  height: '3px',
-                  borderRadius: '2px',
-                  backgroundColor: '#00e5ff',
-                  boxShadow: '0 0 8px #00e5ff',
-                }}
-              />
-            )}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: activeTab === 'pass' ? '4px 16px' : '4px',
+                borderRadius: '14px',
+                backgroundColor: activeTab === 'pass' ? '#E8F1FC' : 'transparent',
+                gap: '2px',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <Ticket size={20} strokeWidth={activeTab === 'pass' ? 2.5 : 1.8} />
+              <span style={{ fontSize: '0.72rem', fontWeight: activeTab === 'pass' ? 800 : 500 }}>
+                Badge
+              </span>
+            </div>
           </button>
 
           {/* Tab 2: Schedule */}
@@ -1598,35 +1642,34 @@ export default function IcrastBadgePage() {
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '4px',
               background: 'transparent',
               border: 'none',
               cursor: 'pointer',
-              color: activeTab === 'schedule' ? '#00a8ff' : 'rgba(255, 255, 255, 0.45)',
+              color: activeTab === 'schedule' ? '#185ADB' : '#7C8BA0',
               transition: 'all 0.15s ease',
-              position: 'relative',
             }}
           >
-            <Calendar size={21} strokeWidth={activeTab === 'schedule' ? 2.5 : 1.8} />
-            <span style={{ fontSize: '0.72rem', fontWeight: activeTab === 'schedule' ? 800 : 500, letterSpacing: '0.01em' }}>
-              Schedule
-            </span>
-            {activeTab === 'schedule' && (
-              <span
-                style={{
-                  position: 'absolute',
-                  bottom: '6px',
-                  width: '16px',
-                  height: '3px',
-                  borderRadius: '2px',
-                  backgroundColor: '#00a8ff',
-                  boxShadow: '0 0 8px #00a8ff',
-                }}
-              />
-            )}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: activeTab === 'schedule' ? '4px 16px' : '4px',
+                borderRadius: '14px',
+                backgroundColor: activeTab === 'schedule' ? '#E8F1FC' : 'transparent',
+                gap: '2px',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <Calendar size={20} strokeWidth={activeTab === 'schedule' ? 2.5 : 1.8} />
+              <span style={{ fontSize: '0.72rem', fontWeight: activeTab === 'schedule' ? 800 : 500 }}>
+                Schedule
+              </span>
+            </div>
           </button>
 
-          {/* Tab 3: Certificate */}
+          {/* Tab 3: Downloads / Certificates */}
           <button
             type="button"
             onClick={() => setActiveTab('certificate')}
@@ -1637,32 +1680,31 @@ export default function IcrastBadgePage() {
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '4px',
               background: 'transparent',
               border: 'none',
               cursor: 'pointer',
-              color: activeTab === 'certificate' ? '#4ade80' : 'rgba(255, 255, 255, 0.45)',
+              color: activeTab === 'certificate' ? '#185ADB' : '#7C8BA0',
               transition: 'all 0.15s ease',
-              position: 'relative',
             }}
           >
-            <Award size={21} strokeWidth={activeTab === 'certificate' ? 2.5 : 1.8} />
-            <span style={{ fontSize: '0.72rem', fontWeight: activeTab === 'certificate' ? 800 : 500, letterSpacing: '0.01em' }}>
-              Certificate
-            </span>
-            {activeTab === 'certificate' && (
-              <span
-                style={{
-                  position: 'absolute',
-                  bottom: '6px',
-                  width: '16px',
-                  height: '3px',
-                  borderRadius: '2px',
-                  backgroundColor: '#4ade80',
-                  boxShadow: '0 0 8px #4ade80',
-                }}
-              />
-            )}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: activeTab === 'certificate' ? '4px 16px' : '4px',
+                borderRadius: '14px',
+                backgroundColor: activeTab === 'certificate' ? '#E8F1FC' : 'transparent',
+                gap: '2px',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <FileText size={20} strokeWidth={activeTab === 'certificate' ? 2.5 : 1.8} />
+              <span style={{ fontSize: '0.72rem', fontWeight: activeTab === 'certificate' ? 800 : 500 }}>
+                Downloads
+              </span>
+            </div>
           </button>
 
           {/* Tab 4: Profile */}
@@ -1676,32 +1718,31 @@ export default function IcrastBadgePage() {
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '4px',
               background: 'transparent',
               border: 'none',
               cursor: 'pointer',
-              color: activeTab === 'profile' ? '#93c5fd' : 'rgba(255, 255, 255, 0.45)',
+              color: activeTab === 'profile' ? '#185ADB' : '#7C8BA0',
               transition: 'all 0.15s ease',
-              position: 'relative',
             }}
           >
-            <User size={21} strokeWidth={activeTab === 'profile' ? 2.5 : 1.8} />
-            <span style={{ fontSize: '0.72rem', fontWeight: activeTab === 'profile' ? 800 : 500, letterSpacing: '0.01em' }}>
-              Profile
-            </span>
-            {activeTab === 'profile' && (
-              <span
-                style={{
-                  position: 'absolute',
-                  bottom: '6px',
-                  width: '16px',
-                  height: '3px',
-                  borderRadius: '2px',
-                  backgroundColor: '#93c5fd',
-                  boxShadow: '0 0 8px #93c5fd',
-                }}
-              />
-            )}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: activeTab === 'profile' ? '4px 16px' : '4px',
+                borderRadius: '14px',
+                backgroundColor: activeTab === 'profile' ? '#E8F1FC' : 'transparent',
+                gap: '2px',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <User size={20} strokeWidth={activeTab === 'profile' ? 2.5 : 1.8} />
+              <span style={{ fontSize: '0.72rem', fontWeight: activeTab === 'profile' ? 800 : 500 }}>
+                Profile
+              </span>
+            </div>
           </button>
         </nav>
       )}
