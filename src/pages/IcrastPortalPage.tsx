@@ -4,12 +4,10 @@ import { Reveal } from '../components/ui/Reveal';
 import {
   IcrastLayout,
   ICRAST_PARTICIPATE_URL,
-  ICRAST_GUIDELINES_DOWNLOAD_URL,
 } from '../components/icrast/IcrastLayout';
 import {
   ArrowUpRight,
   ArrowRight,
-  Download,
   FileText,
   Presentation,
   CheckCircle2,
@@ -205,14 +203,6 @@ export default function IcrastPortalPage() {
                   >
                     <span>Register Now</span>
                   </Link>
-                  <a
-                    href={ICRAST_GUIDELINES_DOWNLOAD_URL}
-                    download="ICRAST-26-Presentation-Guidelines.pdf"
-                    className="icrast-btn icrast-btn--ghost icrast-btn--lg"
-                  >
-                    <Download size={15} />
-                    <span>Guidelines</span>
-                  </a>
                 </div>
               </div>
 
