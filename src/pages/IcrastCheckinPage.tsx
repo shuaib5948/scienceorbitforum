@@ -23,6 +23,8 @@ import {
   UserCheck,
   KeyRound,
   ShieldCheck,
+  ChevronDown,
+  Bell,
 } from 'lucide-react';
 import { Html5Qrcode } from 'html5-qrcode';
 
@@ -75,6 +77,7 @@ export default function IcrastCheckinPage() {
   const [pinInput, setPinInput] = useState('');
   const [pinVerified, setPinVerified] = useState(false);
   const [pinError, setPinError] = useState('');
+  const [showMenu, setShowMenu] = useState(false);
 
   // Mode: 'camera' or 'manual'
   const [activeMode, setActiveMode] = useState<'camera' | 'manual'>('camera');
@@ -439,7 +442,7 @@ export default function IcrastCheckinPage() {
       {/* Top Application Header Bar matching Delegate Portal */}
       <header
         style={{
-          height: '60px',
+          height: '64px',
           backgroundColor: '#ffffff',
           borderBottom: '1px solid #EAEFF5',
           boxShadow: '0 2px 10px rgba(18, 59, 112, 0.04)',
@@ -466,18 +469,18 @@ export default function IcrastCheckinPage() {
             src="/images/icrast-logo-mark.png"
             alt="ICRAST Logo"
             style={{
-              width: '32px',
-              height: '32px',
+              width: '34px',
+              height: '34px',
               objectFit: 'contain',
             }}
           />
           <div>
             <div
               style={{
-                fontSize: '0.96rem',
+                fontSize: '1.02rem',
                 fontWeight: 800,
                 color: '#123B70',
-                lineHeight: 1.1,
+                lineHeight: 1.15,
                 letterSpacing: '-0.02em',
               }}
             >
@@ -496,80 +499,141 @@ export default function IcrastCheckinPage() {
           </div>
         </Link>
 
-        {/* Right Side: Live Registration Count & Lock Button */}
+        {/* Right Action: Desk Coordinator Dropdown Menu matching Delegate Portal */}
         {pinVerified ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
-            {/* Live Registration Count Pill */}
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.45rem',
-                padding: '0.35rem 0.75rem',
-                borderRadius: '9999px',
-                backgroundColor: '#EDF3FA',
-                border: '1px solid #E2E8F0',
-                color: '#123B70',
-                fontSize: '0.78rem',
-                fontWeight: 700,
-              }}
-            >
-              <span
-                style={{
-                  width: '7px',
-                  height: '7px',
-                  borderRadius: '50%',
-                  backgroundColor: '#10B981',
-                  boxShadow: '0 0 8px #10B981',
-                  animation: 'icrast-pulse 2s infinite',
-                }}
-              />
-              <span style={{ color: '#5A6E85', fontSize: '0.74rem', fontWeight: 600 }}>Checked In:</span>
-              <strong style={{ color: '#123B70', fontFamily: 'monospace', fontSize: '0.82rem' }}>
-                {stats ? `${stats.checkedIn} / ${stats.total}` : '...'}
-              </strong>
-              <button
-                type="button"
-                onClick={() => fetchStats('2026')}
-                disabled={isFetchingStats}
-                title="Refresh Live Count"
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#185ADB',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '0 0 0 2px',
-                }}
-              >
-                <RefreshCw size={12} className={isFetchingStats ? 'animate-spin' : ''} />
-              </button>
-            </div>
-
-            {/* Lock Desk Button */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', position: 'relative' }}>
             <button
               type="button"
-              onClick={handleLock}
-              title="Lock Check-in Desk"
+              onClick={() => setShowMenu(!showMenu)}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.35rem',
-                padding: '0.38rem 0.75rem',
+                padding: '0.38rem 0.8rem',
                 borderRadius: '9999px',
-                backgroundColor: '#FEE2E2',
+                backgroundColor: '#EDF3FA',
                 border: 'none',
-                color: '#DC2626',
-                fontSize: '0.76rem',
+                color: '#123B70',
+                fontSize: '0.78rem',
                 fontWeight: 700,
                 cursor: 'pointer',
                 transition: 'all 0.15s ease',
               }}
             >
-              <LogOut size={13} />
-              <span className="hidden sm:inline">Lock</span>
+              <span>Coordinator</span>
+              <ChevronDown
+                size={14}
+                style={{
+                  transform: showMenu ? 'rotate(180deg)' : 'none',
+                  transition: 'transform 0.2s ease',
+                }}
+              />
             </button>
+
+            <button
+              type="button"
+              onClick={() => setShowMenu(!showMenu)}
+              title="Desk Menu & Options"
+              style={{
+                width: '34px',
+                height: '34px',
+                borderRadius: '50%',
+                backgroundColor: '#EDF3FA',
+                border: 'none',
+                color: '#123B70',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <Bell size={15} />
+            </button>
+
+            {/* Dropdown Menu when clicked */}
+            {showMenu && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '46px',
+                  right: 0,
+                  width: '230px',
+                  backgroundColor: '#ffffff',
+                  borderRadius: '16px',
+                  boxShadow: '0 16px 36px rgba(18, 59, 112, 0.14), 0 2px 8px rgba(0,0,0,0.06)',
+                  border: '1px solid #E2E8F0',
+                  padding: '0.85rem',
+                  zIndex: 100,
+                }}
+              >
+                <div style={{ fontSize: '0.68rem', color: '#5A6E85', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                  REGISTRATION DESK
+                </div>
+                <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#123B70', marginTop: '2px' }}>
+                  Desk Coordinator
+                </div>
+                <div
+                  style={{
+                    fontSize: '0.74rem',
+                    color: '#10B981',
+                    fontWeight: 600,
+                    marginTop: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                  }}
+                >
+                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10B981' }} />
+                  <span>PIN Verified · Desk Active</span>
+                </div>
+                <hr style={{ border: 'none', borderTop: '1px solid #F1F5F9', margin: '0.65rem 0' }} />
+                <Link
+                  to="/icrast/badge"
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    padding: '0.5rem 0.65rem',
+                    borderRadius: '8px',
+                    backgroundColor: '#F8FAFC',
+                    color: '#123B70',
+                    fontSize: '0.78rem',
+                    fontWeight: 600,
+                    textDecoration: 'none',
+                    marginBottom: '0.4rem',
+                  }}
+                >
+                  <UserCheck size={14} color="#185ADB" />
+                  <span>Switch to Delegate Portal</span>
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowMenu(false);
+                    handleLock();
+                  }}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    padding: '0.5rem 0.65rem',
+                    borderRadius: '8px',
+                    backgroundColor: '#FEF2F2',
+                    border: 'none',
+                    color: '#DC2626',
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  <LogOut size={14} />
+                  <span>Lock Check-in Desk</span>
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <Link
@@ -601,6 +665,7 @@ export default function IcrastCheckinPage() {
           alignItems: 'center',
           justifyContent: pinVerified ? 'flex-start' : 'center',
           padding: '1.25rem 1rem',
+          paddingBottom: pinVerified ? '92px' : '1.5rem',
           position: 'relative',
         }}
       >
@@ -1464,6 +1529,131 @@ export default function IcrastCheckinPage() {
           </div>
         )}
       </main>
+
+      {/* Bottom Live Attendance Dock Bar (When Unlocked) */}
+      {pinVerified && (
+        <nav
+          style={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: '70px',
+            backgroundColor: '#ffffff',
+            borderTop: '1px solid #EAEFF5',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            zIndex: 50,
+            maxWidth: '580px',
+            marginInline: 'auto',
+            padding: '0 1.25rem',
+            paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+            boxShadow: '0 -4px 20px rgba(18, 59, 112, 0.05)',
+          }}
+        >
+          {/* Left: Checked In Live Status & Count */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div
+              style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '12px',
+                backgroundColor: '#ECFDF5',
+                border: '1px solid #A7F3D0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#059669',
+                flexShrink: 0,
+              }}
+            >
+              <CheckCircle2 size={20} />
+            </div>
+            <div>
+              <div
+                style={{
+                  fontSize: '0.68rem',
+                  color: '#5A6E85',
+                  fontWeight: 700,
+                  letterSpacing: '0.04em',
+                  textTransform: 'uppercase',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                }}
+              >
+                <span
+                  style={{
+                    width: '6px',
+                    height: '6px',
+                    borderRadius: '50%',
+                    backgroundColor: '#10B981',
+                    boxShadow: '0 0 6px #10B981',
+                    animation: 'icrast-pulse 2s infinite',
+                  }}
+                />
+                <span>Checked In</span>
+              </div>
+              <div
+                style={{
+                  fontSize: '1.25rem',
+                  fontWeight: 850,
+                  color: '#123B70',
+                  lineHeight: 1.2,
+                  fontFamily: '"Plus Jakarta Sans", sans-serif',
+                }}
+              >
+                {stats ? stats.checkedIn : '1'}
+                <span style={{ fontSize: '0.88rem', fontWeight: 600, color: '#7C8BA0' }}>
+                  {' '}/ {stats ? stats.total : '32'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Percentage Pill & Refresh Button */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+            {stats && stats.total > 0 && (
+              <div
+                style={{
+                  padding: '0.3rem 0.7rem',
+                  borderRadius: '9999px',
+                  backgroundColor: '#EFF6FF',
+                  border: '1px solid #DBEAFE',
+                  color: '#185ADB',
+                  fontSize: '0.76rem',
+                  fontWeight: 700,
+                }}
+              >
+                {Math.round((stats.checkedIn / stats.total) * 100)}% Verified
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={() => fetchStats('2026')}
+              disabled={isFetchingStats}
+              title="Refresh Live Count"
+              style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '50%',
+                backgroundColor: '#EDF3FA',
+                border: 'none',
+                color: '#185ADB',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <RefreshCw size={15} className={isFetchingStats ? 'animate-spin' : ''} />
+            </button>
+          </div>
+        </nav>
+      )}
     </div>
   );
 }
