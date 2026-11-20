@@ -1520,46 +1520,63 @@ export default function IcrastBadgePage() {
                               style={{
                                 position: 'relative',
                                 display: 'flex',
-                                alignItems: 'flex-start',
-                                paddingBottom: isLast ? '0' : '1.15rem',
+                                alignItems: 'center',
+                                marginBottom: isLast ? '0' : '1rem',
                               }}
                             >
-                              {/* Connecting Line */}
-                              {!isLast && (
-                                <div
-                                  style={{
-                                    position: 'absolute',
-                                    left: '15px',
-                                    top: '30px',
-                                    bottom: 0,
-                                    width: '2px',
-                                    backgroundColor: '#E2E8F0',
-                                    borderLeft: '2px dashed #CBD5E1',
-                                  }}
-                                />
-                              )}
-
-                              {/* Break Node Icon */}
+                              {/* Spine Column: Centered to the Box */}
                               <div
                                 style={{
-                                  width: '32px',
-                                  height: '32px',
-                                  borderRadius: '50%',
-                                  backgroundColor: '#F1F5F9',
-                                  border: '2px solid #CBD5E1',
+                                  width: '20px',
+                                  flexShrink: 0,
+                                  alignSelf: 'stretch',
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
-                                  flexShrink: 0,
-                                  zIndex: 2,
-                                  color: '#64748B',
+                                  position: 'relative',
                                 }}
                               >
-                                {item.title.toLowerCase().includes('lunch') ? (
-                                  <Utensils size={14} />
-                                ) : (
-                                  <Coffee size={14} />
+                                {idx > 0 && (
+                                  <div
+                                    style={{
+                                      position: 'absolute',
+                                      top: '-0.5rem',
+                                      bottom: '50%',
+                                      left: '50%',
+                                      transform: 'translateX(-50%)',
+                                      width: '2px',
+                                      backgroundColor: '#E2E8F0',
+                                      zIndex: 1,
+                                    }}
+                                  />
                                 )}
+                                {!isLast && (
+                                  <div
+                                    style={{
+                                      position: 'absolute',
+                                      top: '50%',
+                                      bottom: '-0.5rem',
+                                      left: '50%',
+                                      transform: 'translateX(-50%)',
+                                      width: '2px',
+                                      backgroundColor: '#E2E8F0',
+                                      zIndex: 1,
+                                    }}
+                                  />
+                                )}
+
+                                {/* Compact Break Circle */}
+                                <div
+                                  style={{
+                                    width: '12px',
+                                    height: '12px',
+                                    borderRadius: '50%',
+                                    backgroundColor: '#F1F5F9',
+                                    border: '2px solid #94A3B8',
+                                    position: 'relative',
+                                    zIndex: 2,
+                                  }}
+                                />
                               </div>
 
                               {/* Break Ribbon */}
@@ -1567,6 +1584,7 @@ export default function IcrastBadgePage() {
                                 style={{
                                   marginLeft: '0.85rem',
                                   flex: 1,
+                                  minWidth: 0,
                                   backgroundColor: '#FAFBFD',
                                   border: '1px dashed #E2E8F0',
                                   borderRadius: '12px',
@@ -1584,9 +1602,17 @@ export default function IcrastBadgePage() {
                                     fontWeight: 650,
                                     color: '#475569',
                                     letterSpacing: '-0.01em',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.45rem',
                                   }}
                                 >
-                                  {item.title}
+                                  {item.title.toLowerCase().includes('lunch') ? (
+                                    <Utensils size={14} style={{ color: '#64748B' }} />
+                                  ) : (
+                                    <Coffee size={14} style={{ color: '#64748B' }} />
+                                  )}
+                                  <span>{item.title}</span>
                                 </div>
                                 <div
                                   style={{
@@ -1613,48 +1639,76 @@ export default function IcrastBadgePage() {
                             style={{
                               position: 'relative',
                               display: 'flex',
-                              alignItems: 'flex-start',
-                              paddingBottom: isLast ? '0' : '1.15rem',
+                              alignItems: 'center',
+                              marginBottom: isLast ? '0' : '1rem',
                             }}
                           >
-                            {/* Connecting Line */}
-                            {!isLast && (
-                              <div
-                                style={{
-                                  position: 'absolute',
-                                  left: '15px',
-                                  top: '30px',
-                                  bottom: 0,
-                                  width: '2px',
-                                  backgroundColor: '#E2E8F0',
-                                }}
-                              />
-                            )}
-
-                            {/* Session Node */}
+                            {/* Spine Column: Centered to the Box */}
                             <div
                               style={{
-                                width: '32px',
-                                height: '32px',
-                                borderRadius: '50%',
-                                backgroundColor: '#EFF6FF',
-                                border: '2px solid #185ADB',
+                                width: '20px',
+                                flexShrink: 0,
+                                alignSelf: 'stretch',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                flexShrink: 0,
-                                zIndex: 2,
-                                color: '#185ADB',
+                                position: 'relative',
                               }}
                             >
+                              {idx > 0 && (
+                                <div
+                                  style={{
+                                    position: 'absolute',
+                                    top: '-0.5rem',
+                                    bottom: '50%',
+                                    left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    width: '2px',
+                                    backgroundColor: '#E2E8F0',
+                                    zIndex: 1,
+                                  }}
+                                />
+                              )}
+                              {!isLast && (
+                                <div
+                                  style={{
+                                    position: 'absolute',
+                                    top: '50%',
+                                    bottom: '-0.5rem',
+                                    left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    width: '2px',
+                                    backgroundColor: '#E2E8F0',
+                                    zIndex: 1,
+                                  }}
+                                />
+                              )}
+
+                              {/* Compact Session Node Circle (Apple Style 14px with inner core & halo) */}
                               <div
                                 style={{
-                                  width: '10px',
-                                  height: '10px',
+                                  width: '14px',
+                                  height: '14px',
                                   borderRadius: '50%',
-                                  backgroundColor: '#185ADB',
+                                  backgroundColor: '#ffffff',
+                                  border: '2.5px solid #185ADB',
+                                  boxShadow: '0 0 0 3px rgba(24, 90, 219, 0.12)',
+                                  position: 'relative',
+                                  zIndex: 2,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
                                 }}
-                              />
+                              >
+                                <div
+                                  style={{
+                                    width: '4px',
+                                    height: '4px',
+                                    borderRadius: '50%',
+                                    backgroundColor: '#185ADB',
+                                  }}
+                                />
+                              </div>
                             </div>
 
                             {/* Session Card */}
@@ -1662,6 +1716,7 @@ export default function IcrastBadgePage() {
                               style={{
                                 marginLeft: '0.85rem',
                                 flex: 1,
+                                minWidth: 0,
                                 backgroundColor: '#ffffff',
                                 border: '1px solid #EAEFF5',
                                 borderRadius: '14px',
