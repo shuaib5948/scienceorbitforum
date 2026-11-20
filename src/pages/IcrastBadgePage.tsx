@@ -44,6 +44,34 @@ function normalizePhone(p: unknown): string {
   return digits.length >= 10 ? digits.slice(-10) : digits;
 }
 
+function splitCampusLines(name: string, maxLineChars = 28): string[] {
+  const str = String(name || '').trim();
+  if (str.length <= 22) return [str];
+  const words = str.split(/\s+/);
+  if (words.length <= 1) return [str];
+  const line1Words: string[] = [];
+  let line2Words: string[] = [];
+  let currentLen = 0;
+  for (let i = 0; i < words.length; i++) {
+    const word = words[i];
+    const candidateLen = currentLen === 0 ? word.length : currentLen + 1 + word.length;
+    if (candidateLen <= maxLineChars && i < words.length - 1) {
+      line1Words.push(word);
+      currentLen = candidateLen;
+    } else if (line1Words.length === 0) {
+      line1Words.push(word);
+      line2Words = words.slice(i + 1);
+      break;
+    } else {
+      line2Words = words.slice(i);
+      break;
+    }
+  }
+  const l1 = line1Words.join(' ');
+  const l2 = line2Words.join(' ');
+  return l2 ? [l1, l2] : [l1];
+}
+
 const DELEGATE_STORAGE_KEY = 'icrast_delegate_mobile_session';
 
 export default function IcrastBadgePage() {
@@ -261,19 +289,7 @@ export default function IcrastBadgePage() {
 
       // Wrap long institution name into up to 2 lines cleanly
       ctx.font = '600 16px "Plus Jakarta Sans", sans-serif';
-      const words = institutionText.split(' ');
-      const lines: string[] = [];
-      let currentLine = '';
-      for (const word of words) {
-        if ((currentLine + ' ' + word).trim().length <= 26) {
-          currentLine = (currentLine + ' ' + word).trim();
-        } else {
-          if (currentLine) lines.push(currentLine);
-          currentLine = word;
-        }
-      }
-      if (currentLine) lines.push(currentLine);
-      const displayLines = lines.slice(0, 2);
+      const displayLines = splitCampusLines(institutionText);
 
       const maxTextWidth = Math.max(...displayLines.map((l) => ctx.measureText(l).width));
       const capWidth = 32;
@@ -283,6 +299,7 @@ export default function IcrastBadgePage() {
       const totalGroupWidth = capWidth + gap + dividerWidth + gap + maxTextWidth;
       const startX = (width - totalGroupWidth) / 2;
       const centerY = 618;
+      const dividerHeight = displayLines.length > 1 ? 34 : 22;
 
       // Draw Cap Icon
       if (capImg.complete && capImg.naturalWidth > 0) {
@@ -291,7 +308,7 @@ export default function IcrastBadgePage() {
 
       // Draw Vertical Divider Line
       ctx.fillStyle = '#081e3e';
-      ctx.fillRect(startX + capWidth + gap, centerY - 14, dividerWidth, 28);
+      ctx.fillRect(startX + capWidth + gap, centerY - dividerHeight / 2, dividerWidth, dividerHeight);
 
       // Draw Institution Text Lines
       ctx.textAlign = 'left';
@@ -302,7 +319,7 @@ export default function IcrastBadgePage() {
         ctx.fillText(displayLines[0], textStartX, centerY);
       } else {
         ctx.fillText(displayLines[0], textStartX, centerY - 9);
-        ctx.fillText(displayLines[1], textStartX, centerY + 11);
+        ctx.fillText(displayLines[1], textStartX, centerY + 10);
       }
 
       // 4. Draw Scannable Vector QR Code with full border clearance
@@ -782,57 +799,67 @@ export default function IcrastBadgePage() {
                   </div>
 
                   {/* 2. Dynamic Campus / Institution with Cap Icon & Divider - Centered relative to Name */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '60.8%',
-                      left: 0,
-                      right: 0,
-                      width: '100%',
-                      margin: '0 auto',
-                      transform: 'translateY(-50%)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '0.45rem',
-                      pointerEvents: 'none',
-                      padding: '0 1rem',
-                    }}
-                  >
-                    <img
-                      src="/images/icrast-badge-cap.png"
-                      alt="Campus"
-                      style={{
-                        width: 'clamp(20px, 4.4vw, 24px)',
-                        height: 'auto',
-                        objectFit: 'contain',
-                        flexShrink: 0,
-                      }}
-                    />
-                    <div
-                      style={{
-                        width: '1.5px',
-                        height: 'clamp(18px, 3.8vw, 24px)',
-                        backgroundColor: '#081e3e',
-                        flexShrink: 0,
-                      }}
-                    />
-                    <div
-                      style={{
-                        fontFamily: '"Plus Jakarta Sans", sans-serif',
-                        fontWeight: 600,
-                        fontSize: 'clamp(0.7rem, 2.6vw, 0.85rem)',
-                        color: '#081e3e',
-                        lineHeight: 1.25,
-                        textAlign: 'left',
-                        maxHeight: '40px',
-                        overflow: 'hidden',
-                        maxWidth: '240px',
-                      }}
-                    >
-                      {delegate.institution || 'University of Calicut'}
-                    </div>
-                  </div>
+                  {(() => {
+                    const campusLines = splitCampusLines(delegate.institution || 'University of Calicut');
+                    const isTwoLines = campusLines.length > 1;
+                    return (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '60.8%',
+                          left: 0,
+                          right: 0,
+                          width: '100%',
+                          margin: '0 auto',
+                          transform: 'translateY(-50%)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '0.45rem',
+                          pointerEvents: 'none',
+                          padding: '0 1rem',
+                        }}
+                      >
+                        <img
+                          src="/images/icrast-badge-cap.png"
+                          alt="Campus"
+                          style={{
+                            width: 'clamp(20px, 4.4vw, 24px)',
+                            height: 'auto',
+                            objectFit: 'contain',
+                            flexShrink: 0,
+                          }}
+                        />
+                        <div
+                          style={{
+                            width: '1.5px',
+                            height: isTwoLines ? 'clamp(28px, 5.8vw, 34px)' : 'clamp(18px, 3.8vw, 22px)',
+                            backgroundColor: '#081e3e',
+                            flexShrink: 0,
+                          }}
+                        />
+                        <div
+                          style={{
+                            fontFamily: '"Plus Jakarta Sans", sans-serif',
+                            fontWeight: 600,
+                            fontSize: 'clamp(0.68rem, 2.4vw, 0.82rem)',
+                            color: '#081e3e',
+                            lineHeight: 1.25,
+                            textAlign: 'left',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            maxWidth: '240px',
+                          }}
+                        >
+                          {campusLines.map((line, idx) => (
+                            <span key={idx} style={{ whiteSpace: 'nowrap' }}>
+                              {line}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()}
 
                   {/* 3. Dynamic Vector SVG QR Code with full border clearance inside Cyan Rounded Frame */}
                   <div
