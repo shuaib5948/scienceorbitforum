@@ -35,6 +35,8 @@ import {
   BadgeCheck,
   Compass,
   Bell,
+  Coffee,
+  Utensils,
 } from 'lucide-react';
 
 function normalizePhone(p: unknown): string {
@@ -75,71 +77,76 @@ function splitCampusLines(name: string, maxLineChars = 28): string[] {
 const DELEGATE_STORAGE_KEY = 'icrast_delegate_mobile_session';
 
 interface ScheduleSessionItem {
+  id: string;
   time: string;
   title: string;
   subtitle?: string;
   isBreak?: boolean;
-  highlightTag?: string;
 }
 
 const CONFERENCE_SCHEDULE: ScheduleSessionItem[] = [
   {
-    time: '09:30 – 10:00 AM',
-    title: 'Registration & Delegate Check-in',
-    subtitle: 'Counter Desk Verification & Kit Dispatch',
+    id: 's1',
+    time: '09:30 AM – 10:00 AM',
+    title: 'Registration',
   },
   {
-    time: '10:00 – 10:30 AM',
+    id: 's2',
+    time: '10:00 AM – 10:30 AM',
     title: 'Inaugural Session',
-    subtitle: 'Dr. P. Raveendran · Vice Chancellor, University of Calicut',
-    highlightTag: 'Inauguration',
+    subtitle: 'Dr. P. Raveendran (Vice Chancellor)',
   },
   {
-    time: '10:30 – 11:15 AM',
+    id: 's3',
+    time: '10:30 AM – 11:15 AM',
     title: 'Invited Talk',
     subtitle: 'Dr. P. Muhammed Shafi',
   },
   {
-    time: '11:15 – 11:30 AM',
-    title: 'Morning Tea Break',
+    id: 's4',
+    time: '11:15 AM – 11:30 AM',
+    title: 'Tea Break',
     isBreak: true,
   },
   {
+    id: 's5',
     time: '11:30 AM – 01:30 PM',
     title: 'Research Paper Presentations',
-    subtitle: '8 Technical Presentations (Aryabhata Hall)',
-    highlightTag: '8 Papers',
+    subtitle: '8 Presentations',
   },
   {
-    time: '01:30 – 02:00 PM',
+    id: 's6',
+    time: '01:30 PM – 02:00 PM',
     title: 'Lunch Break',
     isBreak: true,
   },
   {
-    time: '02:00 – 02:30 PM',
-    title: 'Invited Talk (Online Session)',
-    subtitle: 'Dr. Sara Bologna · CEITEC MU, Brno, Czech Republic',
-    highlightTag: 'Online Stream',
+    id: 's7',
+    time: '02:00 PM – 02:30 PM',
+    title: 'Invited Talk',
+    subtitle: 'Dr. Sara Bologna (Online Session)',
   },
   {
-    time: '02:30 – 03:00 PM',
-    title: 'Chair Talk I',
-    subtitle: 'Dr. Deepti M · Dept. of Biotechnology, University of Calicut',
+    id: 's8',
+    time: '02:30 PM – 03:00 PM',
+    title: 'Chair Talk – I',
+    subtitle: 'Dr. Deepti M',
   },
   {
-    time: '03:00 – 03:30 PM',
-    title: 'Chair Talk II',
-    subtitle: 'Dr. Ali Muhammad K. S · Molecular Radionuclide Pharmacy',
+    id: 's9',
+    time: '03:00 PM – 03:30 PM',
+    title: 'Chair Talk – II',
+    subtitle: 'Dr. Ali Muhammad K. S',
   },
   {
-    time: '03:30 – 04:00 PM',
-    title: 'Valedictory Session',
-    subtitle: 'Best Paper Awards & Certificate Distribution',
-    highlightTag: 'Valedictory',
+    id: 's10',
+    time: '03:30 PM – 04:00 PM',
+    title: 'Valedictory Session, Certificate Distribution & Awards',
   },
   {
-    time: '04:00 – 04:30 PM',
-    title: 'Evening Tea & Academic Networking',
+    id: 's11',
+    time: '04:00 PM – 04:30 PM',
+    title: 'Evening Tea & Networking',
     isBreak: true,
   },
 ];
@@ -156,6 +163,7 @@ export default function IcrastBadgePage() {
 
   // Active Tab: pass | schedule | certificate | profile
   const [activeTab, setActiveTab] = useState<'pass' | 'schedule' | 'certificate' | 'profile'>('pass');
+  const [scheduleFilter, setScheduleFilter] = useState<'all' | 'sessions' | 'breaks'>('all');
 
   // QR Code States
   const [qrSvg, setQrSvg] = useState<string>('');
@@ -1382,212 +1390,348 @@ export default function IcrastBadgePage() {
               </div>
             )}
 
-            {/* TAB 2: SCHEDULE (Clean, Premium, Well-Arranged Timetable) */}
-            {activeTab === 'schedule' && (
-              <div
-                style={{
-                  backgroundColor: '#ffffff',
-                  borderRadius: '24px',
-                  border: '1px solid #EAEFF5',
-                  boxShadow: '0 16px 45px rgba(18, 59, 112, 0.06), 0 2px 8px rgba(0, 0, 0, 0.02)',
-                  overflow: 'hidden',
-                  width: '100%',
-                  maxWidth: '680px',
-                  margin: '0 auto',
-                }}
-              >
-                {/* Header Strip */}
+            {/* TAB 2: SCHEDULE (Connected Stepper Timeline) */}
+            {activeTab === 'schedule' && (() => {
+              const filteredSchedule = CONFERENCE_SCHEDULE.filter((item) => {
+                if (scheduleFilter === 'sessions') return !item.isBreak;
+                if (scheduleFilter === 'breaks') return item.isBreak;
+                return true;
+              });
+
+              return (
                 <div
                   style={{
-                    backgroundColor: '#F8FAFC',
-                    borderBottom: '1px solid #EAEFF5',
-                    padding: '1.25rem 1.5rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    flexWrap: 'wrap',
-                    gap: '0.65rem',
+                    backgroundColor: '#ffffff',
+                    borderRadius: '24px',
+                    border: '1px solid #EAEFF5',
+                    boxShadow: '0 16px 45px rgba(18, 59, 112, 0.06), 0 2px 8px rgba(0, 0, 0, 0.02)',
+                    overflow: 'hidden',
+                    width: '100%',
+                    maxWidth: '680px',
+                    margin: '0 auto',
                   }}
                 >
-                  <div>
-                    <h2
-                      style={{
-                        fontSize: '1.15rem',
-                        fontWeight: 850,
-                        color: '#081e3e',
-                        margin: 0,
-                        lineHeight: 1.2,
-                        letterSpacing: '-0.01em',
-                      }}
-                    >
-                      Conference Schedule
-                    </h2>
+                  {/* Header Strip with Title & Filter Controls */}
+                  <div
+                    style={{
+                      backgroundColor: '#F8FAFC',
+                      borderBottom: '1px solid #EAEFF5',
+                      padding: '1.25rem 1.5rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      flexWrap: 'wrap',
+                      gap: '0.75rem',
+                    }}
+                  >
+                    <div>
+                      <h2
+                        style={{
+                          fontSize: '1.15rem',
+                          fontWeight: 850,
+                          color: '#081e3e',
+                          margin: 0,
+                          lineHeight: 1.2,
+                          letterSpacing: '-0.01em',
+                        }}
+                      >
+                        Conference Schedule
+                      </h2>
+                    </div>
+
+                    {/* Filter Tabs */}
                     <div
                       style={{
-                        fontSize: '0.8rem',
-                        color: '#5A6E85',
-                        fontWeight: 600,
-                        marginTop: '3px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        backgroundColor: '#EDF2F7',
+                        padding: '3px',
+                        borderRadius: '12px',
+                        gap: '2px',
                       }}
                     >
-                      Saturday, 21 November 2026 · Aryabhata Hall
+                      <button
+                        type="button"
+                        onClick={() => setScheduleFilter('all')}
+                        style={{
+                          padding: '0.35rem 0.75rem',
+                          borderRadius: '9px',
+                          fontSize: '0.76rem',
+                          fontWeight: 700,
+                          border: 'none',
+                          backgroundColor: scheduleFilter === 'all' ? '#ffffff' : 'transparent',
+                          color: scheduleFilter === 'all' ? '#185ADB' : '#64748B',
+                          boxShadow: scheduleFilter === 'all' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease',
+                        }}
+                      >
+                        All (11)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setScheduleFilter('sessions')}
+                        style={{
+                          padding: '0.35rem 0.75rem',
+                          borderRadius: '9px',
+                          fontSize: '0.76rem',
+                          fontWeight: 700,
+                          border: 'none',
+                          backgroundColor: scheduleFilter === 'sessions' ? '#ffffff' : 'transparent',
+                          color: scheduleFilter === 'sessions' ? '#185ADB' : '#64748B',
+                          boxShadow: scheduleFilter === 'sessions' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease',
+                        }}
+                      >
+                        Sessions (8)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setScheduleFilter('breaks')}
+                        style={{
+                          padding: '0.35rem 0.75rem',
+                          borderRadius: '9px',
+                          fontSize: '0.76rem',
+                          fontWeight: 700,
+                          border: 'none',
+                          backgroundColor: scheduleFilter === 'breaks' ? '#ffffff' : 'transparent',
+                          color: scheduleFilter === 'breaks' ? '#185ADB' : '#64748B',
+                          boxShadow: scheduleFilter === 'breaks' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease',
+                        }}
+                      >
+                        Breaks (3)
+                      </button>
                     </div>
                   </div>
 
-                  <div
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.35rem',
-                      padding: '0.28rem 0.65rem',
-                      borderRadius: '9999px',
-                      backgroundColor: '#EDF3FA',
-                      border: '1px solid #DBEAFE',
-                      color: '#185ADB',
-                      fontSize: '0.74rem',
-                      fontWeight: 700,
-                    }}
-                  >
-                    <span>Single-Day Track</span>
-                  </div>
-                </div>
+                  {/* Connected Stepper Timeline */}
+                  <div style={{ padding: '1.5rem 1.25rem' }}>
+                    <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
+                      {filteredSchedule.map((item, idx) => {
+                        const isLast = idx === filteredSchedule.length - 1;
 
-                {/* Schedule Item Rows */}
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  {CONFERENCE_SCHEDULE.map((item, idx) => {
-                    const isLast = idx === CONFERENCE_SCHEDULE.length - 1;
-
-                    if (item.isBreak) {
-                      return (
-                        <div
-                          key={idx}
-                          style={{
-                            padding: '0.75rem 1.5rem',
-                            backgroundColor: '#FAFBFD',
-                            borderBottom: isLast ? 'none' : '1px solid #F1F5F9',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '1rem',
-                          }}
-                        >
-                          <div
-                            style={{
-                              width: '145px',
-                              flexShrink: 0,
-                              fontFamily: '"JetBrains Mono", monospace',
-                              fontSize: '0.78rem',
-                              fontWeight: 600,
-                              color: '#7C8BA0',
-                            }}
-                          >
-                            {item.time}
-                          </div>
-                          <div
-                            style={{
-                              fontSize: '0.84rem',
-                              fontWeight: 600,
-                              fontStyle: 'italic',
-                              color: '#64748B',
-                            }}
-                          >
-                            {item.title}
-                          </div>
-                        </div>
-                      );
-                    }
-
-                    return (
-                      <div
-                        key={idx}
-                        style={{
-                          padding: '1.05rem 1.5rem',
-                          backgroundColor: '#ffffff',
-                          borderBottom: isLast ? 'none' : '1px solid #F1F5F9',
-                          display: 'flex',
-                          alignItems: 'flex-start',
-                          gap: '1rem',
-                        }}
-                      >
-                        <div
-                          style={{
-                            width: '145px',
-                            flexShrink: 0,
-                            fontFamily: '"JetBrains Mono", monospace',
-                            fontSize: '0.8rem',
-                            fontWeight: 700,
-                            color: '#185ADB',
-                            lineHeight: 1.35,
-                          }}
-                        >
-                          {item.time}
-                        </div>
-
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div
-                            style={{
-                              fontSize: '0.94rem',
-                              fontWeight: 850,
-                              color: '#081e3e',
-                              lineHeight: 1.3,
-                              display: 'flex',
-                              alignItems: 'center',
-                              flexWrap: 'wrap',
-                              gap: '0.45rem',
-                            }}
-                          >
-                            <span>{item.title}</span>
-                            {item.highlightTag && (
-                              <span
-                                style={{
-                                  fontSize: '0.68rem',
-                                  fontWeight: 700,
-                                  padding: '0.12rem 0.5rem',
-                                  borderRadius: '6px',
-                                  backgroundColor: '#EDF3FA',
-                                  color: '#185ADB',
-                                  letterSpacing: '0.02em',
-                                }}
-                              >
-                                {item.highlightTag}
-                              </span>
-                            )}
-                          </div>
-
-                          {item.subtitle && (
+                        if (item.isBreak) {
+                          return (
                             <div
+                              key={item.id}
                               style={{
-                                fontSize: '0.82rem',
-                                color: '#5A6E85',
-                                fontWeight: 500,
-                                marginTop: '0.22rem',
-                                lineHeight: 1.4,
+                                position: 'relative',
+                                display: 'flex',
+                                alignItems: 'flex-start',
+                                paddingBottom: isLast ? '0' : '1.15rem',
                               }}
                             >
-                              {item.subtitle}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                              {/* Connecting Line */}
+                              {!isLast && (
+                                <div
+                                  style={{
+                                    position: 'absolute',
+                                    left: '15px',
+                                    top: '30px',
+                                    bottom: 0,
+                                    width: '2px',
+                                    backgroundColor: '#E2E8F0',
+                                    borderLeft: '2px dashed #CBD5E1',
+                                  }}
+                                />
+                              )}
 
-                {/* Footer Note */}
-                <div
-                  style={{
-                    padding: '0.85rem 1.5rem',
-                    backgroundColor: '#F8FAFC',
-                    borderTop: '1px solid #EAEFF5',
-                    fontSize: '0.78rem',
-                    color: '#64748B',
-                    textAlign: 'center',
-                    fontWeight: 500,
-                  }}
-                >
-                  Please arrive 15 minutes before your scheduled presentation or session slot.
+                              {/* Break Node Icon */}
+                              <div
+                                style={{
+                                  width: '32px',
+                                  height: '32px',
+                                  borderRadius: '50%',
+                                  backgroundColor: '#F1F5F9',
+                                  border: '2px solid #CBD5E1',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  flexShrink: 0,
+                                  zIndex: 2,
+                                  color: '#64748B',
+                                }}
+                              >
+                                {item.title.toLowerCase().includes('lunch') ? (
+                                  <Utensils size={14} />
+                                ) : (
+                                  <Coffee size={14} />
+                                )}
+                              </div>
+
+                              {/* Break Ribbon */}
+                              <div
+                                style={{
+                                  marginLeft: '0.85rem',
+                                  flex: 1,
+                                  backgroundColor: '#FAFBFD',
+                                  border: '1px dashed #E2E8F0',
+                                  borderRadius: '12px',
+                                  padding: '0.65rem 0.95rem',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'space-between',
+                                  flexWrap: 'wrap',
+                                  gap: '0.5rem',
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    fontSize: '0.86rem',
+                                    fontWeight: 650,
+                                    color: '#475569',
+                                    letterSpacing: '-0.01em',
+                                  }}
+                                >
+                                  {item.title}
+                                </div>
+                                <div
+                                  style={{
+                                    fontFamily: '"JetBrains Mono", monospace',
+                                    fontSize: '0.78rem',
+                                    fontWeight: 600,
+                                    color: '#64748B',
+                                    backgroundColor: '#F1F5F9',
+                                    padding: '0.2rem 0.5rem',
+                                    borderRadius: '6px',
+                                  }}
+                                >
+                                  {item.time}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        }
+
+                        // Regular Session Card
+                        return (
+                          <div
+                            key={item.id}
+                            style={{
+                              position: 'relative',
+                              display: 'flex',
+                              alignItems: 'flex-start',
+                              paddingBottom: isLast ? '0' : '1.15rem',
+                            }}
+                          >
+                            {/* Connecting Line */}
+                            {!isLast && (
+                              <div
+                                style={{
+                                  position: 'absolute',
+                                  left: '15px',
+                                  top: '30px',
+                                  bottom: 0,
+                                  width: '2px',
+                                  backgroundColor: '#E2E8F0',
+                                }}
+                              />
+                            )}
+
+                            {/* Session Node */}
+                            <div
+                              style={{
+                                width: '32px',
+                                height: '32px',
+                                borderRadius: '50%',
+                                backgroundColor: '#EFF6FF',
+                                border: '2px solid #185ADB',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0,
+                                zIndex: 2,
+                                color: '#185ADB',
+                              }}
+                            >
+                              <div
+                                style={{
+                                  width: '10px',
+                                  height: '10px',
+                                  borderRadius: '50%',
+                                  backgroundColor: '#185ADB',
+                                }}
+                              />
+                            </div>
+
+                            {/* Session Card */}
+                            <div
+                              style={{
+                                marginLeft: '0.85rem',
+                                flex: 1,
+                                backgroundColor: '#ffffff',
+                                border: '1px solid #EAEFF5',
+                                borderRadius: '14px',
+                                padding: '0.85rem 1rem',
+                                boxShadow: '0 2px 6px rgba(18, 59, 112, 0.04)',
+                              }}
+                            >
+                              <div
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'space-between',
+                                  flexWrap: 'wrap',
+                                  gap: '0.35rem',
+                                  marginBottom: '0.35rem',
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    fontFamily: '"JetBrains Mono", monospace',
+                                    fontSize: '0.78rem',
+                                    fontWeight: 700,
+                                    color: '#185ADB',
+                                    backgroundColor: '#EDF3FA',
+                                    padding: '0.2rem 0.55rem',
+                                    borderRadius: '6px',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '0.35rem',
+                                  }}
+                                >
+                                  <Clock size={12} />
+                                  <span>{item.time}</span>
+                                </div>
+                              </div>
+
+                              <div
+                                style={{
+                                  fontSize: '0.94rem',
+                                  fontWeight: 800,
+                                  color: '#081e3e',
+                                  lineHeight: 1.3,
+                                  letterSpacing: '-0.01em',
+                                }}
+                              >
+                                {item.title}
+                              </div>
+
+                              {item.subtitle && (
+                                <div
+                                  style={{
+                                    fontSize: '0.82rem',
+                                    color: '#475569',
+                                    fontWeight: 550,
+                                    marginTop: '0.25rem',
+                                    lineHeight: 1.35,
+                                  }}
+                                >
+                                  {item.subtitle}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* TAB 3: CERTIFICATES / DOWNLOADS (Clean Minimal Card State) */}
             {activeTab === 'certificate' && (
