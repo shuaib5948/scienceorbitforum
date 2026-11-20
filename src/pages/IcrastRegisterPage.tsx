@@ -11,6 +11,8 @@ import {
   User,
   Building,
   Radio,
+  Ticket,
+  ArrowRight,
 } from 'lucide-react';
 import {
   ATTENDEE_DESIGNATION_OPTIONS,
@@ -179,30 +181,71 @@ export default function IcrastRegisterPage() {
                   </span>
                 </div>
 
-                <div className="membership-success-actions">
-                  <Link to="/icrast" className="icrast-btn icrast-btn--red icrast-btn--lg">
-                    <span>Return to Conference Portal</span>
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSubmitSuccess(false);
-                      setFullName('');
-                      setEmail('');
-                      setPhone('');
-                      setCountry('India');
-                      setInstitution('');
-                      setDepartment('');
-                      setDesignation(ATTENDEE_DESIGNATION_OPTIONS[0]);
-                      setParticipationMode(PARTICIPATION_MODES[0]);
-                      setAreaOfInterest(PARTICIPATION_AREAS_OF_INTEREST[0]);
-                      setConfirmAccurate(false);
-                      setAgreeUpdates(false);
+                <div className="membership-success-actions" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%', maxWidth: '380px', marginInline: 'auto' }}>
+                  <Link
+                    to={phone ? `/icrast/delegate?phone=${phone.replace(/\D/g, '').slice(-10)}` : '/icrast/delegate'}
+                    className="icrast-btn icrast-btn--lg"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.55rem',
+                      backgroundColor: '#185ADB',
+                      color: '#ffffff',
+                      borderRadius: '12px',
+                      fontWeight: 700,
+                      boxShadow: '0 8px 24px rgba(24, 90, 219, 0.25)',
+                      textDecoration: 'none',
+                      width: '100%',
                     }}
-                    className="icrast-btn icrast-btn--outline-navy icrast-btn--lg"
                   >
-                    <span>Register Another Participant</span>
-                  </button>
+                    <Ticket size={18} />
+                    <span>Open My Digital Badge Pass</span>
+                    <ArrowRight size={16} />
+                  </Link>
+
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', marginTop: '0.25rem' }}>
+                    <Link
+                      to="/icrast"
+                      style={{
+                        fontSize: '0.84rem',
+                        color: '#64748B',
+                        textDecoration: 'none',
+                        fontWeight: 600,
+                      }}
+                    >
+                      Return to Home
+                    </Link>
+                    <span style={{ color: '#CBD5E1' }}>•</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSubmitSuccess(false);
+                        setFullName('');
+                        setEmail('');
+                        setPhone('');
+                        setCountry('India');
+                        setInstitution('');
+                        setDepartment('');
+                        setDesignation(ATTENDEE_DESIGNATION_OPTIONS[0]);
+                        setParticipationMode(PARTICIPATION_MODES[0]);
+                        setAreaOfInterest(PARTICIPATION_AREAS_OF_INTEREST[0]);
+                        setConfirmAccurate(false);
+                        setAgreeUpdates(false);
+                      }}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        fontSize: '0.84rem',
+                        color: '#185ADB',
+                        cursor: 'pointer',
+                        fontWeight: 600,
+                        padding: 0,
+                      }}
+                    >
+                      Register another
+                    </button>
+                  </div>
                 </div>
               </div>
             </Reveal>
