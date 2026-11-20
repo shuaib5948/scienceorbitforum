@@ -235,7 +235,7 @@ export default function IcrastBadgePage() {
       });
       ctx.drawImage(templateImg, 0, 0, width, height);
 
-      // 2. Dynamic Candidate Full Name (Centered at x = 341, y = 542, large prominent font)
+      // 2. Dynamic Candidate Full Name (Centered at x = 341, y = 556, large prominent font with clean gap below DELEGATE banner)
       ctx.fillStyle = '#081e3e';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -247,9 +247,9 @@ export default function IcrastBadgePage() {
       } else {
         ctx.font = 'bold 44px "Plus Jakarta Sans", sans-serif';
       }
-      ctx.fillText(fullName, 341, 542);
+      ctx.fillText(fullName, 341, 556);
 
-      // 3. Dynamic Campus / Institution with Cap Icon & Divider
+      // 3. Dynamic Campus / Institution with Cap Icon & Divider (Centered relative to Name)
       const institutionText = String(delegate.institution || 'University of Calicut').trim();
       const capImg = new Image();
       capImg.crossOrigin = 'anonymous';
@@ -278,11 +278,11 @@ export default function IcrastBadgePage() {
       const maxTextWidth = Math.max(...displayLines.map((l) => ctx.measureText(l).width));
       const capWidth = 32;
       const capHeight = 24;
-      const gap = 10;
+      const gap = 8;
       const dividerWidth = 1.5;
       const totalGroupWidth = capWidth + gap + dividerWidth + gap + maxTextWidth;
       const startX = (width - totalGroupWidth) / 2;
-      const centerY = 604;
+      const centerY = 618;
 
       // Draw Cap Icon
       if (capImg.complete && capImg.naturalWidth > 0) {
@@ -305,7 +305,7 @@ export default function IcrastBadgePage() {
         ctx.fillText(displayLines[1], textStartX, centerY + 11);
       }
 
-      // 4. Draw Scannable Vector QR Code into the Official Cyan Rounded Frame
+      // 4. Draw Scannable Vector QR Code with full border clearance
       const qrImg = new Image();
       qrImg.crossOrigin = 'anonymous';
       await new Promise<void>((resolve) => {
@@ -314,10 +314,11 @@ export default function IcrastBadgePage() {
         qrImg.src = qrSource;
       });
 
-      // Official cyan box is centered at x = 350, y = 760 with ~174px width & height
-      const qrSize = 174;
-      const qrX = 350 - qrSize / 2;
-      const qrY = 760 - qrSize / 2;
+      // Cyan box is centered at x = 341, y = 764 (bounds: x: 231..450, y: 661..866)
+      // qrSize of 162 leaves a clean ~28px margin so all 4 cyan stroke borders are 100% visible
+      const qrSize = 162;
+      const qrX = 341 - qrSize / 2;
+      const qrY = 764 - qrSize / 2;
       ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
 
       // 5. Trigger High-Resolution Download
@@ -751,13 +752,13 @@ export default function IcrastBadgePage() {
                     userSelect: 'none',
                   }}
                 >
-                  {/* 1. Dynamic Candidate Full Name - Prominent & Large */}
+                  {/* 1. Dynamic Candidate Full Name - Prominent & Large with extra gap after DELEGATE */}
                   <div
                     style={{
                       position: 'absolute',
-                      top: '52.8%',
-                      left: '5%',
-                      right: '5%',
+                      top: '54.5%',
+                      left: '4%',
+                      right: '4%',
                       textAlign: 'center',
                       transform: 'translateY(-50%)',
                       pointerEvents: 'none',
@@ -780,26 +781,29 @@ export default function IcrastBadgePage() {
                     </div>
                   </div>
 
-                  {/* 2. Dynamic Campus / Institution with Cap Icon & Divider */}
+                  {/* 2. Dynamic Campus / Institution with Cap Icon & Divider - Centered relative to Name */}
                   <div
                     style={{
                       position: 'absolute',
-                      top: '59.0%',
-                      left: '7%',
-                      right: '7%',
+                      top: '60.8%',
+                      left: 0,
+                      right: 0,
+                      width: '100%',
+                      margin: '0 auto',
                       transform: 'translateY(-50%)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       gap: '0.45rem',
                       pointerEvents: 'none',
+                      padding: '0 1rem',
                     }}
                   >
                     <img
                       src="/images/icrast-badge-cap.png"
                       alt="Campus"
                       style={{
-                        width: 'clamp(20px, 4.5vw, 24px)',
+                        width: 'clamp(20px, 4.4vw, 24px)',
                         height: 'auto',
                         objectFit: 'contain',
                         flexShrink: 0,
@@ -817,27 +821,27 @@ export default function IcrastBadgePage() {
                       style={{
                         fontFamily: '"Plus Jakarta Sans", sans-serif',
                         fontWeight: 600,
-                        fontSize: 'clamp(0.68rem, 2.5vw, 0.82rem)',
+                        fontSize: 'clamp(0.7rem, 2.6vw, 0.85rem)',
                         color: '#081e3e',
                         lineHeight: 1.25,
                         textAlign: 'left',
                         maxHeight: '40px',
                         overflow: 'hidden',
-                        maxWidth: '220px',
+                        maxWidth: '240px',
                       }}
                     >
                       {delegate.institution || 'University of Calicut'}
                     </div>
                   </div>
 
-                  {/* 3. Dynamic Vector SVG QR Code in the Official Cyan Rounded Frame */}
+                  {/* 3. Dynamic Vector SVG QR Code with full border clearance inside Cyan Rounded Frame */}
                   <div
                     style={{
                       position: 'absolute',
-                      top: '74.2%',
-                      left: '51.3%',
+                      top: '74.6%',
+                      left: '50.0%',
                       transform: 'translate(-50%, -50%)',
-                      width: '25.5%',
+                      width: '23.8%',
                       aspectRatio: '1 / 1',
                       display: 'flex',
                       alignItems: 'center',
