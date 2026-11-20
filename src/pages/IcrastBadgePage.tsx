@@ -235,17 +235,17 @@ export default function IcrastBadgePage() {
       });
       ctx.drawImage(templateImg, 0, 0, width, height);
 
-      // 2. Dynamic Candidate Full Name (Centered at x = 341, y = 542)
+      // 2. Dynamic Candidate Full Name (Centered at x = 341, y = 542, large prominent font)
       ctx.fillStyle = '#081e3e';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       const fullName = String(delegate.fullName || '').trim();
       if (fullName.length > 28) {
-        ctx.font = 'bold 24px "Plus Jakarta Sans", sans-serif';
-      } else if (fullName.length > 22) {
-        ctx.font = 'bold 28px "Plus Jakarta Sans", sans-serif';
+        ctx.font = 'bold 30px "Plus Jakarta Sans", sans-serif';
+      } else if (fullName.length > 20) {
+        ctx.font = 'bold 36px "Plus Jakarta Sans", sans-serif';
       } else {
-        ctx.font = 'bold 34px "Plus Jakarta Sans", sans-serif';
+        ctx.font = 'bold 44px "Plus Jakarta Sans", sans-serif';
       }
       ctx.fillText(fullName, 341, 542);
 
@@ -751,13 +751,13 @@ export default function IcrastBadgePage() {
                     userSelect: 'none',
                   }}
                 >
-                  {/* 1. Dynamic Candidate Full Name */}
+                  {/* 1. Dynamic Candidate Full Name - Prominent & Large */}
                   <div
                     style={{
                       position: 'absolute',
                       top: '52.8%',
-                      left: '6%',
-                      right: '6%',
+                      left: '5%',
+                      right: '5%',
                       textAlign: 'center',
                       transform: 'translateY(-50%)',
                       pointerEvents: 'none',
@@ -766,14 +766,14 @@ export default function IcrastBadgePage() {
                     <div
                       style={{
                         fontFamily: '"Plus Jakarta Sans", sans-serif',
-                        fontWeight: 800,
-                        fontSize: 'clamp(1.05rem, 4.3vw, 1.42rem)',
+                        fontWeight: 850,
+                        fontSize: 'clamp(1.35rem, 5.6vw, 1.85rem)',
                         color: '#081e3e',
-                        letterSpacing: '-0.015em',
-                        lineHeight: 1.18,
+                        letterSpacing: '-0.02em',
+                        lineHeight: 1.15,
                         textOverflow: 'ellipsis',
                         overflow: 'hidden',
-                        whiteSpace: delegate.fullName && delegate.fullName.length > 28 ? 'normal' : 'nowrap',
+                        whiteSpace: delegate.fullName && delegate.fullName.length > 24 ? 'normal' : 'nowrap',
                       }}
                     >
                       {delegate.fullName}
@@ -882,7 +882,7 @@ export default function IcrastBadgePage() {
                 </div>
 
                 {/* Primary Solid Navy/Blue Download Button */}
-                <div style={{ width: '100%', maxWidth: '380px', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <div style={{ width: '100%', maxWidth: '380px' }}>
                   <button
                     type="button"
                     onClick={handleDownloadBadgeImage}
@@ -919,239 +919,117 @@ export default function IcrastBadgePage() {
                       </>
                     )}
                   </button>
-
-                  {/* Verification Status Pill - Exactly as in the mockup */}
-                  <div
-                    style={{
-                      padding: '0.82rem 1.1rem',
-                      borderRadius: '16px',
-                      backgroundColor: '#EBF8F2',
-                      border: '1px solid #D1F2DF',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.75rem',
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: '28px',
-                        height: '28px',
-                        borderRadius: '50%',
-                        backgroundColor: '#10B981',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: '#ffffff',
-                        flexShrink: 0,
-                      }}
-                    >
-                      <Check size={16} strokeWidth={3} />
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div
-                        style={{
-                          fontSize: '0.88rem',
-                          fontWeight: 800,
-                          color: '#0D5D3B',
-                          letterSpacing: '-0.01em',
-                          lineHeight: 1.25,
-                        }}
-                      >
-                        {isCheckedIn ? 'Attendance Verified' : 'Registration Confirmed'}
-                      </div>
-                      <div
-                        onClick={handleCopyId}
-                        style={{
-                          fontSize: '0.74rem',
-                          color: '#4A6B5D',
-                          marginTop: '1px',
-                          fontFamily: '"JetBrains Mono", monospace',
-                          cursor: 'pointer',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                        }}
-                        title="Tap to copy"
-                      >
-                        <span>Delegate ID: {delegate.delegateId || 'ICRAST26-D-0487'}</span>
-                        {copiedId ? <Check size={11} color="#10B981" /> : <Copy size={11} opacity={0.5} />}
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             )}
 
-            {/* TAB 2: SCHEDULE (Upcoming Conference Timetable) */}
+            {/* TAB 2: SCHEDULE (Clean Minimal Empty State) */}
             {activeTab === 'schedule' && (
               <div
                 style={{
-                  backgroundColor: '#ffffff',
-                  border: '1px solid #EAEFF5',
-                  borderRadius: '24px',
-                  padding: '2.2rem 1.5rem',
+                  padding: '4.5rem 1.5rem 2rem',
                   textAlign: 'center',
-                  boxShadow: '0 16px 40px rgba(18, 59, 112, 0.08)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  maxWidth: '380px',
+                  margin: '0 auto',
                 }}
               >
                 <div
                   style={{
-                    width: '64px',
-                    height: '64px',
-                    borderRadius: '20px',
-                    backgroundColor: '#EDF3FA',
+                    width: '68px',
+                    height: '68px',
+                    borderRadius: '50%',
+                    backgroundColor: '#E8F1FC',
                     color: '#185ADB',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    margin: '0 auto 1.25rem',
+                    marginBottom: '1.25rem',
                   }}
                 >
-                  <Calendar size={30} />
+                  <Calendar size={32} strokeWidth={1.8} />
                 </div>
 
-                <div
+                <h3
                   style={{
-                    display: 'inline-block',
-                    padding: '0.3rem 0.85rem',
-                    borderRadius: '9999px',
-                    backgroundColor: '#EDF3FA',
+                    fontSize: '1.25rem',
+                    fontWeight: 800,
                     color: '#123B70',
-                    fontSize: '0.74rem',
-                    fontWeight: 700,
-                    marginBottom: '0.85rem',
-                    letterSpacing: '0.04em',
-                    fontFamily: '"JetBrains Mono", monospace',
+                    marginBottom: '0.45rem',
+                    letterSpacing: '-0.01em',
                   }}
                 >
-                  TIMETABLE RELEASING 20 NOV 2026
-                </div>
-
-                <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#123B70', marginBottom: '0.5rem', letterSpacing: '-0.01em' }}>
-                  Conference Schedule &amp; Oral Tracks
+                  Schedule Releasing Soon
                 </h3>
+
                 <p
                   style={{
                     fontSize: '0.88rem',
                     color: '#5A6E85',
-                    maxWidth: '440px',
-                    margin: '0 auto 1.75rem',
                     lineHeight: 1.55,
+                    margin: 0,
                   }}
                 >
-                  The complete oral presentation slots, keynote schedules, and hall allocations will be published here 24 hours prior to Day 1.
+                  Conference session timetable, oral presentation tracks, and hall allocations will be published here 24 hours prior to Day 1.
                 </p>
-
-                <div
-                  style={{
-                    backgroundColor: '#F8FAFC',
-                    border: '1px solid #E2E8F0',
-                    borderRadius: '16px',
-                    padding: '1.25rem',
-                    textAlign: 'left',
-                    fontSize: '0.85rem',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0.65rem',
-                  }}
-                >
-                  <div style={{ color: '#185ADB', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    <MapPin size={15} />
-                    <span>Official Venue:</span>
-                  </div>
-                  <div style={{ color: '#334155', lineHeight: 1.45 }}>
-                    Aryabhata Hall, Department of Physics &amp; Campus Auditorium, University of Calicut, Thenhipalam, Kerala 673635.
-                  </div>
-                </div>
               </div>
             )}
 
-            {/* TAB 3: CERTIFICATES / DOWNLOADS (Verified E-Certificate Desk) */}
+            {/* TAB 3: CERTIFICATES / DOWNLOADS (Clean Minimal Empty State) */}
             {activeTab === 'certificate' && (
               <div
                 style={{
-                  backgroundColor: '#ffffff',
-                  border: isCheckedIn ? '1px solid #D1F2DF' : '1px solid #EAEFF5',
-                  borderRadius: '24px',
-                  padding: '2.2rem 1.5rem',
+                  padding: '4.5rem 1.5rem 2rem',
                   textAlign: 'center',
-                  boxShadow: '0 16px 40px rgba(18, 59, 112, 0.08)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  maxWidth: '380px',
+                  margin: '0 auto',
                 }}
               >
                 <div
                   style={{
-                    width: '64px',
-                    height: '64px',
-                    borderRadius: '20px',
-                    backgroundColor: isCheckedIn ? '#EBF8F2' : '#F1F5F9',
-                    color: isCheckedIn ? '#10B981' : '#64748B',
+                    width: '68px',
+                    height: '68px',
+                    borderRadius: '50%',
+                    backgroundColor: '#E8F1FC',
+                    color: '#185ADB',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    margin: '0 auto 1.25rem',
+                    marginBottom: '1.25rem',
                   }}
                 >
-                  {isCheckedIn ? <Award size={32} /> : <Lock size={28} />}
+                  <Award size={32} strokeWidth={1.8} />
                 </div>
 
-                <div
+                <h3
                   style={{
-                    display: 'inline-block',
-                    padding: '0.3rem 0.85rem',
-                    borderRadius: '9999px',
-                    backgroundColor: isCheckedIn ? '#EBF8F2' : '#F1F5F9',
-                    color: isCheckedIn ? '#0D5D3B' : '#64748B',
-                    fontSize: '0.74rem',
-                    fontWeight: 700,
-                    marginBottom: '0.85rem',
-                    letterSpacing: '0.04em',
-                    fontFamily: '"JetBrains Mono", monospace',
+                    fontSize: '1.25rem',
+                    fontWeight: 800,
+                    color: '#123B70',
+                    marginBottom: '0.45rem',
+                    letterSpacing: '-0.01em',
                   }}
                 >
-                  {isCheckedIn ? 'ATTENDANCE VERIFIED ✓' : 'LOCKED UNTIL CHECK-IN'}
-                </div>
-
-                <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#123B70', marginBottom: '0.5rem', letterSpacing: '-0.01em' }}>
-                  Official E-Certificate Desk
+                  Certificates Available Soon
                 </h3>
+
                 <p
                   style={{
                     fontSize: '0.88rem',
                     color: '#5A6E85',
-                    maxWidth: '440px',
-                    margin: '0 auto 1.75rem',
                     lineHeight: 1.55,
+                    margin: 0,
                   }}
                 >
-                  {isCheckedIn
-                    ? 'Your conference participation certificate is queued and will be generated with authorized Calicut University signatures post-conference.'
-                    : 'To prevent proxy participation, certificates are unlocked only after your QR pass is verified at the registration counter on conference day.'}
+                  Authorized e-certificates of participation and presentation will be available for download here post-conference.
                 </p>
-
-                <div
-                  style={{
-                    backgroundColor: '#F8FAFC',
-                    border: '1px solid #E2E8F0',
-                    borderRadius: '16px',
-                    padding: '1.1rem',
-                    textAlign: 'left',
-                    fontSize: '0.82rem',
-                    color: '#334155',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0.45rem',
-                  }}
-                >
-                  <div style={{ fontWeight: 700, color: '#123B70' }}>
-                    Candidate: {delegate.fullName}
-                  </div>
-                  <div style={{ fontFamily: '"JetBrains Mono", monospace', color: '#185ADB' }}>
-                    ID: {delegate.delegateId || 'ICRAST26-DELEGATE'}
-                  </div>
-                  <div style={{ color: isCheckedIn ? '#166534' : '#D97706', fontWeight: 600 }}>
-                    Status: {isCheckedIn ? 'Checked in at registration counter ✓' : 'Pending in-person check-in'}
-                  </div>
-                </div>
               </div>
             )}
 
@@ -1449,97 +1327,7 @@ export default function IcrastBadgePage() {
                   )}
                 </div>
 
-                {/* 3. Grouped Inset List: Conference Essentials */}
-                <div
-                  style={{
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #EAEFF5',
-                    borderRadius: '20px',
-                    overflow: 'hidden',
-                  }}
-                >
-                  <div
-                    style={{
-                      padding: '0.75rem 1rem 0.35rem',
-                      fontSize: '0.7rem',
-                      fontWeight: 700,
-                      color: '#64748B',
-                      letterSpacing: '0.05em',
-                      textTransform: 'uppercase',
-                    }}
-                  >
-                    Conference Assistance
-                  </div>
-
-                  {/* Row: Campus Wi-Fi */}
-                  <div
-                    style={{
-                      padding: '0.85rem 1rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      borderBottom: '1px solid #F1F5F9',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                      <div
-                        style={{
-                          width: '32px',
-                          height: '32px',
-                          borderRadius: '8px',
-                          backgroundColor: '#EBF8F2',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: '#10B981',
-                        }}
-                      >
-                        <Wifi size={16} />
-                      </div>
-                      <div>
-                        <div style={{ fontSize: '0.72rem', color: '#64748B' }}>Campus Guest Wi-Fi</div>
-                        <div style={{ fontSize: '0.86rem', fontWeight: 600, color: '#123B70' }}>
-                          CU-Guest / Eduroam Available
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Row: Conference Dates */}
-                  <div
-                    style={{
-                      padding: '0.85rem 1rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                      <div
-                        style={{
-                          width: '32px',
-                          height: '32px',
-                          borderRadius: '8px',
-                          backgroundColor: '#EDF3FA',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: '#185ADB',
-                        }}
-                      >
-                        <Clock size={16} />
-                      </div>
-                      <div>
-                        <div style={{ fontSize: '0.72rem', color: '#64748B' }}>Conference Dates</div>
-                        <div style={{ fontSize: '0.86rem', fontWeight: 600, color: '#123B70' }}>
-                          21–22 November 2026 · Calicut University
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 4. Destructive Logout Button */}
+                {/* 3. Destructive Logout Button */}
                 <button
                   type="button"
                   onClick={handleLogout}
