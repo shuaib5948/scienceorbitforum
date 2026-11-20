@@ -1,6 +1,6 @@
 import { useState, useEffect, type ReactNode } from 'react';
 import { Link, useLocation } from '@tanstack/react-router';
-import { ArrowUpRight, Mail, MapPin, Phone, Menu, X } from 'lucide-react';
+import { ArrowUpRight, Mail, MapPin, Phone, Menu, X, Ticket } from 'lucide-react';
 
 /**
  * Direct Google Forms links for Submit Abstract and Register Free.
@@ -61,6 +61,7 @@ export function IcrastLayout({ children }: IcrastLayoutProps) {
   const submitPath = isSubdomain ? '/submit' : '/icrast/submit';
   const registerPath = isSubdomain ? '/register' : '/icrast/register';
   const fullPaperPath = isSubdomain ? '/full-paper' : '/icrast/full-paper';
+  const delegatePath = isSubdomain ? '/delegate' : '/icrast/delegate';
 
   return (
     <div className="icrast-portal">
@@ -123,6 +124,27 @@ export function IcrastLayout({ children }: IcrastLayoutProps) {
 
           {/* Primary Action Buttons on Desktop */}
           <div className="icrast-topbar__actions">
+            <Link
+              to={delegatePath}
+              className="icrast-btn"
+              style={{
+                backgroundColor: '#185ADB',
+                color: '#ffffff',
+                border: 'none',
+                padding: '0.42rem 0.85rem',
+                borderRadius: '8px',
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                boxShadow: '0 2px 8px rgba(24, 90, 219, 0.2)',
+                textDecoration: 'none',
+              }}
+            >
+              <Ticket size={14} />
+              <span>Delegate Pass</span>
+            </Link>
             <Link
               to={fullPaperPath}
               className="icrast-btn icrast-btn--primary"
@@ -208,6 +230,26 @@ export function IcrastLayout({ children }: IcrastLayoutProps) {
 
               {/* Action buttons placed inside the hamburger menu */}
               <div className="icrast-mobile-menu__action">
+                <Link
+                  to={delegatePath}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="icrast-btn icrast-mobile-menu__btn"
+                  style={{
+                    backgroundColor: '#185ADB',
+                    color: '#ffffff',
+                    border: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.45rem',
+                    fontWeight: 700,
+                    marginBottom: '0.5rem',
+                    textDecoration: 'none',
+                  }}
+                >
+                  <Ticket size={16} />
+                  <span>Open Delegate Pass (Badge)</span>
+                </Link>
                 <Link
                   to={fullPaperPath}
                   onClick={() => setMobileMenuOpen(false)}

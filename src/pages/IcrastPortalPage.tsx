@@ -12,6 +12,7 @@ import {
   Presentation,
   CheckCircle2,
   Users,
+  Ticket,
 } from 'lucide-react';
 
 const RESEARCH_THEMES = [
@@ -189,7 +190,7 @@ export default function IcrastPortalPage() {
                 </p>
 
                 {/* 3. Action Buttons */}
-                <div className="icrast-hero__ctas">
+                <div className="icrast-hero__ctas" style={{ flexWrap: 'wrap' }}>
                   <Link
                     to="/icrast/full-paper"
                     className="icrast-btn icrast-btn--red icrast-btn--lg"
@@ -202,6 +203,24 @@ export default function IcrastPortalPage() {
                     className="icrast-btn icrast-btn--outline-blue icrast-btn--lg"
                   >
                     <span>Register Now</span>
+                  </Link>
+                  <Link
+                    to="/icrast/delegate"
+                    className="icrast-btn icrast-btn--lg"
+                    style={{
+                      backgroundColor: '#185ADB',
+                      color: '#ffffff',
+                      border: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.45rem',
+                      fontWeight: 700,
+                      boxShadow: '0 4px 14px rgba(24, 90, 219, 0.25)',
+                      textDecoration: 'none',
+                    }}
+                  >
+                    <Ticket size={17} />
+                    <span>Delegate Pass</span>
                   </Link>
                 </div>
               </div>
