@@ -1308,53 +1308,6 @@ export default function IcrastBadgePage() {
                       </div>
                     </div>
                   </div>
-
-                  {/* Card 3: Conference Venue & Reporting Instructions */}
-                  <div
-                    style={{
-                      backgroundColor: '#ffffff',
-                      border: '1px solid #EAEFF5',
-                      borderRadius: '24px',
-                      padding: '1.5rem',
-                      boxShadow: '0 16px 40px rgba(18, 59, 112, 0.06)',
-                    }}
-                  >
-                    <div style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.04em', color: '#64748B', textTransform: 'uppercase', marginBottom: '1rem' }}>
-                      CONFERENCE DATES &amp; VENUE INFORMATION
-                    </div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
-                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
-                        <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: '#EDF3FA', color: '#185ADB', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          <Calendar size={18} />
-                        </div>
-                        <div>
-                          <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>DATES</div>
-                          <div style={{ fontSize: '0.86rem', fontWeight: 700, color: '#123B70' }}>21–22 Nov 2026</div>
-                        </div>
-                      </div>
-
-                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
-                        <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: '#EDF3FA', color: '#185ADB', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          <MapPin size={18} />
-                        </div>
-                        <div>
-                          <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>VENUE</div>
-                          <div style={{ fontSize: '0.86rem', fontWeight: 700, color: '#123B70' }}>Aryabhata Hall, Calicut Univ.</div>
-                        </div>
-                      </div>
-
-                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
-                        <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: '#EDF3FA', color: '#185ADB', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          <Wifi size={18} />
-                        </div>
-                        <div>
-                          <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>CAMPUS WI-FI</div>
-                          <div style={{ fontSize: '0.86rem', fontWeight: 700, color: '#123B70' }}>CU-Guest / Eduroam</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             )}
