@@ -341,7 +341,32 @@ export default function IcrastBadgePage() {
       });
       ctx.drawImage(templateImg, 0, 0, width, height);
 
-      // 2. Dynamic Candidate Full Name (Centered at x = 341, y = 556, large prominent font with clean gap below DELEGATE banner)
+      // 1.5. Dynamic Badge Role Banner: PARTICIPANT (Centered at x = 341, y = 482)
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = '800 24px "Plus Jakarta Sans", sans-serif';
+      const roleText = 'PARTICIPANT';
+      const letterSpacing = 4.5;
+      if ('letterSpacing' in ctx) {
+        (ctx as unknown as { letterSpacing: string }).letterSpacing = `${letterSpacing}px`;
+        ctx.fillText(roleText, 341, 482);
+        (ctx as unknown as { letterSpacing: string }).letterSpacing = '0px';
+      } else {
+        let totalW = 0;
+        for (let i = 0; i < roleText.length; i++) {
+          totalW += ctx.measureText(roleText[i]).width + (i < roleText.length - 1 ? letterSpacing : 0);
+        }
+        let curX = 341 - totalW / 2;
+        for (let i = 0; i < roleText.length; i++) {
+          const char = roleText[i];
+          const charW = ctx.measureText(char).width;
+          ctx.fillText(char, curX + charW / 2, 482);
+          curX += charW + letterSpacing;
+        }
+      }
+
+      // 2. Dynamic Candidate Full Name (Centered at x = 341, y = 556, large prominent font with clean gap below PARTICIPANT banner)
       ctx.fillStyle = '#081e3e';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -417,7 +442,7 @@ export default function IcrastBadgePage() {
       ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
 
       // 5. Trigger High-Resolution Download
-      const filename = `ICRAST26-Badge-${(delegate.delegateId || 'Delegate').replace(/[^a-zA-Z0-9_-]/g, '_')}.png`;
+      const filename = `ICRAST26-Badge-${(delegate.delegateId || 'Participant').replace(/[^a-zA-Z0-9_-]/g, '_')}.png`;
 
       canvas.toBlob((blob) => {
         if (!blob) return;
@@ -1017,7 +1042,35 @@ export default function IcrastBadgePage() {
                       userSelect: 'none',
                     }}
                   >
-                    {/* 1. Dynamic Candidate Full Name - Prominent & Large with extra gap after DELEGATE */}
+                    {/* 0. Dynamic Badge Role Banner: PARTICIPANT */}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '47.07%',
+                        left: '4%',
+                        right: '4%',
+                        transform: 'translateY(-50%)',
+                        textAlign: 'center',
+                        pointerEvents: 'none',
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontFamily: '"Plus Jakarta Sans", sans-serif',
+                          fontWeight: 800,
+                          fontSize: 'clamp(0.82rem, 3.2vw, 1.08rem)',
+                          color: '#ffffff',
+                          letterSpacing: '0.22em',
+                          textTransform: 'uppercase',
+                          display: 'inline-block',
+                          paddingLeft: '0.22em',
+                        }}
+                      >
+                        PARTICIPANT
+                      </div>
+                    </div>
+
+                    {/* 1. Dynamic Candidate Full Name - Prominent & Large with extra gap after PARTICIPANT */}
                     <div
                       style={{
                         position: 'absolute',
@@ -1224,7 +1277,7 @@ export default function IcrastBadgePage() {
                     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
                       <div>
                         <div style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.06em', color: '#185ADB', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
-                          OFFICIAL CONFERENCE DELEGATE
+                          OFFICIAL CONFERENCE PARTICIPANT
                         </div>
                         <h2 style={{ fontSize: '1.85rem', fontWeight: 850, color: '#081e3e', margin: 0, lineHeight: 1.15, letterSpacing: '-0.02em' }}>
                           {delegate.fullName}
