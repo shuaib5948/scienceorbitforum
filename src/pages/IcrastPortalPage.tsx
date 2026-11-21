@@ -220,7 +220,7 @@ export default function IcrastPortalPage() {
                     }}
                   >
                     <Ticket size={17} />
-                    <span>Delegate Pass</span>
+                    <span>Participant Portal</span>
                   </Link>
                 </div>
               </div>

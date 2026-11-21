@@ -143,7 +143,7 @@ export function IcrastLayout({ children }: IcrastLayoutProps) {
               }}
             >
               <Ticket size={14} />
-              <span>Delegate Pass</span>
+              <span>Participant Portal</span>
             </Link>
             <Link
               to={fullPaperPath}
@@ -248,7 +248,7 @@ export function IcrastLayout({ children }: IcrastLayoutProps) {
                   }}
                 >
                   <Ticket size={16} />
-                  <span>Open Delegate Pass (Badge)</span>
+                  <span>Participant Portal</span>
                 </Link>
                 <Link
                   to={fullPaperPath}

@@ -816,7 +816,7 @@ export default function IcrastCheckinPage() {
                   fontWeight: 600,
                 }}
               >
-                &larr; Switch to Delegate Pass Portal
+                &larr; Switch to Participant Portal
               </Link>
             </div>
           </div>
@@ -1163,7 +1163,7 @@ export default function IcrastCheckinPage() {
                     lineHeight: 1.45,
                   }}
                 >
-                  If delegate pass cannot be scanned, enter their registered 10-digit mobile number.
+                  If participant pass cannot be scanned, enter their registered 10-digit mobile number.
                 </p>
 
                 <form

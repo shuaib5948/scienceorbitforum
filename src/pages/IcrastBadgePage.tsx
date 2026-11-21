@@ -692,7 +692,7 @@ export default function IcrastBadgePage() {
                   letterSpacing: '0.01em',
                 }}
               >
-                Delegate Portal
+                Participant Portal
               </div>
             </div>
           </Link>
@@ -943,7 +943,7 @@ export default function IcrastBadgePage() {
                 letterSpacing: '-0.02em',
               }}
             >
-              Attendee Pass Portal
+              Participant Portal
             </h1>
             <p
               style={{
