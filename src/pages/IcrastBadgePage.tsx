@@ -7,36 +7,24 @@ import {
   type DelegateLookupResult,
 } from '../types/icrast';
 import {
-  QrCode,
   Ticket,
-  Calendar,
   Award,
-  User,
   Download,
   LogOut,
   Building,
   GraduationCap,
-  MapPin,
-  Clock,
   CheckCircle2,
   AlertCircle,
   RefreshCw,
   Search,
   Lock,
-  Sparkles,
   Phone,
-  FileText,
-  Wifi,
-  ChevronRight,
   ChevronDown,
   Copy,
   Check,
-  ShieldCheck,
   BadgeCheck,
-  Compass,
   Bell,
-  Coffee,
-  Utensils,
+  X,
 } from 'lucide-react';
 
 function normalizePhone(p: unknown): string {
@@ -76,81 +64,6 @@ function splitCampusLines(name: string, maxLineChars = 28): string[] {
 
 const DELEGATE_STORAGE_KEY = 'icrast_delegate_mobile_session';
 
-interface ScheduleSessionItem {
-  id: string;
-  time: string;
-  title: string;
-  subtitle?: string;
-  isBreak?: boolean;
-}
-
-const CONFERENCE_SCHEDULE: ScheduleSessionItem[] = [
-  {
-    id: 's1',
-    time: '09:30 AM – 10:00 AM',
-    title: 'Registration',
-  },
-  {
-    id: 's2',
-    time: '10:00 AM – 10:30 AM',
-    title: 'Inaugural Session',
-    subtitle: 'Dr. P. Raveendran (Vice Chancellor)',
-  },
-  {
-    id: 's3',
-    time: '10:30 AM – 11:15 AM',
-    title: 'Invited Talk',
-    subtitle: 'Dr. P. Muhammed Shafi',
-  },
-  {
-    id: 's4',
-    time: '11:15 AM – 11:30 AM',
-    title: 'Tea Break',
-    isBreak: true,
-  },
-  {
-    id: 's5',
-    time: '11:30 AM – 01:30 PM',
-    title: 'Research Paper Presentations',
-    subtitle: '8 Presentations',
-  },
-  {
-    id: 's6',
-    time: '01:30 PM – 02:00 PM',
-    title: 'Lunch Break',
-    isBreak: true,
-  },
-  {
-    id: 's7',
-    time: '02:00 PM – 02:30 PM',
-    title: 'Invited Talk',
-    subtitle: 'Dr. Sara Bologna (Online Session)',
-  },
-  {
-    id: 's8',
-    time: '02:30 PM – 03:00 PM',
-    title: 'Chair Talk – I',
-    subtitle: 'Dr. Deepti M',
-  },
-  {
-    id: 's9',
-    time: '03:00 PM – 03:30 PM',
-    title: 'Chair Talk – II',
-    subtitle: 'Dr. Ali Muhammad K. S',
-  },
-  {
-    id: 's10',
-    time: '03:30 PM – 04:00 PM',
-    title: 'Valedictory Session, Certificate Distribution & Awards',
-  },
-  {
-    id: 's11',
-    time: '04:00 PM – 04:30 PM',
-    title: 'Evening Tea & Networking',
-    isBreak: true,
-  },
-];
-
 export default function IcrastBadgePage() {
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
@@ -161,9 +74,14 @@ export default function IcrastBadgePage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [delegate, setDelegate] = useState<DelegateLookupResult | null>(null);
 
-  // Active Tab: pass | schedule | certificate | profile
-  const [activeTab, setActiveTab] = useState<'pass' | 'schedule' | 'certificate' | 'profile'>('pass');
-  const [scheduleFilter, setScheduleFilter] = useState<'all' | 'sessions' | 'breaks'>('all');
+  // Active Option: pass (Badge Pass) | certificate (Certificate of Participation)
+  const [activeTab, setActiveTab] = useState<'pass' | 'certificate'>('pass');
+
+  // Certificate States & Ref
+  const [isCertDownloading, setIsCertDownloading] = useState(false);
+  const [isCertRendering, setIsCertRendering] = useState(false);
+  const [showCertModal, setShowCertModal] = useState(false);
+  const certCanvasRef = useRef<HTMLCanvasElement>(null);
 
   // QR Code States
   const [qrSvg, setQrSvg] = useState<string>('');
@@ -464,7 +382,184 @@ export default function IcrastBadgePage() {
     }
   };
 
-  const isCheckedIn = delegate?.checkinStatus === 'Checked In';
+  const renderCertificateToCanvas = async (canvas: HTMLCanvasElement, delegateData: DelegateLookupResult) => {
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const width = 3508;
+    const height = 2481;
+    canvas.width = width;
+    canvas.height = height;
+
+    // 1. Draw Official Certificate Template
+    const templateImg = new Image();
+    templateImg.crossOrigin = 'anonymous';
+    await new Promise<void>((resolve, reject) => {
+      templateImg.onload = () => resolve();
+      templateImg.onerror = () => reject(new Error('Certificate template load failed'));
+      templateImg.src = '/images/icrast-certificate-template.png';
+    });
+    ctx.drawImage(templateImg, 0, 0, width, height);
+
+    // Preload Sora fonts
+    try {
+      await Promise.all([
+        document.fonts.load('800 68px "Sora"'),
+        document.fonts.load('700 64px "Sora"'),
+        document.fonts.load('400 58px "Sora"'),
+      ]);
+    } catch {}
+
+    const nameText = (delegateData.fullName || 'Participant Name').trim();
+    const collegeText = (delegateData.institution || 'University of Calicut').trim();
+
+    // 2. Render Continuous Natural Flow Typeset Paragraph - Bold & commanding presentation font size
+    const normalFont = '400 58px "Sora", sans-serif';
+    const nameFont = '800 68px "Sora", sans-serif';
+    const collegeFont = '700 64px "Sora", sans-serif';
+
+    const normalColor = '#334155';
+    const highlightColor = '#081e3e';
+
+    interface TextToken {
+      word: string;
+      font: string;
+      color: string;
+    }
+
+    const tokens: TextToken[] = [];
+    const addSegment = (text: string, font: string, color: string) => {
+      const words = text.split(/\s+/).filter(Boolean);
+      for (const w of words) {
+        tokens.push({ word: w, font, color });
+      }
+    };
+
+    addSegment('This is to certify that', normalFont, normalColor);
+    addSegment(nameText, nameFont, highlightColor);
+    addSegment('of', normalFont, normalColor);
+    addSegment(collegeText, collegeFont, highlightColor);
+    addSegment(
+      'participated in the International Conference on Recent Advancements in Science and Technology (ICRAST-26), organized by Science Orbit Forum, held on November 21, 2026, at Aryabhatta Hall, University of Calicut.',
+      normalFont,
+      normalColor
+    );
+
+    const spaceWidths: Record<string, number> = {};
+    const getSpaceW = (font: string) => {
+      if (!spaceWidths[font]) {
+        ctx.font = font;
+        spaceWidths[font] = ctx.measureText(' ').width;
+      }
+      return spaceWidths[font];
+    };
+
+    interface MeasuredToken extends TextToken {
+      width: number;
+    }
+
+    const measured: MeasuredToken[] = tokens.map((t) => {
+      ctx.font = t.font;
+      return { ...t, width: ctx.measureText(t.word).width };
+    });
+
+    const maxWidth = 3140;
+    const lines: MeasuredToken[][] = [];
+    let currentLine: MeasuredToken[] = [];
+    let currentLineWidth = 0;
+
+    for (const t of measured) {
+      const spaceW = currentLine.length > 0 ? getSpaceW(t.font) : 0;
+      if (currentLine.length > 0 && currentLineWidth + spaceW + t.width > maxWidth) {
+        lines.push(currentLine);
+        currentLine = [t];
+        currentLineWidth = t.width;
+      } else {
+        currentLine.push(t);
+        currentLineWidth += spaceW + t.width;
+      }
+    }
+    if (currentLine.length > 0) {
+      lines.push(currentLine);
+    }
+
+    const centerX = 1754;
+    const lineHeight = 116;
+    const totalH = (lines.length - 1) * lineHeight;
+    const computedStartY = 1340 - totalH / 2;
+
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'left';
+
+    lines.forEach((lineTokens, lineIdx) => {
+      let totalLineW = 0;
+      lineTokens.forEach((t, i) => {
+        totalLineW += t.width;
+        if (i < lineTokens.length - 1) {
+          totalLineW += getSpaceW(t.font);
+        }
+      });
+
+      let currentX = centerX - totalLineW / 2;
+      const currentY = computedStartY + lineIdx * lineHeight;
+
+      lineTokens.forEach((t, i) => {
+        ctx.font = t.font;
+        ctx.fillStyle = t.color;
+        ctx.fillText(t.word, currentX, currentY);
+        currentX += t.width;
+        if (i < lineTokens.length - 1) {
+          currentX += getSpaceW(t.font);
+        }
+      });
+    });
+  };
+
+  const isCheckedIn = (delegate?.checkinStatus || '').trim().toLowerCase() === 'checked in';
+
+  // Auto-render certificate canvas whenever Certificate Tab is active and attendee is Checked In
+  useEffect(() => {
+    if (activeTab === 'certificate' && delegate && isCheckedIn && certCanvasRef.current) {
+      setIsCertRendering(true);
+      renderCertificateToCanvas(certCanvasRef.current, delegate).finally(() => {
+        setIsCertRendering(false);
+      });
+    }
+  }, [activeTab, delegate, isCheckedIn]);
+
+  const handleDownloadCertificate = async () => {
+    if (isCertDownloading || !delegate || !isCheckedIn) return;
+    setIsCertDownloading(true);
+
+    try {
+      let canvas = certCanvasRef.current;
+      if (!canvas || canvas.width !== 3508) {
+        canvas = document.createElement('canvas');
+        await renderCertificateToCanvas(canvas, delegate);
+      }
+
+      const nameText = (delegate.fullName || 'Participant').trim();
+      const filename = `ICRAST26-Certificate-${nameText.replace(/[^a-zA-Z0-9_-]/g, '_')}.png`;
+
+      canvas.toBlob((blob) => {
+        if (!blob) return;
+        const blobUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 2000);
+      }, 'image/png');
+
+      trackEvent('icrast_delegate_portal', 'download_certificate', delegate.delegateId || 'unknown');
+    } catch (err) {
+      console.error('Certificate generation failed:', err);
+    } finally {
+      setIsCertDownloading(false);
+    }
+  };
 
   return (
     <div
@@ -519,9 +614,6 @@ export default function IcrastBadgePage() {
           .icrast-desktop-nav {
             display: none !important;
           }
-          .icrast-bottom-nav {
-            display: flex !important;
-          }
           .icrast-portal-container {
             max-width: 480px !important;
           }
@@ -536,6 +628,10 @@ export default function IcrastBadgePage() {
             flex-direction: column !important;
             align-items: center !important;
             width: 100% !important;
+          }
+          .icrast-cert-card {
+            padding: 0.85rem !important;
+            border-radius: 18px !important;
           }
         }
       `}</style>
@@ -611,12 +707,12 @@ export default function IcrastBadgePage() {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '0.45rem',
-                  padding: '0.45rem 0.95rem',
+                  padding: '0.45rem 1rem',
                   borderRadius: '12px',
                   border: 'none',
                   backgroundColor: activeTab === 'pass' ? '#EDF3FA' : 'transparent',
                   color: activeTab === 'pass' ? '#185ADB' : '#5A6E85',
-                  fontSize: '0.82rem',
+                  fontSize: '0.84rem',
                   fontWeight: activeTab === 'pass' ? 800 : 600,
                   cursor: 'pointer',
                   transition: 'all 0.15s ease',
@@ -628,68 +724,24 @@ export default function IcrastBadgePage() {
 
               <button
                 type="button"
-                onClick={() => setActiveTab('schedule')}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.45rem',
-                  padding: '0.45rem 0.95rem',
-                  borderRadius: '12px',
-                  border: 'none',
-                  backgroundColor: activeTab === 'schedule' ? '#EDF3FA' : 'transparent',
-                  color: activeTab === 'schedule' ? '#185ADB' : '#5A6E85',
-                  fontSize: '0.82rem',
-                  fontWeight: activeTab === 'schedule' ? 800 : 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                <Calendar size={16} strokeWidth={activeTab === 'schedule' ? 2.5 : 1.8} />
-                <span>Schedule</span>
-              </button>
-
-              <button
-                type="button"
                 onClick={() => setActiveTab('certificate')}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '0.45rem',
-                  padding: '0.45rem 0.95rem',
+                  padding: '0.45rem 1rem',
                   borderRadius: '12px',
                   border: 'none',
                   backgroundColor: activeTab === 'certificate' ? '#EDF3FA' : 'transparent',
                   color: activeTab === 'certificate' ? '#185ADB' : '#5A6E85',
-                  fontSize: '0.82rem',
+                  fontSize: '0.84rem',
                   fontWeight: activeTab === 'certificate' ? 800 : 600,
                   cursor: 'pointer',
                   transition: 'all 0.15s ease',
                 }}
               >
-                <FileText size={16} strokeWidth={activeTab === 'certificate' ? 2.5 : 1.8} />
-                <span>Downloads</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setActiveTab('profile')}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.45rem',
-                  padding: '0.45rem 0.95rem',
-                  borderRadius: '12px',
-                  border: 'none',
-                  backgroundColor: activeTab === 'profile' ? '#EDF3FA' : 'transparent',
-                  color: activeTab === 'profile' ? '#185ADB' : '#5A6E85',
-                  fontSize: '0.82rem',
-                  fontWeight: activeTab === 'profile' ? 800 : 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                <User size={16} strokeWidth={activeTab === 'profile' ? 2.5 : 1.8} />
-                <span>Profile</span>
+                <Award size={16} strokeWidth={activeTab === 'certificate' ? 2.5 : 1.8} />
+                <span>Certificate</span>
               </button>
             </nav>
           )}
@@ -840,7 +892,7 @@ export default function IcrastBadgePage() {
           flex: 1,
           overflowY: 'auto',
           padding: '1.25rem 1rem',
-          paddingBottom: delegate ? '88px' : '1.5rem',
+          paddingBottom: '2.5rem',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -1016,7 +1068,74 @@ export default function IcrastBadgePage() {
         ) : (
           /* Authenticated Delegate Portal View */
           <div className="icrast-portal-container" style={{ width: '100%', margin: '0 auto' }}>
-            {/* TAB 1: PASS / TICKET (Hero Digital Badge with Desktop 2-Column Split) */}
+            {/* Direct 2-Option Selector: Badge Pass vs Certificate */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '0.3rem',
+                backgroundColor: '#ffffff',
+                border: '1px solid #E2E8F0',
+                borderRadius: '16px',
+                maxWidth: '360px',
+                width: '100%',
+                margin: '0 auto 1.5rem',
+                boxShadow: '0 2px 10px rgba(18, 59, 112, 0.04)',
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setActiveTab('pass')}
+                style={{
+                  flex: 1,
+                  padding: '0.62rem 1rem',
+                  borderRadius: '12px',
+                  border: 'none',
+                  backgroundColor: activeTab === 'pass' ? '#185ADB' : 'transparent',
+                  color: activeTab === 'pass' ? '#ffffff' : '#5A6E85',
+                  fontWeight: 750,
+                  fontSize: '0.88rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.45rem',
+                  cursor: 'pointer',
+                  boxShadow: activeTab === 'pass' ? '0 4px 12px rgba(24, 90, 219, 0.22)' : 'none',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <Ticket size={16} strokeWidth={activeTab === 'pass' ? 2.5 : 2} />
+                <span>Badge Pass</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab('certificate')}
+                style={{
+                  flex: 1,
+                  padding: '0.62rem 1rem',
+                  borderRadius: '12px',
+                  border: 'none',
+                  backgroundColor: activeTab === 'certificate' ? '#185ADB' : 'transparent',
+                  color: activeTab === 'certificate' ? '#ffffff' : '#5A6E85',
+                  fontWeight: 750,
+                  fontSize: '0.88rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.45rem',
+                  cursor: 'pointer',
+                  boxShadow: activeTab === 'certificate' ? '0 4px 12px rgba(24, 90, 219, 0.22)' : 'none',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <Award size={16} strokeWidth={activeTab === 'certificate' ? 2.5 : 2} />
+                <span>Certificate</span>
+              </button>
+            </div>
+
+            {/* OPTION 1: PASS / TICKET (Hero Digital Badge with Desktop 2-Column Split) */}
             {activeTab === 'pass' && (
               <div className="icrast-desktop-split">
                 {/* Left Column: Official Portrait Ticket Card */}
@@ -1242,12 +1361,12 @@ export default function IcrastBadgePage() {
                       {isDownloading ? (
                         <>
                           <RefreshCw size={18} className="animate-spin" />
-                          <span>Generating High-Res Badge...</span>
+                          <span>Downloading...</span>
                         </>
                       ) : (
                         <>
                           <Download size={18} />
-                          <span>Download Digital Badge (PNG)</span>
+                          <span>Download Badge</span>
                         </>
                       )}
                     </button>
@@ -1364,18 +1483,15 @@ export default function IcrastBadgePage() {
                         {isDownloading ? (
                           <>
                             <RefreshCw size={20} className="animate-spin" />
-                            <span>Generating Print-Quality Badge (1364x2048)...</span>
+                            <span>Downloading...</span>
                           </>
                         ) : (
                           <>
                             <Download size={20} />
-                            <span>Download Digital Badge (High-Resolution PNG)</span>
+                            <span>Download Badge</span>
                           </>
                         )}
                       </button>
-                      <p style={{ fontSize: '0.78rem', color: '#64748B', marginTop: '0.6rem', textAlign: 'center', marginInline: 'auto' }}>
-                        Retina-quality printable badge pass with encrypted QR for on-campus verification at Aryabhata Hall.
-                      </p>
                     </div>
                   </div>
 
@@ -1443,985 +1559,454 @@ export default function IcrastBadgePage() {
               </div>
             )}
 
-            {/* TAB 2: SCHEDULE (Connected Stepper Timeline) */}
-            {activeTab === 'schedule' && (() => {
-              const filteredSchedule = CONFERENCE_SCHEDULE.filter((item) => {
-                if (scheduleFilter === 'sessions') return !item.isBreak;
-                if (scheduleFilter === 'breaks') return item.isBreak;
-                return true;
-              });
-
-              return (
-                <div
-                  style={{
-                    backgroundColor: '#ffffff',
-                    borderRadius: '24px',
-                    border: '1px solid #EAEFF5',
-                    boxShadow: '0 16px 45px rgba(18, 59, 112, 0.06), 0 2px 8px rgba(0, 0, 0, 0.02)',
-                    overflow: 'hidden',
-                    width: '100%',
-                    maxWidth: '680px',
-                    margin: '0 auto',
-                  }}
-                >
-                  {/* Header Strip with Title & Filter Controls */}
-                  <div
-                    style={{
-                      backgroundColor: '#F8FAFC',
-                      borderBottom: '1px solid #EAEFF5',
-                      padding: '1.25rem 1.5rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      flexWrap: 'wrap',
-                      gap: '0.75rem',
-                    }}
-                  >
-                    <div>
-                      <h2
-                        style={{
-                          fontSize: '1.15rem',
-                          fontWeight: 850,
-                          color: '#081e3e',
-                          margin: 0,
-                          lineHeight: 1.2,
-                          letterSpacing: '-0.01em',
-                        }}
-                      >
-                        Conference Schedule
-                      </h2>
-                    </div>
-
-                    {/* Filter Tabs */}
-                    <div
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        backgroundColor: '#EDF2F7',
-                        padding: '3px',
-                        borderRadius: '12px',
-                        gap: '2px',
-                      }}
-                    >
-                      <button
-                        type="button"
-                        onClick={() => setScheduleFilter('all')}
-                        style={{
-                          padding: '0.35rem 0.75rem',
-                          borderRadius: '9px',
-                          fontSize: '0.76rem',
-                          fontWeight: 700,
-                          border: 'none',
-                          backgroundColor: scheduleFilter === 'all' ? '#ffffff' : 'transparent',
-                          color: scheduleFilter === 'all' ? '#185ADB' : '#64748B',
-                          boxShadow: scheduleFilter === 'all' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
-                          cursor: 'pointer',
-                          transition: 'all 0.15s ease',
-                        }}
-                      >
-                        All (11)
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setScheduleFilter('sessions')}
-                        style={{
-                          padding: '0.35rem 0.75rem',
-                          borderRadius: '9px',
-                          fontSize: '0.76rem',
-                          fontWeight: 700,
-                          border: 'none',
-                          backgroundColor: scheduleFilter === 'sessions' ? '#ffffff' : 'transparent',
-                          color: scheduleFilter === 'sessions' ? '#185ADB' : '#64748B',
-                          boxShadow: scheduleFilter === 'sessions' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
-                          cursor: 'pointer',
-                          transition: 'all 0.15s ease',
-                        }}
-                      >
-                        Sessions (8)
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setScheduleFilter('breaks')}
-                        style={{
-                          padding: '0.35rem 0.75rem',
-                          borderRadius: '9px',
-                          fontSize: '0.76rem',
-                          fontWeight: 700,
-                          border: 'none',
-                          backgroundColor: scheduleFilter === 'breaks' ? '#ffffff' : 'transparent',
-                          color: scheduleFilter === 'breaks' ? '#185ADB' : '#64748B',
-                          boxShadow: scheduleFilter === 'breaks' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
-                          cursor: 'pointer',
-                          transition: 'all 0.15s ease',
-                        }}
-                      >
-                        Breaks (3)
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Connected Stepper Timeline */}
-                  <div style={{ padding: '1.5rem 1.25rem' }}>
-                    <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
-                      {filteredSchedule.map((item, idx) => {
-                        const isLast = idx === filteredSchedule.length - 1;
-
-                        if (item.isBreak) {
-                          return (
-                            <div
-                              key={item.id}
-                              style={{
-                                position: 'relative',
-                                display: 'flex',
-                                alignItems: 'center',
-                                marginBottom: isLast ? '0' : '1rem',
-                              }}
-                            >
-                              {/* Spine Column: Centered to the Box */}
-                              <div
-                                style={{
-                                  width: '20px',
-                                  flexShrink: 0,
-                                  alignSelf: 'stretch',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  position: 'relative',
-                                }}
-                              >
-                                {idx > 0 && (
-                                  <div
-                                    style={{
-                                      position: 'absolute',
-                                      top: '-0.5rem',
-                                      bottom: '50%',
-                                      left: '50%',
-                                      transform: 'translateX(-50%)',
-                                      width: '2px',
-                                      backgroundColor: '#E2E8F0',
-                                      zIndex: 1,
-                                    }}
-                                  />
-                                )}
-                                {!isLast && (
-                                  <div
-                                    style={{
-                                      position: 'absolute',
-                                      top: '50%',
-                                      bottom: '-0.5rem',
-                                      left: '50%',
-                                      transform: 'translateX(-50%)',
-                                      width: '2px',
-                                      backgroundColor: '#E2E8F0',
-                                      zIndex: 1,
-                                    }}
-                                  />
-                                )}
-
-                                {/* Compact Break Circle */}
-                                <div
-                                  style={{
-                                    width: '12px',
-                                    height: '12px',
-                                    borderRadius: '50%',
-                                    backgroundColor: '#F1F5F9',
-                                    border: '2px solid #94A3B8',
-                                    position: 'relative',
-                                    zIndex: 2,
-                                  }}
-                                />
-                              </div>
-
-                              {/* Break Ribbon */}
-                              <div
-                                style={{
-                                  marginLeft: '0.85rem',
-                                  flex: 1,
-                                  minWidth: 0,
-                                  backgroundColor: '#FAFBFD',
-                                  border: '1px dashed #E2E8F0',
-                                  borderRadius: '12px',
-                                  padding: '0.65rem 0.95rem',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'space-between',
-                                  flexWrap: 'wrap',
-                                  gap: '0.5rem',
-                                }}
-                              >
-                                <div
-                                  style={{
-                                    fontSize: '0.86rem',
-                                    fontWeight: 650,
-                                    color: '#475569',
-                                    letterSpacing: '-0.01em',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.45rem',
-                                  }}
-                                >
-                                  {item.title.toLowerCase().includes('lunch') ? (
-                                    <Utensils size={14} style={{ color: '#64748B' }} />
-                                  ) : (
-                                    <Coffee size={14} style={{ color: '#64748B' }} />
-                                  )}
-                                  <span>{item.title}</span>
-                                </div>
-                                <div
-                                  style={{
-                                    fontFamily: '"JetBrains Mono", monospace',
-                                    fontSize: '0.78rem',
-                                    fontWeight: 600,
-                                    color: '#64748B',
-                                    backgroundColor: '#F1F5F9',
-                                    padding: '0.2rem 0.5rem',
-                                    borderRadius: '6px',
-                                  }}
-                                >
-                                  {item.time}
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        }
-
-                        // Regular Session Card
-                        return (
-                          <div
-                            key={item.id}
-                            style={{
-                              position: 'relative',
-                              display: 'flex',
-                              alignItems: 'center',
-                              marginBottom: isLast ? '0' : '1rem',
-                            }}
-                          >
-                            {/* Spine Column: Centered to the Box */}
-                            <div
-                              style={{
-                                width: '20px',
-                                flexShrink: 0,
-                                alignSelf: 'stretch',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                position: 'relative',
-                              }}
-                            >
-                              {idx > 0 && (
-                                <div
-                                  style={{
-                                    position: 'absolute',
-                                    top: '-0.5rem',
-                                    bottom: '50%',
-                                    left: '50%',
-                                    transform: 'translateX(-50%)',
-                                    width: '2px',
-                                    backgroundColor: '#E2E8F0',
-                                    zIndex: 1,
-                                  }}
-                                />
-                              )}
-                              {!isLast && (
-                                <div
-                                  style={{
-                                    position: 'absolute',
-                                    top: '50%',
-                                    bottom: '-0.5rem',
-                                    left: '50%',
-                                    transform: 'translateX(-50%)',
-                                    width: '2px',
-                                    backgroundColor: '#E2E8F0',
-                                    zIndex: 1,
-                                  }}
-                                />
-                              )}
-
-                              {/* Compact Session Node Circle (Apple Style 14px with inner core & halo) */}
-                              <div
-                                style={{
-                                  width: '14px',
-                                  height: '14px',
-                                  borderRadius: '50%',
-                                  backgroundColor: '#ffffff',
-                                  border: '2.5px solid #185ADB',
-                                  boxShadow: '0 0 0 3px rgba(24, 90, 219, 0.12)',
-                                  position: 'relative',
-                                  zIndex: 2,
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                }}
-                              >
-                                <div
-                                  style={{
-                                    width: '4px',
-                                    height: '4px',
-                                    borderRadius: '50%',
-                                    backgroundColor: '#185ADB',
-                                  }}
-                                />
-                              </div>
-                            </div>
-
-                            {/* Session Card */}
-                            <div
-                              style={{
-                                marginLeft: '0.85rem',
-                                flex: 1,
-                                minWidth: 0,
-                                backgroundColor: '#ffffff',
-                                border: '1px solid #EAEFF5',
-                                borderRadius: '14px',
-                                padding: '0.85rem 1rem',
-                                boxShadow: '0 2px 6px rgba(18, 59, 112, 0.04)',
-                              }}
-                            >
-                              <div
-                                style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'space-between',
-                                  flexWrap: 'wrap',
-                                  gap: '0.35rem',
-                                  marginBottom: '0.35rem',
-                                }}
-                              >
-                                <div
-                                  style={{
-                                    fontFamily: '"JetBrains Mono", monospace',
-                                    fontSize: '0.78rem',
-                                    fontWeight: 700,
-                                    color: '#185ADB',
-                                    backgroundColor: '#EDF3FA',
-                                    padding: '0.2rem 0.55rem',
-                                    borderRadius: '6px',
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '0.35rem',
-                                  }}
-                                >
-                                  <Clock size={12} />
-                                  <span>{item.time}</span>
-                                </div>
-                              </div>
-
-                              <div
-                                style={{
-                                  fontSize: '0.94rem',
-                                  fontWeight: 800,
-                                  color: '#081e3e',
-                                  lineHeight: 1.3,
-                                  letterSpacing: '-0.01em',
-                                }}
-                              >
-                                {item.title}
-                              </div>
-
-                              {item.subtitle && (
-                                <div
-                                  style={{
-                                    fontSize: '0.82rem',
-                                    color: '#475569',
-                                    fontWeight: 550,
-                                    marginTop: '0.25rem',
-                                    lineHeight: 1.35,
-                                  }}
-                                >
-                                  {item.subtitle}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-              );
-            })()}
-
-            {/* TAB 3: CERTIFICATES / DOWNLOADS (Clean Minimal Card State) */}
+            {/* TAB 2: CERTIFICATES / DOWNLOADS (Interactive Certificate of Participation Hub - Checked-In Only) */}
             {activeTab === 'certificate' && (
               <div
                 style={{
-                  padding: '3.5rem 1.5rem 2.5rem',
-                  textAlign: 'center',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  maxWidth: '520px',
+                  maxWidth: isCheckedIn ? '920px' : '560px',
                   width: '100%',
                   margin: '0 auto',
-                  backgroundColor: '#ffffff',
-                  borderRadius: '24px',
-                  border: '1px solid #EAEFF5',
-                  boxShadow: '0 16px 40px rgba(18, 59, 112, 0.06)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '1.25rem',
                 }}
               >
-                <div
-                  style={{
-                    width: '68px',
-                    height: '68px',
-                    borderRadius: '50%',
-                    backgroundColor: '#E8F1FC',
-                    color: '#185ADB',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: '1.25rem',
-                  }}
-                >
-                  <Award size={32} strokeWidth={1.8} />
-                </div>
-
-                <h3
-                  style={{
-                    fontSize: '1.35rem',
-                    fontWeight: 800,
-                    color: '#123B70',
-                    marginBottom: '0.45rem',
-                    letterSpacing: '-0.01em',
-                  }}
-                >
-                  Certificates Available Soon
-                </h3>
-
-                <p
-                  style={{
-                    fontSize: '0.9rem',
-                    color: '#5A6E85',
-                    lineHeight: 1.6,
-                    margin: 0,
-                    maxWidth: '420px',
-                  }}
-                >
-                  Authorized digital e-certificates of participation and presentation will be available for download here post-conference.
-                </p>
-
-                <div
-                  style={{
-                    marginTop: '1.5rem',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    padding: '0.45rem 1rem',
-                    borderRadius: '9999px',
-                    backgroundColor: '#F8FAFC',
-                    border: '1px solid #E2E8F0',
-                    fontSize: '0.78rem',
-                    color: '#185ADB',
-                    fontWeight: 700,
-                  }}
-                >
-                  <ShieldCheck size={14} />
-                  <span>Issued post-event with unique verification ID</span>
-                </div>
-              </div>
-            )}
-
-            {/* TAB 4: PROFILE */}
-            {activeTab === 'profile' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', maxWidth: '640px', width: '100%', margin: '0 auto' }}>
-                {/* 1. Profile Hero Card */}
-                <div
-                  style={{
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #EAEFF5',
-                    borderRadius: '24px',
-                    padding: '1.5rem',
-                    boxShadow: '0 16px 40px rgba(18, 59, 112, 0.08)',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '1.1rem' }}>
-                    {/* Clean Monogram Avatar */}
+                {!isCheckedIn ? (
+                  /* Locked State for Attendees who have not yet checked in at the desk */
+                  <div
+                    style={{
+                      backgroundColor: '#ffffff',
+                      borderRadius: '24px',
+                      border: '1px solid #EAEFF5',
+                      boxShadow: '0 16px 45px rgba(18, 59, 112, 0.06)',
+                      padding: '2.5rem 1.75rem',
+                      textAlign: 'center',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                    }}
+                  >
                     <div
                       style={{
                         width: '64px',
                         height: '64px',
                         borderRadius: '20px',
-                        backgroundColor: '#E8F1FC',
-                        color: '#185ADB',
+                        backgroundColor: '#EFF6FF',
+                        border: '1px solid #DBEAFE',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontSize: '1.5rem',
-                        fontWeight: 800,
-                        flexShrink: 0,
+                        color: '#185ADB',
+                        marginBottom: '1.25rem',
                       }}
                     >
-                      {delegate.fullName ? delegate.fullName.charAt(0).toUpperCase() : 'D'}
+                      <Lock size={30} />
                     </div>
 
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                        <h2
-                          style={{
-                            fontSize: '1.25rem',
-                            fontWeight: 800,
-                            color: '#123B70',
-                            margin: 0,
-                            lineHeight: 1.2,
-                            letterSpacing: '-0.02em',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
-                          {delegate.fullName}
-                        </h2>
-                        <BadgeCheck size={18} style={{ color: '#185ADB', flexShrink: 0 }} />
+                    <div
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.4rem',
+                        padding: '0.35rem 0.85rem',
+                        borderRadius: '9999px',
+                        backgroundColor: '#FEF3C7',
+                        border: '1px solid #FDE68A',
+                        color: '#B45309',
+                        fontSize: '0.74rem',
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.04em',
+                        marginBottom: '0.85rem',
+                      }}
+                    >
+                      <span>Check-in Required</span>
+                    </div>
+
+                    <h2
+                      style={{
+                        fontSize: '1.4rem',
+                        fontWeight: 850,
+                        color: '#081e3e',
+                        margin: '0 0 0.5rem',
+                        letterSpacing: '-0.02em',
+                      }}
+                    >
+                      Certificate Locked
+                    </h2>
+
+                    <p
+                      style={{
+                        fontSize: '0.92rem',
+                        color: '#475569',
+                        maxWidth: '440px',
+                        lineHeight: 1.55,
+                        margin: '0 0 1.5rem',
+                      }}
+                    >
+                      Your official Certificate of Participation will unlock automatically once your attendance is verified at the conference registration desk.
+                    </p>
+
+                    <div
+                      style={{
+                        backgroundColor: '#F8FAFC',
+                        border: '1px solid #E2E8F0',
+                        borderRadius: '14px',
+                        padding: '0.85rem 1.25rem',
+                        width: '100%',
+                        maxWidth: '420px',
+                        marginBottom: '1.5rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <div style={{ textAlign: 'left' }}>
+                        <div style={{ fontSize: '0.7rem', color: '#64748B', fontWeight: 700, textTransform: 'uppercase' }}>
+                          Participant ID
+                        </div>
+                        <div style={{ fontSize: '0.92rem', color: '#081e3e', fontWeight: 800, fontFamily: '"JetBrains Mono", monospace' }}>
+                          {delegate.delegateId || 'ICRAST26-DELEGATE'}
+                        </div>
                       </div>
 
                       <div
                         style={{
-                          fontSize: '0.82rem',
-                          color: '#5A6E85',
-                          marginTop: '3px',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
+                          fontSize: '0.75rem',
+                          fontWeight: 700,
+                          color: '#D97706',
+                          backgroundColor: '#FFFBEB',
+                          border: '1px solid #FDE68A',
+                          padding: '0.25rem 0.65rem',
+                          borderRadius: '8px',
                         }}
                       >
-                        {delegate.designation || 'Conference Delegate'}
+                        Pending Check-in
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('pass')}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.55rem',
+                        padding: '0.85rem 1.75rem',
+                        borderRadius: '12px',
+                        backgroundColor: '#185ADB',
+                        color: '#ffffff',
+                        border: 'none',
+                        fontSize: '0.92rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        boxShadow: '0 4px 16px rgba(24, 90, 219, 0.22)',
+                        transition: 'all 0.15s ease',
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#154ec4')}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#185ADB')}
+                    >
+                      <Ticket size={17} />
+                      <span>Open QR Pass</span>
+                    </button>
+                  </div>
+                ) : (
+                  /* Certificate Card Container (Unlocked for Checked-in Delegates) */
+                  <div
+                    className="icrast-cert-card"
+                    style={{
+                      backgroundColor: '#ffffff',
+                      borderRadius: '24px',
+                      border: '1px solid #EAEFF5',
+                      boxShadow: '0 16px 45px rgba(18, 59, 112, 0.06)',
+                      overflow: 'hidden',
+                      padding: '1.5rem',
+                    }}
+                  >
+                    {/* Header Strip */}
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        flexWrap: 'wrap',
+                        gap: '0.75rem',
+                        marginBottom: '1.25rem',
+                        paddingBottom: '1rem',
+                        borderBottom: '1px solid #F1F5F9',
+                      }}
+                    >
+                      <div>
+                        <div
+                          style={{
+                            fontSize: '0.72rem',
+                            fontWeight: 800,
+                            color: '#185ADB',
+                            letterSpacing: '0.08em',
+                            textTransform: 'uppercase',
+                            marginBottom: '0.2rem',
+                          }}
+                        >
+                          OFFICIAL DIGITAL CERTIFICATION
+                        </div>
+                        <h2
+                          style={{
+                            fontSize: '1.25rem',
+                            fontWeight: 850,
+                            color: '#081e3e',
+                            margin: 0,
+                            lineHeight: 1.2,
+                            letterSpacing: '-0.01em',
+                          }}
+                        >
+                          Certificate of Participation
+                        </h2>
                       </div>
 
-                      {/* Monospace Delegate ID with Copy action */}
                       <div
-                        onClick={handleCopyId}
                         style={{
                           display: 'inline-flex',
                           alignItems: 'center',
                           gap: '0.4rem',
-                          marginTop: '0.5rem',
-                          padding: '0.2rem 0.6rem',
-                          borderRadius: '6px',
-                          backgroundColor: '#F1F5F9',
-                          border: '1px solid #E2E8F0',
-                          color: '#185ADB',
-                          fontFamily: '"JetBrains Mono", monospace',
+                          padding: '0.35rem 0.85rem',
+                          borderRadius: '9999px',
+                          backgroundColor: '#ECFDF5',
+                          border: '1px solid #A7F3D0',
+                          color: '#059669',
                           fontSize: '0.74rem',
                           fontWeight: 700,
+                        }}
+                      >
+                        <CheckCircle2 size={13} />
+                        <span>Checked In &amp; Verified</span>
+                      </div>
+                    </div>
+
+                    {/* Live Certificate Interactive Canvas Preview (Tap anywhere to open) */}
+                    <div
+                      onClick={() => setShowCertModal(true)}
+                      style={{
+                        position: 'relative',
+                        width: '100%',
+                        aspectRatio: '3508 / 2481',
+                        borderRadius: '14px',
+                        overflow: 'hidden',
+                        boxShadow: '0 12px 36px rgba(18, 59, 112, 0.1)',
+                        border: '1px solid rgba(18, 59, 112, 0.08)',
+                        backgroundColor: '#ffffff',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {isCertRendering && (
+                        <div
+                          style={{
+                            position: 'absolute',
+                            inset: 0,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '0.5rem',
+                            backgroundColor: '#F8FAFC',
+                            zIndex: 2,
+                          }}
+                        >
+                          <RefreshCw size={26} className="animate-spin text-blue-600" />
+                          <span style={{ fontSize: '0.82rem', fontWeight: 650, color: '#64748B' }}>
+                            Generating Preview...
+                          </span>
+                        </div>
+                      )}
+                      <canvas
+                        ref={certCanvasRef}
+                        style={{
+                          width: '100%',
+                          height: 'auto',
+                          aspectRatio: '3508 / 2481',
+                          display: 'block',
                           cursor: 'pointer',
+                          touchAction: 'manipulation',
                         }}
-                        title="Tap to copy Delegate ID"
-                      >
-                        <span>{delegate.delegateId || 'ICRAST26-DELEGATE'}</span>
-                        {copiedId ? <Check size={12} color="#10B981" /> : <Copy size={12} opacity={0.6} />}
-                      </div>
+                      />
                     </div>
-                  </div>
 
-                  {/* Quick Metrics Bar (3 Chips) */}
-                  <div
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(3, 1fr)',
-                      gap: '0.65rem',
-                      marginTop: '1.25rem',
-                      paddingTop: '1.1rem',
-                      borderTop: '1px solid #F1F5F9',
-                    }}
-                  >
-                    {/* Chip 1: Registration Status */}
-                    <div
-                      style={{
-                        backgroundColor: '#F8FAFC',
-                        borderRadius: '12px',
-                        padding: '0.65rem',
-                        textAlign: 'center',
-                        border: '1px solid #EAEFF5',
-                      }}
-                    >
-                      <div style={{ fontSize: '0.65rem', color: '#64748B', fontWeight: 700 }}>
-                        CHECK-IN
-                      </div>
-                      <div
+                    {/* Primary Certificate Download Action */}
+                    <div style={{ marginTop: '1.1rem' }}>
+                      <button
+                        type="button"
+                        onClick={handleDownloadCertificate}
+                        disabled={isCertDownloading}
                         style={{
-                          fontSize: '0.78rem',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '0.65rem',
+                          padding: '0.95rem 1.75rem',
+                          borderRadius: '14px',
+                          backgroundColor: '#185ADB',
+                          color: '#ffffff',
+                          border: 'none',
+                          fontSize: '0.98rem',
                           fontWeight: 700,
-                          color: isCheckedIn ? '#16A34A' : '#D97706',
-                          marginTop: '2px',
+                          cursor: isCertDownloading ? 'wait' : 'pointer',
+                          boxShadow: '0 8px 24px rgba(24, 90, 219, 0.25)',
+                          transition: 'all 0.15s ease',
+                          width: '100%',
                         }}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#154ec4')}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#185ADB')}
                       >
-                        {isCheckedIn ? 'Verified ✓' : 'Pending'}
-                      </div>
-                    </div>
-
-                    {/* Chip 2: Mode */}
-                    <div
-                      style={{
-                        backgroundColor: '#F8FAFC',
-                        borderRadius: '12px',
-                        padding: '0.65rem',
-                        textAlign: 'center',
-                        border: '1px solid #EAEFF5',
-                      }}
-                    >
-                      <div style={{ fontSize: '0.65rem', color: '#64748B', fontWeight: 700 }}>
-                        ENTRY MODE
-                      </div>
-                      <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#185ADB', marginTop: '2px' }}>
-                        {delegate.participationMode?.includes('Online') ? 'Online' : 'On-Campus'}
-                      </div>
-                    </div>
-
-                    {/* Chip 3: Venue Hall */}
-                    <div
-                      style={{
-                        backgroundColor: '#F8FAFC',
-                        borderRadius: '12px',
-                        padding: '0.65rem',
-                        textAlign: 'center',
-                        border: '1px solid #EAEFF5',
-                      }}
-                    >
-                      <div style={{ fontSize: '0.65rem', color: '#64748B', fontWeight: 700 }}>
-                        VENUE
-                      </div>
-                      <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#123B70', marginTop: '2px' }}>
-                        Aryabhata
-                      </div>
+                        {isCertDownloading ? (
+                          <>
+                            <RefreshCw size={18} className="animate-spin" />
+                            <span>Downloading...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Download size={18} />
+                            <span>Download Certificate</span>
+                          </>
+                        )}
+                      </button>
                     </div>
                   </div>
-                </div>
+                )}
 
-                {/* 2. Grouped Inset List: Academic Details */}
-                <div
-                  style={{
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #EAEFF5',
-                    borderRadius: '20px',
-                    overflow: 'hidden',
-                  }}
-                >
+                {/* Modal Lightbox for Fullscreen Zoom on Mobile and Desktop */}
+                {showCertModal && (
                   <div
                     style={{
-                      padding: '0.75rem 1rem 0.35rem',
-                      fontSize: '0.7rem',
-                      fontWeight: 700,
-                      color: '#64748B',
-                      letterSpacing: '0.05em',
-                      textTransform: 'uppercase',
-                    }}
-                  >
-                    Academic Credentials
-                  </div>
-
-                  {/* Row: Institution */}
-                  <div
-                    style={{
-                      padding: '0.85rem 1rem',
+                      position: 'fixed',
+                      inset: 0,
+                      backgroundColor: 'rgba(7, 18, 36, 0.92)',
+                      backdropFilter: 'blur(8px)',
+                      zIndex: 9999,
                       display: 'flex',
+                      flexDirection: 'column',
                       alignItems: 'center',
-                      justifyContent: 'space-between',
-                      borderBottom: '1px solid #F1F5F9',
+                      justifyContent: 'center',
+                      padding: '1rem',
                     }}
+                    onClick={() => setShowCertModal(false)}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                      <div
+                    <div
+                      style={{
+                        width: '100%',
+                        maxWidth: '1080px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        color: '#ffffff',
+                        marginBottom: '0.75rem',
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <span style={{ fontSize: '0.9rem', fontWeight: 700 }}>
+                        Certificate Preview
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setShowCertModal(false)}
                         style={{
-                          width: '32px',
-                          height: '32px',
-                          borderRadius: '8px',
-                          backgroundColor: '#EDF3FA',
+                          backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                          border: 'none',
+                          color: '#ffffff',
+                          borderRadius: '50%',
+                          width: '36px',
+                          height: '36px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          color: '#185ADB',
+                          cursor: 'pointer',
                         }}
                       >
-                        <Building size={16} />
-                      </div>
-                      <div>
-                        <div style={{ fontSize: '0.72rem', color: '#64748B' }}>Institution</div>
-                        <div style={{ fontSize: '0.86rem', fontWeight: 600, color: '#123B70' }}>
-                          {delegate.institution || 'University of Calicut'}
-                        </div>
-                      </div>
+                        <X size={20} />
+                      </button>
+                    </div>
+
+                    <div
+                      style={{
+                        width: '100%',
+                        maxWidth: '1080px',
+                        overflow: 'auto',
+                        borderRadius: '16px',
+                        boxShadow: '0 24px 60px rgba(0,0,0,0.5)',
+                        maxHeight: '80vh',
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <img
+                        src={certCanvasRef.current ? certCanvasRef.current.toDataURL('image/png') : ''}
+                        alt="Certificate Preview"
+                        style={{
+                          width: '100%',
+                          height: 'auto',
+                          display: 'block',
+                          borderRadius: '16px',
+                        }}
+                      />
+                    </div>
+
+                    <div
+                      style={{
+                        marginTop: '1rem',
+                        display: 'flex',
+                        gap: '0.75rem',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        justifyContent: 'center',
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button
+                        type="button"
+                        onClick={handleDownloadCertificate}
+                        disabled={isCertDownloading}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.5rem',
+                          padding: '0.75rem 1.5rem',
+                          borderRadius: '12px',
+                          backgroundColor: '#185ADB',
+                          color: '#ffffff',
+                          border: 'none',
+                          fontSize: '0.92rem',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <Download size={16} />
+                        <span>Download</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowCertModal(false)}
+                        style={{
+                          padding: '0.75rem 1.25rem',
+                          borderRadius: '12px',
+                          backgroundColor: 'rgba(255, 255, 255, 0.12)',
+                          color: '#ffffff',
+                          border: '1px solid rgba(255, 255, 255, 0.2)',
+                          fontSize: '0.92rem',
+                          fontWeight: 650,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Close
+                      </button>
                     </div>
                   </div>
-
-                  {/* Row: Department */}
-                  {delegate.department && (
-                    <div
-                      style={{
-                        padding: '0.85rem 1rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        borderBottom: '1px solid #F1F5F9',
-                      }}
-                    >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <div
-                          style={{
-                            width: '32px',
-                            height: '32px',
-                            borderRadius: '8px',
-                            backgroundColor: '#F3E8FF',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: '#9333EA',
-                          }}
-                        >
-                          <GraduationCap size={16} />
-                        </div>
-                        <div>
-                          <div style={{ fontSize: '0.72rem', color: '#64748B' }}>Department</div>
-                          <div style={{ fontSize: '0.86rem', fontWeight: 600, color: '#123B70' }}>
-                            {delegate.department}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Row: Track */}
-                  {delegate.areaOfInterest && (
-                    <div
-                      style={{
-                        padding: '0.85rem 1rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                      }}
-                    >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <div
-                          style={{
-                            width: '32px',
-                            height: '32px',
-                            borderRadius: '8px',
-                            backgroundColor: '#FEF9C3',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: '#CA8A04',
-                          }}
-                        >
-                          <Sparkles size={16} />
-                        </div>
-                        <div>
-                          <div style={{ fontSize: '0.72rem', color: '#64748B' }}>Research Track</div>
-                          <div style={{ fontSize: '0.86rem', fontWeight: 600, color: '#123B70' }}>
-                            {delegate.areaOfInterest}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* 3. Destructive Logout Button */}
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  style={{
-                    width: '100%',
-                    padding: '0.9rem',
-                    borderRadius: '16px',
-                    backgroundColor: '#FEF2F2',
-                    border: '1px solid #FECACA',
-                    color: '#DC2626',
-                    fontSize: '0.9rem',
-                    fontWeight: 700,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.55rem',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease',
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#FEE2E2')}
-                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#FEF2F2')}
-                >
-                  <LogOut size={16} />
-                  <span>Log Out / Switch Mobile Number</span>
-                </button>
+                )}
               </div>
             )}
+
           </div>
         )}
       </main>
 
-      {/* Clean White Bottom Navigation Bar - Exactly as in Mockup */}
-      {delegate && (
-        <nav
-          className="icrast-bottom-nav"
-          style={{
-            position: 'fixed',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: '66px',
-            backgroundColor: '#ffffff',
-            borderTop: '1px solid #EAEFF5',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-around',
-            zIndex: 50,
-            maxWidth: '580px',
-            marginInline: 'auto',
-            paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-            boxShadow: '0 -4px 20px rgba(18, 59, 112, 0.04)',
-          }}
-        >
-          {/* Tab 1: Badge */}
-          <button
-            type="button"
-            onClick={() => setActiveTab('pass')}
-            style={{
-              flex: 1,
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              color: activeTab === 'pass' ? '#185ADB' : '#7C8BA0',
-              transition: 'all 0.15s ease',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: activeTab === 'pass' ? '4px 16px' : '4px',
-                borderRadius: '14px',
-                backgroundColor: activeTab === 'pass' ? '#E8F1FC' : 'transparent',
-                gap: '2px',
-                transition: 'all 0.15s ease',
-              }}
-            >
-              <Ticket size={20} strokeWidth={activeTab === 'pass' ? 2.5 : 1.8} />
-              <span style={{ fontSize: '0.72rem', fontWeight: activeTab === 'pass' ? 800 : 500 }}>
-                Badge
-              </span>
-            </div>
-          </button>
 
-          {/* Tab 2: Schedule */}
-          <button
-            type="button"
-            onClick={() => setActiveTab('schedule')}
-            style={{
-              flex: 1,
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              color: activeTab === 'schedule' ? '#185ADB' : '#7C8BA0',
-              transition: 'all 0.15s ease',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: activeTab === 'schedule' ? '4px 16px' : '4px',
-                borderRadius: '14px',
-                backgroundColor: activeTab === 'schedule' ? '#E8F1FC' : 'transparent',
-                gap: '2px',
-                transition: 'all 0.15s ease',
-              }}
-            >
-              <Calendar size={20} strokeWidth={activeTab === 'schedule' ? 2.5 : 1.8} />
-              <span style={{ fontSize: '0.72rem', fontWeight: activeTab === 'schedule' ? 800 : 500 }}>
-                Schedule
-              </span>
-            </div>
-          </button>
-
-          {/* Tab 3: Downloads / Certificates */}
-          <button
-            type="button"
-            onClick={() => setActiveTab('certificate')}
-            style={{
-              flex: 1,
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              color: activeTab === 'certificate' ? '#185ADB' : '#7C8BA0',
-              transition: 'all 0.15s ease',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: activeTab === 'certificate' ? '4px 16px' : '4px',
-                borderRadius: '14px',
-                backgroundColor: activeTab === 'certificate' ? '#E8F1FC' : 'transparent',
-                gap: '2px',
-                transition: 'all 0.15s ease',
-              }}
-            >
-              <FileText size={20} strokeWidth={activeTab === 'certificate' ? 2.5 : 1.8} />
-              <span style={{ fontSize: '0.72rem', fontWeight: activeTab === 'certificate' ? 800 : 500 }}>
-                Downloads
-              </span>
-            </div>
-          </button>
-
-          {/* Tab 4: Profile */}
-          <button
-            type="button"
-            onClick={() => setActiveTab('profile')}
-            style={{
-              flex: 1,
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              color: activeTab === 'profile' ? '#185ADB' : '#7C8BA0',
-              transition: 'all 0.15s ease',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: activeTab === 'profile' ? '4px 16px' : '4px',
-                borderRadius: '14px',
-                backgroundColor: activeTab === 'profile' ? '#E8F1FC' : 'transparent',
-                gap: '2px',
-                transition: 'all 0.15s ease',
-              }}
-            >
-              <User size={20} strokeWidth={activeTab === 'profile' ? 2.5 : 1.8} />
-              <span style={{ fontSize: '0.72rem', fontWeight: activeTab === 'profile' ? 800 : 500 }}>
-                Profile
-              </span>
-            </div>
-          </button>
-        </nav>
-      )}
     </div>
   );
 }
